@@ -31,8 +31,12 @@ jobs:
           mkdir -p "$ADDON_SRC/packages/bot/src"
           mkdir -p "$ADDON_SRC/packages/core/src"
 
-          # package.json e tsconfig root (workspace)
-          cp package.json "$ADDON_SRC/"
+          # package.json root: riscritto con solo i workspace necessari (bot+core)
+          node -e "
+            const pkg = JSON.parse(require('fs').readFileSync('package.json','utf8'));
+            pkg.workspaces = ['packages/core','packages/bot'];
+            require('fs').writeFileSync('$ADDON_SRC/package.json', JSON.stringify(pkg, null, 2));
+          "
           cp tsconfig.base.json "$ADDON_SRC/"
 
           # package-lock.json se presente

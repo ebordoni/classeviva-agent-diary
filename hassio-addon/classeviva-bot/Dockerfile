@@ -1,16 +1,15 @@
-ARG BUILD_FROM=node:20-alpine
+ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
-RUN apk add --no-cache bash jq
+# Installa Node.js 20 e strumenti necessari
+RUN apk add --no-cache bash jq nodejs npm
 
 WORKDIR /build
 
-# I sorgenti vengono copiati dalla cartella src/ dell'add-on
-# (vedi README: esegui scripts/prepare-addon.sh prima di copiare su HA)
 COPY src/ .
 
 # Installa le dipendenze e compila
-RUN npm ci
+RUN npm ci --workspace=packages/core --workspace=packages/bot --ignore-scripts
 RUN npm run build:core && npm run build:bot
 RUN npm prune --omit=dev
 

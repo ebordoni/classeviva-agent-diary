@@ -9,8 +9,11 @@ import {
   getLezioni,
   getLoginState,
   getMaterie,
+  getSavedStudentId,
   getVoti,
   invalidateUser,
+  saveStudentId,
+  clearSavedStudentId,
   setLoginState,
 } from "./cache.js";
 import {
@@ -81,6 +84,7 @@ export function buildBot(
         const client = new ClassevivaClient(studentId, password);
         await client.accedi();
         updateSession(chatId, { client });
+        await saveStudentId(chatId, studentId);
         await ctx.reply(
           `✅ <b>Accesso effettuato!</b>\nBenvenuto, <b>${client.nomeCompleto}</b>.\n\nUsa /help per vedere i comandi disponibili.`,
           { parse_mode: "HTML" },
@@ -129,11 +133,21 @@ export function buildBot(
   bot.command("login", async (ctx) => {
     const chatId = ctx.chat.id;
     clearSession(chatId);
-    await setLoginState(chatId, { step: "awaiting_studentId" });
-    await ctx.reply(
-      "🔐 Inserisci il tuo <b>Student ID</b> (es. <code>S1234567</code>):",
-      { parse_mode: "HTML" },
-    );
+
+    const savedId = await getSavedStudentId(chatId);
+    if (savedId) {
+      await setLoginState(chatId, { step: "awaiting_password", pendingStudentId: savedId });
+      await ctx.reply(
+        `🔐 Bentornato! Uso lo Student ID salvato: <code>${savedId}</code>\n\nInserisci la <b>password</b>:`,
+        { parse_mode: "HTML" },
+      );
+    } else {
+      await setLoginState(chatId, { step: "awaiting_studentId" });
+      await ctx.reply(
+        "🔐 Inserisci il tuo <b>Student ID</b> (es. <code>S1234567</code>):",
+        { parse_mode: "HTML" },
+      );
+    }
   });
 
   // ──────────────────────────────────────────────
@@ -146,6 +160,7 @@ export function buildBot(
       await invalidateUser(session.client.datiUtente.ident);
     }
     await clearLoginState(chatId);
+    await clearSavedStudentId(chatId);
     clearSession(chatId);
     await ctx.reply(
       "👋 Sessione terminata. Le credenziali sono state dimenticate.",

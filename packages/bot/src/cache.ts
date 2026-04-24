@@ -340,6 +340,29 @@ export async function clearLoginState(chatId: number): Promise<void> {
 }
 
 // ─────────────────────────────────────────────────────────────────
+// Student ID ricordato per chat (nessuna scadenza — rimane finché
+// l'utente non fa /logout o sovrascrive con un nuovo login)
+// ─────────────────────────────────────────────────────────────────
+
+export async function saveStudentId(
+  chatId: number,
+  studentId: string,
+): Promise<void> {
+  // TTL 365 giorni — di fatto permanente per uso pratico
+  await store.set(key("saved_student_id", chatId), studentId, 365 * 24 * 60 * 60 * 1000);
+}
+
+export async function getSavedStudentId(
+  chatId: number,
+): Promise<string | undefined> {
+  return store.get<string>(key("saved_student_id", chatId));
+}
+
+export async function clearSavedStudentId(chatId: number): Promise<void> {
+  await store.delete(key("saved_student_id", chatId));
+}
+
+// ─────────────────────────────────────────────────────────────────
 // Invalidazione manuale (es. dopo /logout o su richiesta utente)
 // ─────────────────────────────────────────────────────────────────
 

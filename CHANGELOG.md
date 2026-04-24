@@ -7,6 +7,14 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.0] — 2026-04-24
+
+### Aggiunto
+- Il bot ricorda lo Student ID dell'ultimo login per ogni chat: al prossimo `/login` viene proposto automaticamente, basta inserire solo la password
+- Lo Student ID salvato viene cancellato al `/logout`
+
+---
+
 ## [1.3.0] — 2026-04-24
 
 ### Migliorato

@@ -1,3 +1,8 @@
+## 1.4.0 — 2026-04-24
+
+- Il bot ricorda lo Student ID: al prossimo `/login` basta inserire solo la password
+- Lo Student ID viene dimenticato al `/logout`
+
 ## 1.3.0 — 2026-04-24
 
 - Cache `/compiti` per-giorno: l'AI viene chiamata solo per i giorni non ancora analizzati

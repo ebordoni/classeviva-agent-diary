@@ -7,6 +7,14 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.5.1] — 2026-04-24
+
+### Corretto
+
+- `allowed_chat_ids` ora è una stringa separata da virgola (es. `6039121257,987654321`) invece di lista di interi, per compatibilità con il validatore di HA Supervisor.
+
+---
+
 ## [1.5.0] — 2026-04-24
 
 ### Aggiunto

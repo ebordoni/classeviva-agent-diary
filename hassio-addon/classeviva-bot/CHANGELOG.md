@@ -1,3 +1,7 @@
+## 1.5.1 — 2026-04-24
+
+- Fix: `allowed_chat_ids` è ora una stringa separata da virgola (es. `6039121257`) invece di lista di interi
+
 ## 1.5.0 — 2026-04-24
 
 - Whitelist `allowed_chat_ids`: solo i chat ID configurati possono usare il bot; campo vuoto = accesso aperto

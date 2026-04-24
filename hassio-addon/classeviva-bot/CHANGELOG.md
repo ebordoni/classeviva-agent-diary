@@ -1,3 +1,9 @@
+## 1.2.0 — 2026-04-24
+
+- Nuovo comando `/aggiorna`: svuota la cache e forza il recupero di dati aggiornati
+- Garbage collection automatica delle chiavi scadute (ogni 2 ore)
+- Fix: la cache per lezioni e compiti ora viene correttamente invalidata al logout
+
 ## 1.1.0 — 2026-04-24
 
 - Menu comandi `/` di Telegram con tutti i comandi disponibili

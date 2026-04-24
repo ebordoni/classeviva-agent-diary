@@ -7,6 +7,17 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.2.0] — 2026-04-24
+
+### Aggiunto
+- Comando `/aggiorna` per svuotare la cache dell'utente e forzare dati aggiornati da Classeviva
+- Garbage collection automatica delle chiavi scadute nel file cache (ogni 2 ore)
+
+### Corretto
+- Invalidazione della cache al logout era rotta per le chiavi con range date (lezioni, compiti): ora vengono correttamente cancellate tutte le chiavi dell'utente tramite prefisso
+
+---
+
 ## [1.1.0] — 2026-04-24
 
 ### Aggiunto

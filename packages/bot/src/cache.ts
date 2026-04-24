@@ -211,14 +211,104 @@ export async function getCompiti(
   fine: string,
   ai: AIService,
 ): Promise<{ data: CompitiEstrattiResponse; fromCache: boolean }> {
-  return getOrFetch(
-    key("compiti", client.datiUtente!.ident, inizio, fine),
-    TTL.compiti,
-    async () => {
-      const lezioni = await client.lezioniDaA(inizio, fine);
-      return ai.estraiCompiti(lezioni);
-    },
+  const oggi = new Date().toISOString().split("T")[0];
+
+  // Genera la lista di date nel range [inizio, fine]
+  const dates: string[] = [];
+  const cur = new Date(inizio + "T00:00:00");
+  const end = new Date(fine + "T00:00:00");
+  while (cur <= end) {
+    dates.push(cur.toISOString().split("T")[0]);
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  // Controlla quali giorni sono già in cache
+  const cached = await Promise.all(
+    dates.map((d) =>
+      store
+        .get<CompitiEstrattiResponse>(
+          key("compiti_giorno", client.datiUtente!.ident, d),
+        )
+        .then((v) => ({ date: d, value: v })),
+    ),
   );
+
+  const hitDates = cached.filter((c) => c.value !== undefined);
+  const missDates = cached.filter((c) => c.value === undefined).map((c) => c.date);
+
+  let allFromCache = missDates.length === 0;
+
+  // Per i giorni mancanti, recupera le lezioni e chiama AI giorno per giorno
+  const newResults: CompitiEstrattiResponse[] = [];
+  if (missDates.length > 0) {
+    const missInizio = missDates[0];
+    const missFine = missDates[missDates.length - 1];
+    const lezioni = await client.lezioniDaA(missInizio, missFine);
+
+    // Raggruppa le lezioni per data
+    const lessonsByDate = new Map<string, typeof lezioni.lessons>();
+    for (const l of lezioni.lessons) {
+      if (!lessonsByDate.has(l.evtDate)) lessonsByDate.set(l.evtDate, []);
+      lessonsByDate.get(l.evtDate)!.push(l);
+    }
+
+    // Chiama AI solo per i giorni con lezioni, cacha il risultato
+    for (const d of missDates) {
+      const dayLessons = lessonsByDate.get(d) ?? [];
+      // TTL: giorni passati = 30 giorni, oggi = 4 ore
+      const ttl =
+        d < oggi
+          ? 30 * 24 * 60 * 60 * 1000
+          : 4 * 60 * 60 * 1000;
+
+      if (dayLessons.length === 0) {
+        // Nessuna lezione quel giorno: cacha risposta vuota
+        const empty: CompitiEstrattiResponse = {
+          compiti: [],
+          metadata: {
+            totale_lezioni: 0,
+            totale_compiti: 0,
+            modello_utilizzato: "",
+            timestamp: new Date().toISOString(),
+          },
+        };
+        await store.set(
+          key("compiti_giorno", client.datiUtente!.ident, d),
+          empty,
+          ttl,
+        );
+      } else {
+        const result = await ai.estraiCompiti({ lessons: dayLessons });
+        await store.set(
+          key("compiti_giorno", client.datiUtente!.ident, d),
+          result,
+          ttl,
+        );
+        newResults.push(result);
+      }
+    }
+  }
+
+  // Merge di tutti i risultati (cache hit + nuovi)
+  const allCompiti = [
+    ...hitDates.flatMap((c) => c.value!.compiti),
+    ...newResults.flatMap((r) => r.compiti),
+  ];
+
+  const merged: CompitiEstrattiResponse = {
+    compiti: allCompiti,
+    metadata: {
+      totale_lezioni: dates.length,
+      totale_compiti: allCompiti.length,
+      modello_utilizzato:
+        newResults[0]?.metadata.modello_utilizzato ??
+        hitDates[0]?.value?.metadata.modello_utilizzato ??
+        "",
+      timestamp: new Date().toISOString(),
+    },
+  };
+
+  return { data: merged, fromCache: allFromCache };
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -260,7 +350,7 @@ export async function invalidateUser(studentId: string): Promise<void> {
     "assenze",
     "agenda",
     "materie",
-    "compiti",
+    "compiti_giorno",
   ];
   // Le chiavi nel FileStore hanno il namespace prefissato: "classeviva:<tipo>:<studentId>..."
   // deleteByPrefix cancella tutte le chiavi che iniziano con quel prefisso,

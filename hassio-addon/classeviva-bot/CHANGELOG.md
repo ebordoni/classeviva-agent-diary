@@ -1,3 +1,9 @@
+## 1.3.0 — 2026-04-24
+
+- Cache `/compiti` per-giorno: l'AI viene chiamata solo per i giorni non ancora analizzati
+- TTL 30 giorni per i giorni passati, 4 ore per oggi
+- Feedback nel messaggio: indica se i dati sono dalla cache o freschi di AI
+
 ## 1.2.0 — 2026-04-24
 
 - Nuovo comando `/aggiorna`: svuota la cache e forza il recupero di dati aggiornati

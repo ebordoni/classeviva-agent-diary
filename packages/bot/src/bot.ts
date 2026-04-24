@@ -294,7 +294,7 @@ export function buildBot(
         ai,
       );
       const msg = formatCompiti(compiti);
-      const footer = fromCache ? "\n<i>📦 dati dalla cache</i>" : "";
+      const footer = fromCache ? "\n<i>📦 tutti i dati dalla cache</i>" : "\n<i>🤖 analisi AI completata (i risultati sono ora in cache)</i>";
       await ctx.reply(msg + footer, { parse_mode: "HTML" });
     } catch (err) {
       await ctx.reply(`❌ Errore: ${(err as Error).message}`);

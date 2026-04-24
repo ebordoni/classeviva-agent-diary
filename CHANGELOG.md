@@ -7,6 +7,15 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.3.0] — 2026-04-24
+
+### Migliorato
+- Cache `/compiti` ora lavora per-giorno anziché per range date: le lezioni già analizzate dall'AI non vengono riprocessate nelle richieste successive
+- TTL differenziato per i compiti: giorni passati = 30 giorni, oggi = 4 ore
+- Il feedback del bot indica se i risultati provengono interamente dalla cache o se è stata coinvolta l'AI
+
+---
+
 ## [1.2.0] — 2026-04-24
 
 ### Aggiunto

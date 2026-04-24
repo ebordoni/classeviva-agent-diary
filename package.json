@@ -1,0 +1,46 @@
+{
+      "name": "classeviva.js",
+      "version": "2.0.0",
+      "description": "Classeviva Node.js API wrapper - Wrapper dell'API di Classeviva (registro elettronico di Spaggiari) per Node.js",
+      "private": true,
+      "type": "module",
+      "workspaces": [
+            "packages/core",
+            "packages/cli",
+            "packages/tui",
+            "packages/bot"
+      ],
+      "scripts": {
+            "build": "npm run build -w packages/core && npm run build -w packages/cli && npm run build -w packages/tui && npm run build -w packages/bot",
+            "build:core": "npm run build -w packages/core",
+            "build:cli": "npm run build -w packages/cli",
+            "build:tui": "npm run build -w packages/tui",
+            "build:bot": "npm run build -w packages/bot",
+            "clean": "npm run clean -w packages/core && npm run clean -w packages/cli && npm run clean -w packages/tui && npm run clean -w packages/bot",
+            "dev:core": "npm run watch -w packages/core",
+            "dev:cli": "npm run dev -w packages/cli",
+            "dev:bot": "npm run dev -w packages/bot",
+            "cv": "npm run dev -w packages/cli --"
+      },
+      "keywords": [
+            "classeviva",
+            "api",
+            "spaggiari",
+            "registro-elettronico",
+            "nodejs",
+            "wrapper"
+      ],
+      "author": "ebordoni",
+      "license": "MIT",
+      "repository": {
+            "type": "git",
+            "url": "git+https://github.com/ebordoni/classeviva-diario.git"
+      },
+      "bugs": {
+            "url": "https://github.com/ebordoni/classeviva-diario/issues"
+      },
+      "homepage": "https://github.com/ebordoni/classeviva-diario#readme",
+      "engines": {
+            "node": ">=18.0.0"
+      }
+}

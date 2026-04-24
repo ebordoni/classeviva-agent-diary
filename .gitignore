@@ -1,0 +1,59 @@
+# Dipendenze Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Variabili di ambiente
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Log
+*.log
+logs/
+
+# Coverage e test
+coverage/
+.nyc_output/
+*.lcov
+
+# Build
+dist/
+build/
+*.tgz
+*.tar.gz
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Sistema operativo
+Thumbs.db
+Desktop.ini
+
+# Credenziali (non committare mai!)
+username.txt
+password.txt
+*/password.txt
+*/username.txt
+
+# Cache bot
+*.db
+cache.json
+packages/bot/cache.json
+
+# Add-on HA — sorgenti generati da prepare-addon.ps1
+hassio-addon/classeviva-bot/src/
+
+# File temporanei
+*.tmp
+*.temp
+.cache/

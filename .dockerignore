@@ -1,0 +1,13 @@
+node_modules
+**/node_modules
+**/dist
+**/.env
+*.db
+.git
+.gitignore
+README.md
+REFACTORING_SUMMARY.md
+SETUP_COMPLETE.md
+examples-ts
+packages/cli
+packages/tui

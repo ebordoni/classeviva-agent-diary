@@ -1,0 +1,30 @@
+name: "Classeviva Bot"
+description: "Telegram bot per Classeviva — consulta voti, lezioni, compiti direttamente da Telegram."
+version: "1.0.0"
+slug: "classeviva_bot"
+init: false
+
+# Architetture supportate (RPi 4 = aarch64, RPi 3 = armv7)
+arch:
+  - aarch64
+  - armv7
+  - amd64
+
+# Volume /data persistente (cache, gestito da HA Supervisor)
+map:
+  - data:rw
+
+# Opzioni configurabili dall'interfaccia HA
+options:
+  telegram_token: ""
+  ai_provider: "openai"
+  ai_model: ""
+  ai_api_key: ""
+
+schema:
+  telegram_token: str
+  ai_provider: str
+  ai_model: str?
+  ai_api_key: str?
+
+# Nessuna porta esposta — il bot usa long-polling Telegram

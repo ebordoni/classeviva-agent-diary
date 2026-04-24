@@ -126,16 +126,16 @@ Consulta voti, lezioni, compiti e altro direttamente da Telegram, con estrazione
 
 ### Comandi disponibili
 
-| Comando              | Descrizione                                          |
-| -------------------- | ---------------------------------------------------- |
-| `/login`             | Accedi a Classeviva                                  |
-| `/lezioni [giorni]`  | Lezioni degli ultimi N giorni (default: 7)           |
-| `/voti`              | Voti con media per materia                           |
-| `/assenze`           | Assenze, ritardi, uscite anticipate                  |
-| `/agenda`            | Compiti e verifiche in agenda                        |
-| `/compiti [giorni]`  | Estrai compiti con AI (default: 10 giorni)           |
-| `/materie`           | Lista materie e docenti                              |
-| `/aggiorna`          | Svuota la cache e forza dati aggiornati              |
+| Comando             | Descrizione                                |
+| ------------------- | ------------------------------------------ |
+| `/login`            | Accedi a Classeviva                        |
+| `/lezioni [giorni]` | Lezioni degli ultimi N giorni (default: 7) |
+| `/voti`             | Voti con media per materia                 |
+| `/assenze`          | Assenze, ritardi, uscite anticipate        |
+| `/agenda`           | Compiti e verifiche in agenda              |
+| `/compiti [giorni]` | Estrai compiti con AI (default: 10 giorni) |
+| `/materie`          | Lista materie e docenti                    |
+| `/aggiorna`         | Svuota la cache e forza dati aggiornati    |
 
 ### Avvio in locale
 

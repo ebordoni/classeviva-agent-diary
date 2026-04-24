@@ -300,5 +300,18 @@ export function buildBot(
     }
   });
 
+  // Registra i comandi nel menu "/" di Telegram
+  bot.telegram.setMyCommands([
+    { command: "login", description: "🔐 Accedi a Classeviva" },
+    { command: "logout", description: "🚪 Disconnetti" },
+    { command: "lezioni", description: "📚 Lezioni (default 7 giorni)" },
+    { command: "voti", description: "📝 Voti con media per materia" },
+    { command: "assenze", description: "📅 Assenze, ritardi, uscite" },
+    { command: "agenda", description: "📌 Compiti e verifiche in agenda" },
+    { command: "compiti", description: "🤖 Estrai compiti con AI" },
+    { command: "materie", description: "📖 Lista materie e docenti" },
+    { command: "help", description: "❓ Mostra i comandi disponibili" },
+  ]).catch(() => {});
+
   return bot;
 }

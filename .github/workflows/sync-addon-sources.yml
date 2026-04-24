@@ -1,0 +1,61 @@
+name: Sync HA Addon Sources
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "packages/bot/src/**"
+      - "packages/bot/package.json"
+      - "packages/bot/tsconfig.json"
+      - "packages/core/src/**"
+      - "packages/core/package.json"
+      - "packages/core/tsconfig.json"
+      - "package.json"
+      - "tsconfig.base.json"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync sources into addon
+        run: |
+          ADDON_SRC="hassio-addon/classeviva-bot/src"
+
+          # Pulisce e ricrea la struttura
+          rm -rf "$ADDON_SRC"
+          mkdir -p "$ADDON_SRC/packages/bot/src"
+          mkdir -p "$ADDON_SRC/packages/core/src"
+
+          # package.json e tsconfig root (workspace)
+          cp package.json "$ADDON_SRC/"
+          cp tsconfig.base.json "$ADDON_SRC/"
+
+          # package-lock.json se presente
+          [ -f package-lock.json ] && cp package-lock.json "$ADDON_SRC/"
+
+          # pacchetto bot
+          cp packages/bot/package.json "$ADDON_SRC/packages/bot/"
+          cp packages/bot/tsconfig.json "$ADDON_SRC/packages/bot/"
+          cp -r packages/bot/src/. "$ADDON_SRC/packages/bot/src/"
+
+          # pacchetto core
+          cp packages/core/package.json "$ADDON_SRC/packages/core/"
+          cp packages/core/tsconfig.json "$ADDON_SRC/packages/core/"
+          cp -r packages/core/src/. "$ADDON_SRC/packages/core/src/"
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add hassio-addon/classeviva-bot/src/
+          if git diff --cached --quiet; then
+            echo "Nessuna modifica da committare."
+          else
+            git commit -m "chore(addon): sync sources from packages [skip ci]"
+            git push
+          fi

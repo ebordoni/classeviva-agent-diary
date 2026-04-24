@@ -50,9 +50,6 @@ password.txt
 cache.json
 packages/bot/cache.json
 
-# Add-on HA — sorgenti generati da prepare-addon.ps1
-hassio-addon/classeviva-bot/src/
-
 # File temporanei
 *.tmp
 *.temp

@@ -20,14 +20,13 @@ options:
   ai_provider: "openai"
   ai_model: ""
   ai_api_key: ""
-  allowed_chat_ids: []
+  allowed_chat_ids: ""
 
 schema:
   telegram_token: str
   ai_provider: str
   ai_model: str?
   ai_api_key: str?
-  allowed_chat_ids:
-    - int
+  allowed_chat_ids: str?
 
 # Nessuna porta esposta — il bot usa long-polling Telegram

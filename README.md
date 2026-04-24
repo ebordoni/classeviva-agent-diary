@@ -316,6 +316,27 @@ examples-ts/   — Esempi di utilizzo della libreria
 
 Progetto non ufficiale, non affiliato con Spaggiari o Classeviva. Usalo a tuo rischio e pericolo.
 
+## 🔒 Privacy e sicurezza
+
+**Il modello corretto è: ogni utente ospita la propria istanza.**
+
+Questo bot è progettato per uso personale su infrastruttura propria (es. Home Assistant). Non è un servizio centralizzato — chi lo installa controlla il server, i dati e le credenziali.
+
+### Cosa fa il bot con le credenziali
+
+| Dato | Trattamento |
+| --- | --- |
+| **Password Classeviva** | Usata una sola volta per la chiamata di login all'API. Non viene mai scritta su disco. Il messaggio Telegram contenente la password viene cancellato immediatamente. |
+| **Token di sessione** | Mantenuto solo in RAM. Non viene mai persistito su disco. Va perso al riavvio del bot. |
+| **Student ID** | Salvato nel file cache locale (`cache.json`) per evitare di reinserirlo a ogni login. È uno username, non un segreto critico. |
+| **Dati del registro** | Cachati localmente sul tuo server per ridurre le chiamate API. Non vengono mai trasmessi a terzi. |
+
+### Garanzie
+
+- Il codice è **open source e auditabile** — chiunque può verificare esattamente cosa fa il bot con le credenziali.
+- Se ospiti il bot per altri utenti, questi devono fidarsi di te come operatore: non esiste soluzione tecnica che elimini questo requisito di fiducia per un servizio che accetta credenziali.
+- **Raccomandazione**: ogni utente dovrebbe installare la propria istanza del bot sul proprio Home Assistant.
+
 ## 📄 Licenza
 
 [MIT](./LICENSE)

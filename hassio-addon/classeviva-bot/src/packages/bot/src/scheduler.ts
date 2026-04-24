@@ -39,7 +39,7 @@ async function sendDailyDigest(bot: Telegraf, ai: AIService): Promise<void> {
           { parse_mode: "HTML" },
         );
       } else {
-        const corpo = formatCompiti(data, oggi, oggi);
+        const corpo = formatCompiti(data);
         await bot.telegram.sendMessage(
           chatId,
           `📅 <b>Digest giornaliero</b>\n\n${corpo}`,
@@ -73,7 +73,10 @@ export function startScheduler(
     return;
   }
 
-  const ai = new AIService(aiApiKey, aiProvider);
+  const ai = new AIService({
+    provider: (aiProvider as any) ?? "openai",
+    apiKey: aiApiKey,
+  });
 
   function scheduleNext() {
     const now = new Date();

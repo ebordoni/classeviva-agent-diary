@@ -1,6 +1,6 @@
 name: "Classeviva Bot"
 description: "Telegram bot per Classeviva — consulta voti, lezioni, compiti direttamente da Telegram."
-version: "1.0.0"
+version: "1.1.0"
 slug: "classeviva_bot"
 init: false
 

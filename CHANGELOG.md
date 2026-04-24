@@ -7,6 +7,13 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.4.1] — 2026-04-24
+
+### Corretto
+- **Regressione critica 1.3.0**: `/compiti` con N giorni non in cache eseguiva N chiamate AI sequenziali causando timeout a 90s. Ora viene eseguita una sola chiamata AI per tutti i giorni mancanti; i risultati vengono poi suddivisi per `data_lezione` e cachati per-giorno.
+
+---
+
 ## [1.4.0] — 2026-04-24
 
 ### Aggiunto

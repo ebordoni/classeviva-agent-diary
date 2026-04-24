@@ -2,6 +2,7 @@ import type {
   AgendaResponse,
   AssenzeResponse,
   CompitiEstrattiResponse,
+  CompitoEstratto,
   LezioniResponse,
   MaterieResponse,
   VotiResponse,
@@ -234,65 +235,67 @@ export async function getCompiti(
   );
 
   const hitDates = cached.filter((c) => c.value !== undefined);
-  const missDates = cached.filter((c) => c.value === undefined).map((c) => c.date);
+  const missDates = cached
+    .filter((c) => c.value === undefined)
+    .map((c) => c.date);
+  const allFromCache = missDates.length === 0;
 
-  let allFromCache = missDates.length === 0;
+  // Mappa per i risultati nuovi (usata nel merge finale)
+  const newByDate = new Map<string, CompitiEstrattiResponse>();
 
-  // Per i giorni mancanti, recupera le lezioni e chiama AI giorno per giorno
-  const newResults: CompitiEstrattiResponse[] = [];
   if (missDates.length > 0) {
     const missInizio = missDates[0];
     const missFine = missDates[missDates.length - 1];
     const lezioni = await client.lezioniDaA(missInizio, missFine);
 
-    // Raggruppa le lezioni per data
-    const lessonsByDate = new Map<string, typeof lezioni.lessons>();
-    for (const l of lezioni.lessons) {
-      if (!lessonsByDate.has(l.evtDate)) lessonsByDate.set(l.evtDate, []);
-      lessonsByDate.get(l.evtDate)!.push(l);
+    // ── UNA SOLA chiamata AI per tutti i giorni mancanti ──
+    // Evita N chiamate sequenziali che causano timeout a 90s.
+    const hasLessons = lezioni.lessons.length > 0;
+    const aiResult = hasLessons
+      ? await ai.estraiCompiti(lezioni)
+      : null;
+
+    // Raggruppa i compiti restituiti per data_lezione
+    const compitiByDate = new Map<string, CompitoEstratto[]>();
+    for (const c of aiResult?.compiti ?? []) {
+      const d = c.data_lezione || missInizio;
+      if (!compitiByDate.has(d)) compitiByDate.set(d, []);
+      compitiByDate.get(d)!.push(c);
     }
 
-    // Chiama AI solo per i giorni con lezioni, cacha il risultato
-    for (const d of missDates) {
-      const dayLessons = lessonsByDate.get(d) ?? [];
-      // TTL: giorni passati = 30 giorni, oggi = 4 ore
-      const ttl =
-        d < oggi
-          ? 30 * 24 * 60 * 60 * 1000
-          : 4 * 60 * 60 * 1000;
+    // Raggruppa le lezioni per data (per i metadata per-giorno)
+    const lessonsByDate = new Map<string, number>();
+    for (const l of lezioni.lessons) {
+      lessonsByDate.set(l.evtDate, (lessonsByDate.get(l.evtDate) ?? 0) + 1);
+    }
 
-      if (dayLessons.length === 0) {
-        // Nessuna lezione quel giorno: cacha risposta vuota
-        const empty: CompitiEstrattiResponse = {
-          compiti: [],
-          metadata: {
-            totale_lezioni: 0,
-            totale_compiti: 0,
-            modello_utilizzato: "",
-            timestamp: new Date().toISOString(),
-          },
-        };
-        await store.set(
-          key("compiti_giorno", client.datiUtente!.ident, d),
-          empty,
-          ttl,
-        );
-      } else {
-        const result = await ai.estraiCompiti({ lessons: dayLessons });
-        await store.set(
-          key("compiti_giorno", client.datiUtente!.ident, d),
-          result,
-          ttl,
-        );
-        newResults.push(result);
-      }
+    // Cacha il risultato per ogni giorno mancante separatamente
+    for (const d of missDates) {
+      const dayCompiti = compitiByDate.get(d) ?? [];
+      const ttl =
+        d < oggi ? 30 * 24 * 60 * 60 * 1000 : 4 * 60 * 60 * 1000;
+      const dayResult: CompitiEstrattiResponse = {
+        compiti: dayCompiti,
+        metadata: {
+          totale_lezioni: lessonsByDate.get(d) ?? 0,
+          totale_compiti: dayCompiti.length,
+          modello_utilizzato: aiResult?.metadata.modello_utilizzato ?? "",
+          timestamp: new Date().toISOString(),
+        },
+      };
+      await store.set(
+        key("compiti_giorno", client.datiUtente!.ident, d),
+        dayResult,
+        ttl,
+      );
+      newByDate.set(d, dayResult);
     }
   }
 
-  // Merge di tutti i risultati (cache hit + nuovi)
+  // Merge: cache hit + nuovi
   const allCompiti = [
     ...hitDates.flatMap((c) => c.value!.compiti),
-    ...newResults.flatMap((r) => r.compiti),
+    ...missDates.flatMap((d) => newByDate.get(d)?.compiti ?? []),
   ];
 
   const merged: CompitiEstrattiResponse = {
@@ -301,7 +304,7 @@ export async function getCompiti(
       totale_lezioni: dates.length,
       totale_compiti: allCompiti.length,
       modello_utilizzato:
-        newResults[0]?.metadata.modello_utilizzato ??
+        newByDate.values().next().value?.metadata.modello_utilizzato ??
         hitDates[0]?.value?.metadata.modello_utilizzato ??
         "",
       timestamp: new Date().toISOString(),

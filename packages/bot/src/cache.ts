@@ -65,9 +65,7 @@ class FileStore {
 
   /** Cancella tutte le chiavi che iniziano con il prefisso dato. */
   deleteByPrefix(prefix: string): Promise<number> {
-    const toDelete = Object.keys(this.data).filter((k) =>
-      k.startsWith(prefix),
-    );
+    const toDelete = Object.keys(this.data).filter((k) => k.startsWith(prefix));
     for (const k of toDelete) delete this.data[k];
     if (toDelete.length > 0) this.scheduleFlush();
     return Promise.resolve(toDelete.length);
@@ -251,9 +249,7 @@ export async function getCompiti(
     // ── UNA SOLA chiamata AI per tutti i giorni mancanti ──
     // Evita N chiamate sequenziali che causano timeout a 90s.
     const hasLessons = lezioni.lessons.length > 0;
-    const aiResult = hasLessons
-      ? await ai.estraiCompiti(lezioni)
-      : null;
+    const aiResult = hasLessons ? await ai.estraiCompiti(lezioni) : null;
 
     // Raggruppa i compiti restituiti per data_lezione
     const compitiByDate = new Map<string, CompitoEstratto[]>();
@@ -272,8 +268,7 @@ export async function getCompiti(
     // Cacha il risultato per ogni giorno mancante separatamente
     for (const d of missDates) {
       const dayCompiti = compitiByDate.get(d) ?? [];
-      const ttl =
-        d < oggi ? 30 * 24 * 60 * 60 * 1000 : 4 * 60 * 60 * 1000;
+      const ttl = d < oggi ? 30 * 24 * 60 * 60 * 1000 : 4 * 60 * 60 * 1000;
       const dayResult: CompitiEstrattiResponse = {
         compiti: dayCompiti,
         metadata: {
@@ -352,7 +347,11 @@ export async function saveStudentId(
   studentId: string,
 ): Promise<void> {
   // TTL 365 giorni — di fatto permanente per uso pratico
-  await store.set(key("saved_student_id", chatId), studentId, 365 * 24 * 60 * 60 * 1000);
+  await store.set(
+    key("saved_student_id", chatId),
+    studentId,
+    365 * 24 * 60 * 60 * 1000,
+  );
 }
 
 export async function getSavedStudentId(

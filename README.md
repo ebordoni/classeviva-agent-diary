@@ -15,6 +15,7 @@ Progetto monorepo con tre package:
 | [`@classeviva/core`](./packages/core) | Libreria TypeScript — client API, tipi, integrazione AI              |
 | [`@classeviva/cli`](./packages/cli)   | CLI da terminale con output tabulare o JSON                          |
 | [`@classeviva/tui`](./packages/tui)   | TUI interattiva basata su [Ink](https://github.com/vadimdemedes/ink) |
+| [`@classeviva/bot`](./packages/bot)   | Bot Telegram — consulta il registro direttamente da Telegram         |
 
 ---
 
@@ -119,7 +120,44 @@ Supporta le stesse variabili d'ambiente del CLI per pre-popolare le credenziali.
 
 ---
 
-## 📚 Quick Start — Libreria (`@classeviva/core`)
+## 🤖 Quick Start — Bot Telegram
+
+Consulta voti, lezioni, compiti e altro direttamente da Telegram, con estrazione compiti tramite AI.
+
+### Comandi disponibili
+
+| Comando              | Descrizione                                          |
+| -------------------- | ---------------------------------------------------- |
+| `/login`             | Accedi a Classeviva                                  |
+| `/lezioni [giorni]`  | Lezioni degli ultimi N giorni (default: 7)           |
+| `/voti`              | Voti con media per materia                           |
+| `/assenze`           | Assenze, ritardi, uscite anticipate                  |
+| `/agenda`            | Compiti e verifiche in agenda                        |
+| `/compiti [giorni]`  | Estrai compiti con AI (default: 10 giorni)           |
+| `/materie`           | Lista materie e docenti                              |
+| `/aggiorna`          | Svuota la cache e forza dati aggiornati              |
+
+### Avvio in locale
+
+```bash
+# Dalla root del monorepo
+npm run dev:bot
+```
+
+Variabili d'ambiente necessarie:
+
+```env
+TELEGRAM_BOT_TOKEN=123456789:AAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+AI_PROVIDER=openai        # per /compiti
+AI_API_KEY=sk-...
+```
+
+### Deploy su Home Assistant
+
+Il bot è disponibile come **addon per Home Assistant** nella cartella [`hassio-addon/`](./hassio-addon/).
+Aggiungere il repository `https://github.com/ebordoni/classeviva-agent-diary` nell'Add-on Store di HA.
+
+> Consulta [packages/bot/README.md](./packages/bot/README.md) per la documentazione completa.
 
 ### Installazione
 

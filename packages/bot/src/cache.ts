@@ -62,6 +62,38 @@ class FileStore {
     return Promise.resolve(had);
   }
 
+  /** Cancella tutte le chiavi che iniziano con il prefisso dato. */
+  deleteByPrefix(prefix: string): Promise<number> {
+    const toDelete = Object.keys(this.data).filter((k) =>
+      k.startsWith(prefix),
+    );
+    for (const k of toDelete) delete this.data[k];
+    if (toDelete.length > 0) this.scheduleFlush();
+    return Promise.resolve(toDelete.length);
+  }
+
+  /**
+   * Rimuove le chiavi scadute dal file JSON.
+   * Keyv salva ogni entry come {"value":...,"expires":<timestamp ms>}.
+   */
+  gc(): Promise<number> {
+    const now = Date.now();
+    let removed = 0;
+    for (const [k, v] of Object.entries(this.data)) {
+      try {
+        const parsed = JSON.parse(v) as { expires?: number };
+        if (parsed.expires !== undefined && parsed.expires < now) {
+          delete this.data[k];
+          removed++;
+        }
+      } catch {
+        // entry non parsabile: lascia stare
+      }
+    }
+    if (removed > 0) this.scheduleFlush();
+    return Promise.resolve(removed);
+  }
+
   clear(): Promise<void> {
     this.data = {};
     this.scheduleFlush();
@@ -81,12 +113,27 @@ const TTL = {
 
 const cachePath = process.env.CACHE_DB_PATH ?? "./cache.json";
 
+const fileStore = new FileStore(cachePath);
+
 const store = new Keyv({
-  store: new FileStore(cachePath),
+  store: fileStore,
   namespace: "classeviva",
 });
 
 store.on("error", (err) => console.error("[cache] Errore store:", err));
+
+// GC ogni 2 ore: rimuove le chiavi scadute dal file JSON
+setInterval(
+  () => {
+    fileStore
+      .gc()
+      .then((n) => {
+        if (n > 0) console.log(`[cache] GC: rimosse ${n} chiavi scadute`);
+      })
+      .catch(() => {});
+  },
+  2 * 60 * 60 * 1000,
+).unref();
 
 // ─────────────────────────────────────────────────────────────────
 // Helpers
@@ -215,5 +262,12 @@ export async function invalidateUser(studentId: string): Promise<void> {
     "materie",
     "compiti",
   ];
-  await Promise.all(prefixes.map((p) => store.delete(key(p, studentId))));
+  // Le chiavi nel FileStore hanno il namespace prefissato: "classeviva:<tipo>:<studentId>..."
+  // deleteByPrefix cancella tutte le chiavi che iniziano con quel prefisso,
+  // incluse quelle con range data (es. lezioni:S123:2026-04-17:2026-04-24).
+  await Promise.all(
+    prefixes.map((p) =>
+      fileStore.deleteByPrefix(`classeviva:${key(p, studentId)}`),
+    ),
+  );
 }

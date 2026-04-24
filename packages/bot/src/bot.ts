@@ -35,6 +35,7 @@ const HELP = `
 📌 <b>/agenda</b> — Compiti e verifiche in agenda
 🤖 <b>/compiti</b> [giorni] — Estrai compiti con AI (default: 10 giorni)
 📖 <b>/materie</b> — Lista materie e docenti
+🔄 <b>/aggiorna</b> — Svuota la cache e forza dati aggiornati
 
 ❓ <b>/help</b> — Mostra questo messaggio
 `.trim();
@@ -300,6 +301,19 @@ export function buildBot(
     }
   });
 
+  // ──────────────────────────────────────────────
+  // /aggiorna — svuota la cache per l'utente corrente
+  // ──────────────────────────────────────────────
+  bot.command("aggiorna", async (ctx) => {
+    const client = await requireAuth(ctx);
+    if (!client) return;
+
+    await invalidateUser(client.datiUtente!.ident);
+    await ctx.reply(
+      "🔄 Cache svuotata. I prossimi comandi recupereranno dati aggiornati da Classeviva.",
+    );
+  });
+
   // Registra i comandi nel menu "/" di Telegram
   bot.telegram.setMyCommands([
     { command: "login", description: "🔐 Accedi a Classeviva" },
@@ -310,6 +324,7 @@ export function buildBot(
     { command: "agenda", description: "📌 Compiti e verifiche in agenda" },
     { command: "compiti", description: "🤖 Estrai compiti con AI" },
     { command: "materie", description: "📖 Lista materie e docenti" },
+    { command: "aggiorna", description: "🔄 Svuota la cache dati" },
     { command: "help", description: "❓ Mostra i comandi disponibili" },
   ]).catch(() => {});
 

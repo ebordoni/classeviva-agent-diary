@@ -1,7 +1,7 @@
 ## 1.5.0 — 2026-04-24
 
-- Whitelist `allowed_chat_ids`: solo i chat ID configurati possono usare il bot
-- Lista vuota = accesso aperto (comportamento precedente)
+- Whitelist `allowed_chat_ids`: solo i chat ID configurati possono usare il bot; campo vuoto = accesso aperto
+- Fix: `allowed_chat_ids` ora è una stringa separata da virgola (es. `6039121257,987654321`) invece di lista interi, per compatibilità con il validatore HA
 
 ## 1.4.1 — 2026-04-24
 

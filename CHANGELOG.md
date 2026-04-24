@@ -11,7 +11,11 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ### Aggiunto
 
-- Whitelist chat ID: impostando `allowed_chat_ids` nella configurazione dell'addon HA, solo gli utenti autorizzati possono usare il bot. Se la lista è vuota l'accesso è aperto a tutti (comportamento precedente).
+- Whitelist chat ID: impostando `allowed_chat_ids` nella configurazione dell'addon HA, solo gli utenti autorizzati possono usare il bot. Se il campo è vuoto l'accesso è aperto a tutti (comportamento precedente).
+
+### Corretto
+
+- `allowed_chat_ids` ora è un campo testo (stringa separata da virgola) invece di lista di interi, per compatibilità con il validatore di HA Supervisor.
 
 ---
 

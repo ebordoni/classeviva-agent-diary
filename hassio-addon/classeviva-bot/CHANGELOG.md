@@ -1,6 +1,7 @@
 ## 1.4.1 — 2026-04-24
 
 - Fix regressione: `/compiti` non andava in timeout — ora fa una sola chiamata AI per tutti i giorni mancanti
+- Aggiunta icona addon (`icon.png`)
 
 ## 1.4.0 — 2026-04-24
 

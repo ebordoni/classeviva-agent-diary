@@ -15,7 +15,12 @@ const allowedChatIds = process.env.ALLOWED_CHAT_IDS
       .filter((n) => !isNaN(n))
   : [];
 
-const bot = buildBot(token, process.env.AI_API_KEY, process.env.AI_PROVIDER, allowedChatIds);
+const bot = buildBot(
+  token,
+  process.env.AI_API_KEY,
+  process.env.AI_PROVIDER,
+  allowedChatIds,
+);
 
 bot.launch();
 

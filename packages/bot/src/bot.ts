@@ -60,7 +60,9 @@ export function buildBot(
     bot.use(async (ctx, next) => {
       const chatId = ctx.chat?.id;
       if (!chatId || !allowedChatIds.includes(chatId)) {
-        await ctx.reply("⛔ Non sei autorizzato a usare questo bot.").catch(() => {});
+        await ctx
+          .reply("⛔ Non sei autorizzato a usare questo bot.")
+          .catch(() => {});
         return;
       }
       return next();

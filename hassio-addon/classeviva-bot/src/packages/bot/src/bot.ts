@@ -3,6 +3,7 @@ import type { Context } from "telegraf";
 import { Telegraf } from "telegraf";
 import {
   clearLoginState,
+  clearSavedStudentId,
   getAgenda,
   getAssenze,
   getCompiti,
@@ -13,7 +14,6 @@ import {
   getVoti,
   invalidateUser,
   saveStudentId,
-  clearSavedStudentId,
   setLoginState,
 } from "./cache.js";
 import {
@@ -136,7 +136,10 @@ export function buildBot(
 
     const savedId = await getSavedStudentId(chatId);
     if (savedId) {
-      await setLoginState(chatId, { step: "awaiting_password", pendingStudentId: savedId });
+      await setLoginState(chatId, {
+        step: "awaiting_password",
+        pendingStudentId: savedId,
+      });
       await ctx.reply(
         `🔐 Bentornato! Uso lo Student ID salvato: <code>${savedId}</code>\n\nInserisci la <b>password</b>:`,
         { parse_mode: "HTML" },
@@ -309,7 +312,9 @@ export function buildBot(
         ai,
       );
       const msg = formatCompiti(compiti);
-      const footer = fromCache ? "\n<i>📦 tutti i dati dalla cache</i>" : "\n<i>🤖 analisi AI completata (i risultati sono ora in cache)</i>";
+      const footer = fromCache
+        ? "\n<i>📦 tutti i dati dalla cache</i>"
+        : "\n<i>🤖 analisi AI completata (i risultati sono ora in cache)</i>";
       await ctx.reply(msg + footer, { parse_mode: "HTML" });
     } catch (err) {
       await ctx.reply(`❌ Errore: ${(err as Error).message}`);
@@ -330,18 +335,20 @@ export function buildBot(
   });
 
   // Registra i comandi nel menu "/" di Telegram
-  bot.telegram.setMyCommands([
-    { command: "login", description: "🔐 Accedi a Classeviva" },
-    { command: "logout", description: "🚪 Disconnetti" },
-    { command: "lezioni", description: "📚 Lezioni (default 7 giorni)" },
-    { command: "voti", description: "📝 Voti con media per materia" },
-    { command: "assenze", description: "📅 Assenze, ritardi, uscite" },
-    { command: "agenda", description: "📌 Compiti e verifiche in agenda" },
-    { command: "compiti", description: "🤖 Estrai compiti con AI" },
-    { command: "materie", description: "📖 Lista materie e docenti" },
-    { command: "aggiorna", description: "🔄 Svuota la cache dati" },
-    { command: "help", description: "❓ Mostra i comandi disponibili" },
-  ]).catch(() => {});
+  bot.telegram
+    .setMyCommands([
+      { command: "login", description: "🔐 Accedi a Classeviva" },
+      { command: "logout", description: "🚪 Disconnetti" },
+      { command: "lezioni", description: "📚 Lezioni (default 7 giorni)" },
+      { command: "voti", description: "📝 Voti con media per materia" },
+      { command: "assenze", description: "📅 Assenze, ritardi, uscite" },
+      { command: "agenda", description: "📌 Compiti e verifiche in agenda" },
+      { command: "compiti", description: "🤖 Estrai compiti con AI" },
+      { command: "materie", description: "📖 Lista materie e docenti" },
+      { command: "aggiorna", description: "🔄 Svuota la cache dati" },
+      { command: "help", description: "❓ Mostra i comandi disponibili" },
+    ])
+    .catch(() => {});
 
   return bot;
 }

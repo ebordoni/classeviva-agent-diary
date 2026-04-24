@@ -1,10 +1,10 @@
 import type {
-      AgendaResponse,
-      AssenzeResponse,
-      CompitiEstrattiResponse,
-      LezioniResponse,
-      MaterieResponse,
-      VotiResponse,
+  AgendaResponse,
+  AssenzeResponse,
+  CompitiEstrattiResponse,
+  LezioniResponse,
+  MaterieResponse,
+  VotiResponse,
 } from "@classeviva/core";
 
 /** Escape HTML per Telegram parse_mode HTML */
@@ -17,8 +17,18 @@ function e(s: string | undefined | null): string {
 
 const GIORNI_IT = ["dom", "lun", "mar", "mer", "gio", "ven", "sab"];
 const MESI_IT = [
-  "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
-  "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre",
+  "gennaio",
+  "febbraio",
+  "marzo",
+  "aprile",
+  "maggio",
+  "giugno",
+  "luglio",
+  "agosto",
+  "settembre",
+  "ottobre",
+  "novembre",
+  "dicembre",
 ];
 
 function formatDateIT(dateStr: string): string {

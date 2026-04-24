@@ -1,3 +1,8 @@
+## 1.5.0 — 2026-04-24
+
+- Whitelist `allowed_chat_ids`: solo i chat ID configurati possono usare il bot
+- Lista vuota = accesso aperto (comportamento precedente)
+
 ## 1.4.1 — 2026-04-24
 
 - Fix regressione: `/compiti` non andava in timeout — ora fa una sola chiamata AI per tutti i giorni mancanti

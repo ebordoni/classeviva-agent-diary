@@ -48,8 +48,24 @@ export function buildBot(
   token: string,
   aiApiKey?: string,
   aiProvider?: string,
+  allowedChatIds: number[] = [],
 ): Telegraf {
   const bot = new Telegraf(token);
+
+  // ──────────────────────────────────────────────
+  // Middleware whitelist: blocca tutti gli utenti non autorizzati
+  // Se allowedChatIds è vuoto, l'accesso è aperto a tutti.
+  // ──────────────────────────────────────────────
+  if (allowedChatIds.length > 0) {
+    bot.use(async (ctx, next) => {
+      const chatId = ctx.chat?.id;
+      if (!chatId || !allowedChatIds.includes(chatId)) {
+        await ctx.reply("⛔ Non sei autorizzato a usare questo bot.").catch(() => {});
+        return;
+      }
+      return next();
+    });
+  }
 
   // ──────────────────────────────────────────────
   // Gestione messaggi di testo libero (flusso login)

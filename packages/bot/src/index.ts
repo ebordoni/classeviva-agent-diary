@@ -9,7 +9,13 @@ if (!token) {
   process.exit(1);
 }
 
-const bot = buildBot(token, process.env.AI_API_KEY, process.env.AI_PROVIDER);
+const allowedChatIds = process.env.ALLOWED_CHAT_IDS
+  ? process.env.ALLOWED_CHAT_IDS.split(",")
+      .map((s) => parseInt(s.trim(), 10))
+      .filter((n) => !isNaN(n))
+  : [];
+
+const bot = buildBot(token, process.env.AI_API_KEY, process.env.AI_PROVIDER, allowedChatIds);
 
 bot.launch();
 

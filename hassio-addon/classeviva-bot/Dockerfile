@@ -2,14 +2,18 @@ ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
 # Installa Node.js 20 e strumenti necessari
-RUN apk add --no-cache bash jq nodejs npm
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash jq curl ca-certificates \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
 
 COPY src/ .
 
 # Installa le dipendenze e compila
-RUN npm ci --workspace=packages/core --workspace=packages/bot --ignore-scripts
+RUN npm install --workspace=packages/core --workspace=packages/bot --ignore-scripts
 RUN npm run build:core && npm run build:bot
 RUN npm prune --omit=dev
 

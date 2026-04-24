@@ -24,12 +24,12 @@ I dati vengono cachati su SQLite per ridurre le chiamate all'API di Classeviva e
 
 **Questo bot è progettato per uso personale su infrastruttura propria.** Il modello consigliato è che ogni utente installi la propria istanza (es. come addon Home Assistant) sul proprio server.
 
-| Dato | Trattamento |
-| --- | --- |
+| Dato                    | Trattamento                                                                                                    |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------- |
 | **Password Classeviva** | Usata solo per la chiamata login all'API. Mai scritta su disco. Il messaggio Telegram viene cancellato subito. |
-| **Token di sessione** | Solo in RAM. Mai su disco. Perso al riavvio. |
-| **Student ID** | Salvato in `cache.json` per evitare di reinserirlo a ogni login. |
-| **Dati del registro** | Cachati localmente. Non trasmessi a terzi. |
+| **Token di sessione**   | Solo in RAM. Mai su disco. Perso al riavvio.                                                                   |
+| **Student ID**          | Salvato in `cache.json` per evitare di reinserirlo a ogni login.                                               |
+| **Dati del registro**   | Cachati localmente. Non trasmessi a terzi.                                                                     |
 
 Il codice è open source: chiunque può verificare il trattamento delle credenziali. Chi ospita il bot per altri utenti ne è l'unico responsabile.
 

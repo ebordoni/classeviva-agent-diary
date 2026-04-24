@@ -324,12 +324,12 @@ Questo bot è progettato per uso personale su infrastruttura propria (es. Home A
 
 ### Cosa fa il bot con le credenziali
 
-| Dato | Trattamento |
-| --- | --- |
+| Dato                    | Trattamento                                                                                                                                                          |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Password Classeviva** | Usata una sola volta per la chiamata di login all'API. Non viene mai scritta su disco. Il messaggio Telegram contenente la password viene cancellato immediatamente. |
-| **Token di sessione** | Mantenuto solo in RAM. Non viene mai persistito su disco. Va perso al riavvio del bot. |
-| **Student ID** | Salvato nel file cache locale (`cache.json`) per evitare di reinserirlo a ogni login. È uno username, non un segreto critico. |
-| **Dati del registro** | Cachati localmente sul tuo server per ridurre le chiamate API. Non vengono mai trasmessi a terzi. |
+| **Token di sessione**   | Mantenuto solo in RAM. Non viene mai persistito su disco. Va perso al riavvio del bot.                                                                               |
+| **Student ID**          | Salvato nel file cache locale (`cache.json`) per evitare di reinserirlo a ogni login. È uno username, non un segreto critico.                                        |
+| **Dati del registro**   | Cachati localmente sul tuo server per ridurre le chiamate API. Non vengono mai trasmessi a terzi.                                                                    |
 
 ### Garanzie
 

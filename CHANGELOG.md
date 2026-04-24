@@ -7,6 +7,18 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.6.0] — 2026-04-24
+
+### Aggiunto
+
+- **Digest giornaliero automatico**: il bot invia ogni mattina un riepilogo dei compiti del giorno a tutti gli utenti che hanno attivato la funzione
+- Nuovo comando `/notifiche`: attiva o disattiva il digest giornaliero per la propria chat
+- Configurazione orario digest tramite campo `daily_digest_time` (es. `"07:30"`) nelle opzioni dell'addon HA; campo vuoto = funzione disabilitata
+- Le credenziali vengono salvate localmente (volume `/data/` protetto da HA Supervisor) solo con consenso esplicito dell'utente tramite `/notifiche`
+- Al `/logout` le credenziali vengono cancellate e l'iscrizione al digest rimossa
+
+---
+
 ## [1.5.1] — 2026-04-24
 
 ### Corretto

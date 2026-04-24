@@ -1,5 +1,6 @@
 import { config as loadEnv } from "dotenv";
 import { buildBot } from "./bot.js";
+import { startScheduler } from "./scheduler.js";
 
 loadEnv();
 
@@ -15,14 +16,22 @@ const allowedChatIds = process.env.ALLOWED_CHAT_IDS
       .filter((n) => !isNaN(n))
   : [];
 
+const digestTime = process.env.DAILY_DIGEST_TIME?.trim() || undefined;
+
 const bot = buildBot(
   token,
   process.env.AI_API_KEY,
   process.env.AI_PROVIDER,
   allowedChatIds,
+  digestTime,
 );
 
 bot.launch();
+
+if (digestTime) {
+  startScheduler(bot, digestTime, process.env.AI_API_KEY, process.env.AI_PROVIDER);
+  console.log(`📅 Digest giornaliero programmato alle ${digestTime}`);
+}
 
 console.log("🤖 Classeviva Bot avviato.");
 

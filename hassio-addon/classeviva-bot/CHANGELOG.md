@@ -1,3 +1,10 @@
+## 1.6.0 — 2026-04-24
+
+- Digest giornaliero automatico: invia i compiti del giorno ogni mattina
+- Nuovo comando `/notifiche` per opt-in/out al digest
+- Configurabile tramite `daily_digest_time` nelle opzioni addon (es. `"07:30"`)
+- Le credenziali sono salvate solo con consenso esplicito e cancellate al logout
+
 ## 1.5.1 — 2026-04-24
 
 - Fix: `allowed_chat_ids` è ora una stringa separata da virgola (es. `6039121257`) invece di lista di interi

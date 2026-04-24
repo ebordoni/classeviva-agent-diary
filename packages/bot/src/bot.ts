@@ -2,19 +2,25 @@ import { AIService, ClassevivaClient, ultimiNGiorni } from "@classeviva/core";
 import type { Context } from "telegraf";
 import { Telegraf } from "telegraf";
 import {
+  clearCredentials,
   clearLoginState,
   clearSavedStudentId,
   getAgenda,
   getAssenze,
   getCompiti,
+  getCredentials,
+  getDigestSubscriptions,
   getLezioni,
   getLoginState,
   getMaterie,
   getSavedStudentId,
   getVoti,
   invalidateUser,
+  saveCredentials,
   saveStudentId,
   setLoginState,
+  subscribeDigest,
+  unsubscribeDigest,
 } from "./cache.js";
 import {
   formatAgenda,
@@ -39,6 +45,7 @@ const HELP = `
 🤖 <b>/compiti</b> [giorni] — Estrai compiti con AI (default: 10 giorni)
 📖 <b>/materie</b> — Lista materie e docenti
 🔄 <b>/aggiorna</b> — Svuota la cache e forza dati aggiornati
+🔔 <b>/notifiche</b> — Attiva/disattiva digest giornaliero automatico
 
 ❓ <b>/help</b> — Mostra questo messaggio
 `.trim();
@@ -49,6 +56,7 @@ export function buildBot(
   aiApiKey?: string,
   aiProvider?: string,
   allowedChatIds: number[] = [],
+  digestTime?: string,
 ): Telegraf {
   const bot = new Telegraf(token);
 
@@ -103,6 +111,8 @@ export function buildBot(
         await client.accedi();
         updateSession(chatId, { client });
         await saveStudentId(chatId, studentId);
+        // Salva credenziali per il digest giornaliero (usate solo se l'utente attiva /notifiche)
+        await saveCredentials(chatId, studentId, password);
         await ctx.reply(
           `✅ <b>Accesso effettuato!</b>\nBenvenuto, <b>${client.nomeCompleto}</b>.\n\nUsa /help per vedere i comandi disponibili.`,
           { parse_mode: "HTML" },
@@ -182,6 +192,8 @@ export function buildBot(
     }
     await clearLoginState(chatId);
     await clearSavedStudentId(chatId);
+    await clearCredentials(chatId);
+    await unsubscribeDigest(chatId);
     clearSession(chatId);
     await ctx.reply(
       "👋 Sessione terminata. Le credenziali sono state dimenticate.",
@@ -340,6 +352,45 @@ export function buildBot(
   });
 
   // ──────────────────────────────────────────────
+  // /notifiche — attiva/disattiva digest giornaliero
+  // ──────────────────────────────────────────────
+  bot.command("notifiche", async (ctx) => {
+    const chatId = ctx.chat.id;
+
+    if (!digestTime) {
+      await ctx.reply(
+        "🔕 Il digest giornaliero non è abilitato in questa installazione.\n\nConfigura <code>daily_digest_time</code> nelle opzioni dell'addon per abilitarlo.",
+        { parse_mode: "HTML" },
+      );
+      return;
+    }
+
+    const subs = await getDigestSubscriptions();
+    const isSubscribed = subs.includes(chatId);
+
+    if (isSubscribed) {
+      await unsubscribeDigest(chatId);
+      await ctx.reply(
+        `🔕 Digest giornaliero <b>disattivato</b>.\n\nUsare /notifiche per riattivarlo.`,
+        { parse_mode: "HTML" },
+      );
+    } else {
+      const creds = await getCredentials(chatId);
+      if (!creds) {
+        await ctx.reply(
+          "⚠️ Devi effettuare il /login prima di attivare le notifiche.",
+        );
+        return;
+      }
+      await subscribeDigest(chatId);
+      await ctx.reply(
+        `🔔 Digest giornaliero <b>attivato</b>!\n\nRiceverai un riepilogo dei compiti ogni giorno alle <b>${digestTime}</b>.\n\nUsare /notifiche per disattivarlo.`,
+        { parse_mode: "HTML" },
+      );
+    }
+  });
+
+  // ──────────────────────────────────────────────
   // /aggiorna — svuota la cache per l'utente corrente
   // ──────────────────────────────────────────────
   bot.command("aggiorna", async (ctx) => {
@@ -364,6 +415,7 @@ export function buildBot(
       { command: "compiti", description: "🤖 Estrai compiti con AI" },
       { command: "materie", description: "📖 Lista materie e docenti" },
       { command: "aggiorna", description: "🔄 Svuota la cache dati" },
+      { command: "notifiche", description: "🔔 Digest giornaliero automatico" },
       { command: "help", description: "❓ Mostra i comandi disponibili" },
     ])
     .catch(() => {});

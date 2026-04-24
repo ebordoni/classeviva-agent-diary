@@ -386,3 +386,57 @@ export async function invalidateUser(studentId: string): Promise<void> {
     ),
   );
 }
+
+// ─────────────────────────────────────────────────────────────────
+// Credenziali per il digest giornaliero automatico
+// Salvate solo con esplicito consenso dell'utente (/notifiche on)
+// ─────────────────────────────────────────────────────────────────
+
+const YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+
+interface DigestCredentials {
+  studentId: string;
+  password: string;
+}
+
+export async function saveCredentials(
+  chatId: number,
+  studentId: string,
+  password: string,
+): Promise<void> {
+  await store.set(key("digest_creds", chatId), { studentId, password }, YEAR_MS);
+}
+
+export async function getCredentials(
+  chatId: number,
+): Promise<DigestCredentials | undefined> {
+  return store.get<DigestCredentials>(key("digest_creds", chatId));
+}
+
+export async function clearCredentials(chatId: number): Promise<void> {
+  await store.delete(key("digest_creds", chatId));
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Lista chat iscritte al digest giornaliero
+// ─────────────────────────────────────────────────────────────────
+
+export async function getDigestSubscriptions(): Promise<number[]> {
+  return (await store.get<number[]>("digest_subscriptions")) ?? [];
+}
+
+export async function subscribeDigest(chatId: number): Promise<void> {
+  const subs = await getDigestSubscriptions();
+  if (!subs.includes(chatId)) {
+    await store.set("digest_subscriptions", [...subs, chatId], YEAR_MS);
+  }
+}
+
+export async function unsubscribeDigest(chatId: number): Promise<void> {
+  const subs = await getDigestSubscriptions();
+  await store.set(
+    "digest_subscriptions",
+    subs.filter((id) => id !== chatId),
+    YEAR_MS,
+  );
+}

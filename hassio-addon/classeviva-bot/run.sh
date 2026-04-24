@@ -15,6 +15,8 @@ AI_MODEL=$(jq -r '.ai_model // empty' "$OPTIONS")
 AI_API_KEY=$(jq -r '.ai_api_key // empty' "$OPTIONS")
 # Chat ID autorizzati come stringa separata da virgola (es. "123456,789012")
 ALLOWED_CHAT_IDS=$(jq -r '.allowed_chat_ids // ""' "$OPTIONS")
+# Orario digest giornaliero (es. "07:30", vuoto = disabilitato)
+DAILY_DIGEST_TIME=$(jq -r '.daily_digest_time // ""' "$OPTIONS")
 
 if [ -z "$TELEGRAM_TOKEN" ]; then
   echo "[classeviva-bot] ERRORE: telegram_token non impostato!"
@@ -27,6 +29,7 @@ export AI_PROVIDER="$AI_PROVIDER"
 export AI_MODEL="$AI_MODEL"
 export AI_API_KEY="$AI_API_KEY"
 export ALLOWED_CHAT_IDS="$ALLOWED_CHAT_IDS"
+export DAILY_DIGEST_TIME="$DAILY_DIGEST_TIME"
 export CACHE_DB_PATH="/data/cache.json"
 export NODE_ENV="production"
 

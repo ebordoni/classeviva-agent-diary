@@ -1,6 +1,6 @@
 name: "Classeviva Bot"
 description: "Telegram bot per Classeviva — consulta voti, lezioni, compiti direttamente da Telegram."
-version: "1.5.1"
+version: "1.6.0"
 slug: "classeviva_bot"
 init: false
 
@@ -21,6 +21,7 @@ options:
   ai_model: ""
   ai_api_key: ""
   allowed_chat_ids: ""
+  daily_digest_time: ""
 
 schema:
   telegram_token: str
@@ -28,5 +29,6 @@ schema:
   ai_model: str?
   ai_api_key: str?
   allowed_chat_ids: str?
+  daily_digest_time: str?
 
 # Nessuna porta esposta — il bot usa long-polling Telegram

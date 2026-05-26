@@ -12,6 +12,7 @@ WORKDIR /build
 COPY src/ .
 
 RUN npm install --workspaces --ignore-scripts
+RUN find . -name "*.tsbuildinfo" -delete
 RUN npm run build:core
 RUN npm run build:server
 RUN npm run build:ui

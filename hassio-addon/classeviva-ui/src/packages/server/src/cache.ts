@@ -247,8 +247,7 @@ export async function getCompiti(
 
     for (const d of missDates) {
       const dayCompiti = compitiByDate.get(d) ?? [];
-      const ttl =
-        d! < oggi! ? 30 * 24 * 60 * 60 * 1000 : 4 * 60 * 60 * 1000;
+      const ttl = d! < oggi! ? 30 * 24 * 60 * 60 * 1000 : 4 * 60 * 60 * 1000;
       const dayResult: CompitiEstrattiResponse = {
         compiti: dayCompiti,
         metadata: {

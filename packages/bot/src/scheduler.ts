@@ -68,8 +68,17 @@ export function startScheduler(
   const hour = parseInt(parts[0], 10);
   const minute = parseInt(parts[1] ?? "0", 10);
 
-  if (isNaN(hour) || isNaN(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) {
-    console.error(`[scheduler] Orario non valido: "${time}". Digest disabilitato.`);
+  if (
+    isNaN(hour) ||
+    isNaN(minute) ||
+    hour < 0 ||
+    hour > 23 ||
+    minute < 0 ||
+    minute > 59
+  ) {
+    console.error(
+      `[scheduler] Orario non valido: "${time}". Digest disabilitato.`,
+    );
     return;
   }
 

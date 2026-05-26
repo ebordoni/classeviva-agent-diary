@@ -1,21 +1,21 @@
 import "dotenv/config";
 import express from "express";
 import session from "express-session";
+import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import crypto from "node:crypto";
 
-import authRouter from "./routes/auth.js";
-import lezioniRouter from "./routes/lezioni.js";
-import votiRouter from "./routes/voti.js";
-import assenzeRouter from "./routes/assenze.js";
 import agendaRouter from "./routes/agenda.js";
-import materieRouter from "./routes/materie.js";
-import compitiRouter from "./routes/compiti.js";
-import noteRouter from "./routes/note.js";
+import assenzeRouter from "./routes/assenze.js";
+import authRouter from "./routes/auth.js";
 import bachecaRouter from "./routes/bacheca.js";
-import didatticaRouter from "./routes/didattica.js";
 import cacheRouter from "./routes/cache.js";
+import compitiRouter from "./routes/compiti.js";
+import didatticaRouter from "./routes/didattica.js";
+import lezioniRouter from "./routes/lezioni.js";
+import materieRouter from "./routes/materie.js";
+import noteRouter from "./routes/note.js";
+import votiRouter from "./routes/voti.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -24,8 +24,7 @@ const port = parseInt(process.env.PORT ?? "8099", 10);
 
 // Genera un session secret se non configurato
 const sessionSecret =
-  process.env.SESSION_SECRET ||
-  crypto.randomBytes(32).toString("hex");
+  process.env.SESSION_SECRET || crypto.randomBytes(32).toString("hex");
 
 app.set("trust proxy", 1);
 app.use(express.json());
@@ -58,8 +57,7 @@ app.use("/api/cache", cacheRouter);
 
 // Serve static UI (Vite build output)
 const uiDistPath =
-  process.env.UI_DIST_PATH ??
-  path.resolve(__dirname, "../../../ui/dist");
+  process.env.UI_DIST_PATH ?? path.resolve(__dirname, "../../../ui/dist");
 
 app.use(express.static(uiDistPath));
 

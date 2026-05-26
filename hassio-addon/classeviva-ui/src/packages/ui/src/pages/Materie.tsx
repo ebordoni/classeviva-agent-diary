@@ -16,7 +16,9 @@ export default function Materie() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Materie</h1>
         {data?.fromCache && (
-          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">📦 cache</span>
+          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+            📦 cache
+          </span>
         )}
       </div>
 

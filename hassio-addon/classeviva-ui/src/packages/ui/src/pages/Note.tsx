@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { noteApi } from "../api.ts";
-import type { Nota } from "../types.ts";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
+import { noteApi } from "../api.ts";
+import type { Nota } from "../types.ts";
 
 function Section({ title, notes }: { title: string; notes: Nota[] }) {
   const qc = useQueryClient();
@@ -36,7 +36,10 @@ function Section({ title, notes }: { title: string; notes: Nota[] }) {
               {!n.readStatus && (
                 <button
                   onClick={() =>
-                    mutation.mutate({ eventCode: n.warningType, evtId: n.evtId })
+                    mutation.mutate({
+                      eventCode: n.warningType,
+                      evtId: n.evtId,
+                    })
                   }
                   disabled={mutation.isPending}
                   className="text-xs text-indigo-600 hover:text-indigo-800 whitespace-nowrap"
@@ -68,7 +71,9 @@ export default function Note() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Note disciplinari</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">
+        Note disciplinari
+      </h1>
 
       {isLoading && <Spinner />}
       {error && <ErrorMsg message={(error as Error).message} />}

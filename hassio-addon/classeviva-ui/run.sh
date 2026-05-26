@@ -4,8 +4,8 @@ set -e
 OPTIONS="/data/options.json"
 
 if [ ! -f "$OPTIONS" ]; then
-  echo "[classeviva-ui] ERRORE: $OPTIONS non trovato."
-  exit 1
+    echo "[classeviva-ui] ERRORE: $OPTIONS non trovato."
+    exit 1
 fi
 
 AI_PROVIDER=$(jq -r '.ai_provider // "openai"' "$OPTIONS")

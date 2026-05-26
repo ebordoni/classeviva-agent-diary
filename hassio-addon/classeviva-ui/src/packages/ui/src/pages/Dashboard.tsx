@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { votiApi, assenzeApi, agendaApi } from "../api.ts";
-import { Link } from "react-router-dom";
-import { format, parseISO, isToday, isTomorrow } from "date-fns";
+import { format, isToday, isTomorrow, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
+import { Link } from "react-router-dom";
+import { agendaApi, assenzeApi, votiApi } from "../api.ts";
 
 function toDateInput(d: Date) {
   return d.toISOString().split("T")[0]!;
@@ -44,10 +44,14 @@ export default function Dashboard() {
   const prossimi = events.slice(0, 5);
 
   // Media generale
-  const numerici = grades.filter((g) => !isNaN(g.decimalValue) && g.decimalValue > 0);
+  const numerici = grades.filter(
+    (g) => !isNaN(g.decimalValue) && g.decimalValue > 0,
+  );
   const mediaGenerale =
     numerici.length > 0
-      ? (numerici.reduce((s, g) => s + g.decimalValue, 0) / numerici.length).toFixed(2)
+      ? (
+          numerici.reduce((s, g) => s + g.decimalValue, 0) / numerici.length
+        ).toFixed(2)
       : "—";
 
   return (
@@ -56,22 +60,38 @@ export default function Dashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-        <Link to="/voti" className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-4 hover:border-indigo-200 transition-colors">
-          <p className={`text-3xl font-bold ${gradeColor(parseFloat(mediaGenerale))}`}>
+        <Link
+          to="/voti"
+          className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-4 hover:border-indigo-200 transition-colors"
+        >
+          <p
+            className={`text-3xl font-bold ${gradeColor(parseFloat(mediaGenerale))}`}
+          >
             {mediaGenerale}
           </p>
           <p className="text-xs text-gray-500 mt-1">Media voti</p>
         </Link>
-        <Link to="/voti" className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-4 hover:border-indigo-200 transition-colors">
+        <Link
+          to="/voti"
+          className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-4 hover:border-indigo-200 transition-colors"
+        >
           <p className="text-3xl font-bold text-gray-800">{grades.length}</p>
           <p className="text-xs text-gray-500 mt-1">Voti totali</p>
         </Link>
-        <Link to="/assenze" className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-4 hover:border-indigo-200 transition-colors">
+        <Link
+          to="/assenze"
+          className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-4 hover:border-indigo-200 transition-colors"
+        >
           <p className="text-3xl font-bold text-gray-800">{absences.length}</p>
           <p className="text-xs text-gray-500 mt-1">Assenze totali</p>
         </Link>
-        <Link to="/assenze" className={`bg-white rounded-xl border shadow-sm px-4 py-4 hover:border-orange-200 transition-colors ${nonGiustificate > 0 ? "border-orange-200" : "border-gray-100"}`}>
-          <p className={`text-3xl font-bold ${nonGiustificate > 0 ? "text-orange-600" : "text-gray-800"}`}>
+        <Link
+          to="/assenze"
+          className={`bg-white rounded-xl border shadow-sm px-4 py-4 hover:border-orange-200 transition-colors ${nonGiustificate > 0 ? "border-orange-200" : "border-gray-100"}`}
+        >
+          <p
+            className={`text-3xl font-bold ${nonGiustificate > 0 ? "text-orange-600" : "text-gray-800"}`}
+          >
             {nonGiustificate}
           </p>
           <p className="text-xs text-gray-500 mt-1">Da giustificare</p>
@@ -81,13 +101,20 @@ export default function Dashboard() {
       {/* Prossimi eventi */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-gray-700">Prossimi eventi</h2>
-          <Link to="/agenda" className="text-xs text-indigo-600 hover:underline">
+          <h2 className="text-sm font-semibold text-gray-700">
+            Prossimi eventi
+          </h2>
+          <Link
+            to="/agenda"
+            className="text-xs text-indigo-600 hover:underline"
+          >
             Vedi tutto
           </Link>
         </div>
         {prossimi.length === 0 ? (
-          <p className="text-sm text-gray-400">Nessun evento nei prossimi 14 giorni.</p>
+          <p className="text-sm text-gray-400">
+            Nessun evento nei prossimi 14 giorni.
+          </p>
         ) : (
           <div className="space-y-2">
             {prossimi.map((e) => {
@@ -95,8 +122,8 @@ export default function Dashboard() {
               const label = isToday(date)
                 ? "Oggi"
                 : isTomorrow(date)
-                ? "Domani"
-                : format(date, "d MMM", { locale: it });
+                  ? "Domani"
+                  : format(date, "d MMM", { locale: it });
               return (
                 <div key={e.evtId} className="flex items-start gap-3">
                   <span className="text-xs font-semibold text-indigo-600 w-14 shrink-0 pt-0.5">
@@ -104,7 +131,9 @@ export default function Dashboard() {
                   </span>
                   <div>
                     {e.subjectDesc && (
-                      <span className="text-xs text-gray-400">{e.subjectDesc} — </span>
+                      <span className="text-xs text-gray-400">
+                        {e.subjectDesc} —{" "}
+                      </span>
                     )}
                     <span className="text-sm text-gray-800">{e.evtText}</span>
                   </div>

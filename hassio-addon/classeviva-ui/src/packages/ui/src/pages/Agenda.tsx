@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { agendaApi } from "../api.ts";
 import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
+import { useState } from "react";
+import { agendaApi } from "../api.ts";
 
 function toDateInput(d: Date) {
   return d.toISOString().split("T")[0]!;
@@ -43,7 +43,9 @@ export default function Agenda() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Agenda</h1>
         {data?.fromCache && (
-          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">📦 cache</span>
+          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+            📦 cache
+          </span>
         )}
       </div>
 
@@ -53,7 +55,9 @@ export default function Agenda() {
           <input
             type="date"
             value={range.inizio}
-            onChange={(e) => setRange((r) => ({ ...r, inizio: e.target.value }))}
+            onChange={(e) =>
+              setRange((r) => ({ ...r, inizio: e.target.value }))
+            }
             className="border border-gray-200 rounded px-2 py-1 text-sm"
           />
         </div>
@@ -72,7 +76,9 @@ export default function Agenda() {
       {error && <ErrorMsg message={(error as Error).message} />}
 
       {!isLoading && dates.length === 0 && (
-        <p className="text-gray-500 text-sm">Nessun evento nel periodo selezionato.</p>
+        <p className="text-gray-500 text-sm">
+          Nessun evento nel periodo selezionato.
+        </p>
       )}
 
       {dates.map((date) => (
@@ -86,14 +92,20 @@ export default function Agenda() {
                 key={e.evtId}
                 className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3 flex gap-3 items-start"
               >
-                <span className="text-lg leading-none mt-0.5">{evtIcon(e.evtCode)}</span>
+                <span className="text-lg leading-none mt-0.5">
+                  {evtIcon(e.evtCode)}
+                </span>
                 <div>
                   {e.subjectDesc && (
-                    <p className="text-xs font-semibold text-indigo-600 mb-0.5">{e.subjectDesc}</p>
+                    <p className="text-xs font-semibold text-indigo-600 mb-0.5">
+                      {e.subjectDesc}
+                    </p>
                   )}
                   <p className="text-sm text-gray-800">{e.evtText}</p>
                   {e.authorName && (
-                    <p className="text-xs text-gray-400 mt-0.5">{e.authorName}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {e.authorName}
+                    </p>
                   )}
                 </div>
               </div>

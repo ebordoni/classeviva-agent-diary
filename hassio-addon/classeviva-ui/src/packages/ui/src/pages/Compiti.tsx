@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { format, isPast, isToday, parseISO } from "date-fns";
+import { it } from "date-fns/locale";
+import { useState } from "react";
 import { compitiApi } from "../api.ts";
 import type { CompitiResponse } from "../types.ts";
-import { format, parseISO, isPast, isToday } from "date-fns";
-import { it } from "date-fns/locale";
 
 const PROVIDERS = ["openai", "google", "anthropic", "groq", "xai"] as const;
 
@@ -47,7 +47,9 @@ export default function Compiti() {
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Compiti AI</h1>
 
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 mb-6">
-        <h2 className="text-sm font-semibold text-gray-700 mb-4">Configurazione</h2>
+        <h2 className="text-sm font-semibold text-gray-700 mb-4">
+          Configurazione
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs text-gray-500 mb-1">
@@ -63,7 +65,9 @@ export default function Compiti() {
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Provider AI (opzionale)</label>
+            <label className="block text-xs text-gray-500 mb-1">
+              Provider AI (opzionale)
+            </label>
             <select
               value={provider}
               onChange={(e) => setProvider(e.target.value)}
@@ -78,7 +82,9 @@ export default function Compiti() {
             </select>
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">API Key (opzionale)</label>
+            <label className="block text-xs text-gray-500 mb-1">
+              API Key (opzionale)
+            </label>
             <input
               type="password"
               value={apiKey}
@@ -88,7 +94,9 @@ export default function Compiti() {
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Modello (opzionale)</label>
+            <label className="block text-xs text-gray-500 mb-1">
+              Modello (opzionale)
+            </label>
             <input
               type="text"
               value={model}
@@ -119,32 +127,52 @@ export default function Compiti() {
           <div className="flex items-center gap-3 mb-4">
             <p className="text-sm text-gray-500">
               {result.metadata.totale_compiti} compiti trovati su{" "}
-              {result.metadata.totale_lezioni} giorni — {result.metadata.modello_utilizzato}
+              {result.metadata.totale_lezioni} giorni —{" "}
+              {result.metadata.modello_utilizzato}
             </p>
             {result.fromCache && (
-              <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">📦 cache</span>
+              <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+                📦 cache
+              </span>
             )}
           </div>
 
           {result.compiti.length === 0 && (
-            <p className="text-gray-500 text-sm">🎉 Nessun compito trovato nel periodo.</p>
+            <p className="text-gray-500 text-sm">
+              🎉 Nessun compito trovato nel periodo.
+            </p>
           )}
 
           {deadlines.map((deadline) => {
             const isExpired =
-              deadline !== "senza scadenza" && isPast(parseISO(deadline)) && !isToday(parseISO(deadline));
-            const isScadenzaOggi = deadline !== "senza scadenza" && isToday(parseISO(deadline));
+              deadline !== "senza scadenza" &&
+              isPast(parseISO(deadline)) &&
+              !isToday(parseISO(deadline));
+            const isScadenzaOggi =
+              deadline !== "senza scadenza" && isToday(parseISO(deadline));
 
             return (
               <div key={deadline} className="mb-4">
                 <h2 className="text-sm font-semibold mb-2 flex items-center gap-2">
                   {isExpired && <span className="text-red-500">⚠️</span>}
-                  {isScadenzaOggi && <span className="text-orange-500">🔴</span>}
-                  <span className={isExpired ? "text-red-600" : isScadenzaOggi ? "text-orange-600" : "text-indigo-600"}>
+                  {isScadenzaOggi && (
+                    <span className="text-orange-500">🔴</span>
+                  )}
+                  <span
+                    className={
+                      isExpired
+                        ? "text-red-600"
+                        : isScadenzaOggi
+                          ? "text-orange-600"
+                          : "text-indigo-600"
+                    }
+                  >
                     Entro{" "}
                     {deadline === "senza scadenza"
                       ? "data non specificata"
-                      : format(parseISO(deadline), "EEEE d MMMM", { locale: it })}
+                      : format(parseISO(deadline), "EEEE d MMMM", {
+                          locale: it,
+                        })}
                   </span>
                 </h2>
                 <div className="space-y-2">
@@ -153,9 +181,13 @@ export default function Compiti() {
                       key={i}
                       className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3"
                     >
-                      <p className="text-xs font-semibold text-indigo-600 mb-0.5">{c.materia}</p>
+                      <p className="text-xs font-semibold text-indigo-600 mb-0.5">
+                        {c.materia}
+                      </p>
                       <p className="text-sm text-gray-800">{c.testo}</p>
-                      {c.note && <p className="text-xs text-gray-400 mt-1">{c.note}</p>}
+                      {c.note && (
+                        <p className="text-xs text-gray-400 mt-1">{c.note}</p>
+                      )}
                     </div>
                   ))}
                 </div>

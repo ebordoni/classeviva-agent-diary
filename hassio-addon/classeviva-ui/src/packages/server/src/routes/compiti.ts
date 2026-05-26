@@ -1,10 +1,9 @@
-import { Router } from "express";
-import type { Request, Response } from "express";
-import { AIService } from "@classeviva/core";
 import type { AIProvider } from "@classeviva/core";
-import { requireAuth } from "../middleware/auth.js";
+import { AIService, ultimiNGiorni } from "@classeviva/core";
+import type { Request, Response } from "express";
+import { Router } from "express";
 import { getCompiti } from "../cache.js";
-import { ultimiNGiorni } from "@classeviva/core";
+import { requireAuth } from "../middleware/auth.js";
 
 const router = Router();
 
@@ -21,7 +20,9 @@ router.post("/", requireAuth, async (req: Request, res: Response) => {
   };
 
   // AI config: request body ha precedenza sulle variabili d'ambiente
-  const provider = (body.provider ?? process.env.AI_PROVIDER ?? "openai") as AIProvider;
+  const provider = (body.provider ??
+    process.env.AI_PROVIDER ??
+    "openai") as AIProvider;
   const apiKey = body.apiKey ?? process.env.AI_API_KEY ?? "";
   const model = body.model ?? process.env.AI_MODEL ?? undefined;
 

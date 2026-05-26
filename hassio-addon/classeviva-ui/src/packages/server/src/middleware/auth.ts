@@ -1,5 +1,5 @@
-import type { Request, Response, NextFunction } from "express";
 import type { ClassevivaClient } from "@classeviva/core";
+import type { NextFunction, Request, Response } from "express";
 import { getClientBySessionId } from "../session.js";
 
 declare module "express" {

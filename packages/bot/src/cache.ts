@@ -404,7 +404,11 @@ export async function saveCredentials(
   studentId: string,
   password: string,
 ): Promise<void> {
-  await store.set(key("digest_creds", chatId), { studentId, password }, YEAR_MS);
+  await store.set(
+    key("digest_creds", chatId),
+    { studentId, password },
+    YEAR_MS,
+  );
 }
 
 export async function getCredentials(

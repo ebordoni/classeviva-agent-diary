@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { votiApi } from "../api.ts";
-import type { Voto } from "../types.ts";
 import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
+import { votiApi } from "../api.ts";
+import type { Voto } from "../types.ts";
 
 function gradeColor(v: number): string {
   if (v >= 8) return "text-green-700 bg-green-50";
@@ -28,9 +28,12 @@ export default function Voti() {
   );
 
   function avg(voti: Voto[]): string {
-    const numeric = voti.filter((v) => !isNaN(v.decimalValue) && v.decimalValue > 0);
+    const numeric = voti.filter(
+      (v) => !isNaN(v.decimalValue) && v.decimalValue > 0,
+    );
     if (numeric.length === 0) return "—";
-    const mean = numeric.reduce((s, v) => s + v.decimalValue, 0) / numeric.length;
+    const mean =
+      numeric.reduce((s, v) => s + v.decimalValue, 0) / numeric.length;
     return mean.toFixed(2);
   }
 
@@ -39,7 +42,9 @@ export default function Voti() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Voti</h1>
         {data?.fromCache && (
-          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">📦 cache</span>
+          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+            📦 cache
+          </span>
         )}
       </div>
 
@@ -62,7 +67,9 @@ export default function Voti() {
                 <tr className="bg-gray-50 text-gray-500 text-xs uppercase">
                   <th className="px-4 py-2 text-left">Data</th>
                   <th className="px-4 py-2 text-left">Voto</th>
-                  <th className="px-4 py-2 text-left hidden md:table-cell">Periodo</th>
+                  <th className="px-4 py-2 text-left hidden md:table-cell">
+                    Periodo
+                  </th>
                   <th className="px-4 py-2 text-left">Descrizione</th>
                 </tr>
               </thead>
@@ -71,7 +78,10 @@ export default function Voti() {
                   .slice()
                   .sort((a, b) => b.evtDate.localeCompare(a.evtDate))
                   .map((v, i) => (
-                    <tr key={`${v.evtDate}-${i}`} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                    <tr
+                      key={`${v.evtDate}-${i}`}
+                      className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                    >
                       <td className="px-4 py-2 text-gray-500">
                         {format(parseISO(v.evtDate), "d MMM", { locale: it })}
                       </td>
@@ -82,8 +92,12 @@ export default function Voti() {
                           {v.displayValue}
                         </span>
                       </td>
-                      <td className="px-4 py-2 text-gray-500 hidden md:table-cell">{v.periodDesc}</td>
-                      <td className="px-4 py-2 text-gray-700">{v.skillDesc || "—"}</td>
+                      <td className="px-4 py-2 text-gray-500 hidden md:table-cell">
+                        {v.periodDesc}
+                      </td>
+                      <td className="px-4 py-2 text-gray-700">
+                        {v.skillDesc || "—"}
+                      </td>
                     </tr>
                   ))}
               </tbody>

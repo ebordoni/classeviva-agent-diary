@@ -29,7 +29,12 @@ const bot = buildBot(
 bot.launch();
 
 if (digestTime) {
-  startScheduler(bot, digestTime, process.env.AI_API_KEY, process.env.AI_PROVIDER);
+  startScheduler(
+    bot,
+    digestTime,
+    process.env.AI_API_KEY,
+    process.env.AI_PROVIDER,
+  );
   console.log(`📅 Digest giornaliero programmato alle ${digestTime}`);
 }
 

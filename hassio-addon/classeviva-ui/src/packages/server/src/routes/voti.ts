@@ -1,7 +1,7 @@
-import { Router } from "express";
 import type { Request, Response } from "express";
-import { requireAuth } from "../middleware/auth.js";
+import { Router } from "express";
 import { getVoti } from "../cache.js";
+import { requireAuth } from "../middleware/auth.js";
 
 const router = Router();
 

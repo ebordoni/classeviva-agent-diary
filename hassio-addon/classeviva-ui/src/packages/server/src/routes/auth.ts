@@ -1,17 +1,17 @@
-import { Router } from "express";
-import type { Request, Response } from "express";
 import { ClassevivaClient } from "@classeviva/core";
+import type { Request, Response } from "express";
+import { Router } from "express";
 import {
-  setClientBySessionId,
+  clearSavedStudentId,
+  getSavedStudentId,
+  invalidateUser,
+  saveStudentId,
+} from "../cache.js";
+import {
   clearClientBySessionId,
   getClientBySessionId,
+  setClientBySessionId,
 } from "../session.js";
-import {
-  saveStudentId,
-  getSavedStudentId,
-  clearSavedStudentId,
-  invalidateUser,
-} from "../cache.js";
 
 const router = Router();
 

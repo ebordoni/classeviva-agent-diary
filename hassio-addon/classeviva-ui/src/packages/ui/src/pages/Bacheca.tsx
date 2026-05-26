@@ -1,7 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { bachecaApi } from "../api.ts";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
+import { bachecaApi } from "../api.ts";
 
 export default function Bacheca() {
   const qc = useQueryClient();
@@ -28,7 +28,9 @@ export default function Bacheca() {
       {error && <ErrorMsg message={(error as Error).message} />}
 
       {!isLoading && items.length === 0 && (
-        <p className="text-gray-500 text-sm">Nessuna comunicazione disponibile.</p>
+        <p className="text-gray-500 text-sm">
+          Nessuna comunicazione disponibile.
+        </p>
       )}
 
       <div className="space-y-3">
@@ -45,7 +47,9 @@ export default function Bacheca() {
                   {!item.readStatus && (
                     <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
                   )}
-                  <p className="text-sm font-medium text-gray-800">{item.cntTitle}</p>
+                  <p className="text-sm font-medium text-gray-800">
+                    {item.cntTitle}
+                  </p>
                 </div>
                 <div className="flex items-center gap-3 text-xs text-gray-400">
                   <span>{item.cntCategory}</span>

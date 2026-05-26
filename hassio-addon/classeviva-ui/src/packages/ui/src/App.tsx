@@ -1,18 +1,18 @@
-import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import { authApi } from "./api.ts";
 import Layout from "./components/Layout.tsx";
-import Login from "./pages/Login.tsx";
-import Dashboard from "./pages/Dashboard.tsx";
-import Lezioni from "./pages/Lezioni.tsx";
-import Voti from "./pages/Voti.tsx";
-import Assenze from "./pages/Assenze.tsx";
 import Agenda from "./pages/Agenda.tsx";
-import Materie from "./pages/Materie.tsx";
-import Compiti from "./pages/Compiti.tsx";
-import Note from "./pages/Note.tsx";
+import Assenze from "./pages/Assenze.tsx";
 import Bacheca from "./pages/Bacheca.tsx";
+import Compiti from "./pages/Compiti.tsx";
+import Dashboard from "./pages/Dashboard.tsx";
 import Didattica from "./pages/Didattica.tsx";
+import Lezioni from "./pages/Lezioni.tsx";
+import Login from "./pages/Login.tsx";
+import Materie from "./pages/Materie.tsx";
+import Note from "./pages/Note.tsx";
+import Voti from "./pages/Voti.tsx";
 
 function AppRoutes() {
   const { data, isLoading } = useQuery({

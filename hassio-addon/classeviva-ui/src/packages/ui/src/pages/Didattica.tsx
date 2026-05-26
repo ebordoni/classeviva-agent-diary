@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { ChevronLeft, FileText, FolderOpen } from "lucide-react";
+import { useState } from "react";
 import { didatticaApi } from "../api.ts";
-import type { FolderDidattica, ElementoDidattica } from "../types.ts";
-import { ChevronLeft, FolderOpen, FileText } from "lucide-react";
+import type { ElementoDidattica, FolderDidattica } from "../types.ts";
 
 function FolderList({
   folders,
@@ -12,7 +12,9 @@ function FolderList({
   onSelect: (f: FolderDidattica) => void;
 }) {
   if (folders.length === 0)
-    return <p className="text-gray-500 text-sm">Nessuna cartella disponibile.</p>;
+    return (
+      <p className="text-gray-500 text-sm">Nessuna cartella disponibile.</p>
+    );
 
   return (
     <div className="space-y-2">
@@ -23,7 +25,9 @@ function FolderList({
           className="w-full bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3 flex items-center gap-3 hover:border-indigo-200 transition-colors text-left"
         >
           <FolderOpen size={18} className="text-indigo-500 shrink-0" />
-          <span className="text-sm font-medium text-gray-800">{f.folderName}</span>
+          <span className="text-sm font-medium text-gray-800">
+            {f.folderName}
+          </span>
         </button>
       ))}
     </div>
@@ -53,7 +57,9 @@ function ElementList({ elements }: { elements: ElementoDidattica[] }) {
 }
 
 export default function Didattica() {
-  const [selectedFolder, setSelectedFolder] = useState<FolderDidattica | null>(null);
+  const [selectedFolder, setSelectedFolder] = useState<FolderDidattica | null>(
+    null,
+  );
 
   const { data: foldersData, isLoading: foldersLoading } = useQuery({
     queryKey: ["didattica"],

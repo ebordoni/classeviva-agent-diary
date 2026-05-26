@@ -30,22 +30,23 @@ export const authApi = {
       "/api/auth/login",
       { method: "POST", body: JSON.stringify({ studentId, password }) },
     ),
-  logout: () => apiFetch<{ success: boolean }>("/api/auth/logout", { method: "POST" }),
+  logout: () =>
+    apiFetch<{ success: boolean }>("/api/auth/logout", { method: "POST" }),
 };
 
 // ─── Dati ────────────────────────────────────────────────────────
 
 import type {
-  LezioniResponse,
-  VotiResponse,
-  AssenzeResponse,
   AgendaResponse,
-  MaterieResponse,
-  CompitiResponse,
-  NoteResponse,
+  AssenzeResponse,
   BachecaResponse,
+  CompitiResponse,
   DidatticaResponse,
   ElementiDidatticaResponse,
+  LezioniResponse,
+  MaterieResponse,
+  NoteResponse,
+  VotiResponse,
 } from "./types.ts";
 
 export const lezioniApi = {

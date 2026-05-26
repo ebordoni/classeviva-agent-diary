@@ -1,21 +1,21 @@
-import { type ReactNode } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import {
-  BookOpen,
-  Star,
-  Calendar,
-  ClipboardList,
-  Users,
-  Brain,
   AlertCircle,
   Bell,
+  BookOpen,
+  Brain,
+  Calendar,
+  ClipboardList,
   FolderOpen,
+  LayoutDashboard,
   LogOut,
   RefreshCw,
-  LayoutDashboard,
+  Star,
+  Users,
 } from "lucide-react";
+import { type ReactNode } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { authApi, cacheApi } from "../api.ts";
-import { useQueryClient } from "@tanstack/react-query";
 
 interface NavItem {
   to: string;
@@ -65,7 +65,9 @@ export default function Layout({ children, userName }: LayoutProps) {
       {/* Sidebar */}
       <aside className="flex flex-col w-56 bg-gray-900 text-gray-100 shrink-0">
         <div className="px-4 py-5 border-b border-gray-700">
-          <span className="text-lg font-bold tracking-tight">🏫 Classeviva</span>
+          <span className="text-lg font-bold tracking-tight">
+            🏫 Classeviva
+          </span>
           <p className="text-xs text-gray-400 mt-1 truncate">{userName}</p>
         </div>
 

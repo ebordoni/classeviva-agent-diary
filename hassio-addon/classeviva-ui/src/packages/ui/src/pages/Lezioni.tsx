@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { lezioniApi } from "../api.ts";
 import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
+import { useState } from "react";
+import { lezioniApi } from "../api.ts";
 
 function toDateInput(d: Date) {
   return d.toISOString().split("T")[0]!;
@@ -35,7 +35,9 @@ export default function Lezioni() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Lezioni</h1>
         {data?.fromCache && (
-          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">📦 cache</span>
+          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+            📦 cache
+          </span>
         )}
       </div>
 
@@ -45,7 +47,9 @@ export default function Lezioni() {
           <input
             type="date"
             value={range.inizio}
-            onChange={(e) => setRange((r) => ({ ...r, inizio: e.target.value }))}
+            onChange={(e) =>
+              setRange((r) => ({ ...r, inizio: e.target.value }))
+            }
             className="border border-gray-200 rounded px-2 py-1 text-sm"
           />
         </div>
@@ -64,7 +68,9 @@ export default function Lezioni() {
       {error && <ErrorMsg message={(error as Error).message} />}
 
       {!isLoading && dates.length === 0 && (
-        <p className="text-gray-500 text-sm">Nessuna lezione nel periodo selezionato.</p>
+        <p className="text-gray-500 text-sm">
+          Nessuna lezione nel periodo selezionato.
+        </p>
       )}
 
       {dates.map((date) => (
@@ -78,17 +84,30 @@ export default function Lezioni() {
                 <tr className="bg-gray-50 text-gray-500 text-xs uppercase">
                   <th className="px-4 py-2 text-left w-8">Ora</th>
                   <th className="px-4 py-2 text-left">Materia</th>
-                  <th className="px-4 py-2 text-left hidden md:table-cell">Docente</th>
+                  <th className="px-4 py-2 text-left hidden md:table-cell">
+                    Docente
+                  </th>
                   <th className="px-4 py-2 text-left">Argomento</th>
                 </tr>
               </thead>
               <tbody>
                 {(byDate.get(date) ?? []).map((l, i) => (
-                  <tr key={l.evtId} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                    <td className="px-4 py-2 text-gray-400 font-mono">{i + 1}ª</td>
-                    <td className="px-4 py-2 font-medium text-gray-800">{l.subjectDesc}</td>
-                    <td className="px-4 py-2 text-gray-500 hidden md:table-cell">{l.authorName}</td>
-                    <td className="px-4 py-2 text-gray-700">{l.lessonArg || l.evtText || "—"}</td>
+                  <tr
+                    key={l.evtId}
+                    className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                  >
+                    <td className="px-4 py-2 text-gray-400 font-mono">
+                      {i + 1}ª
+                    </td>
+                    <td className="px-4 py-2 font-medium text-gray-800">
+                      {l.subjectDesc}
+                    </td>
+                    <td className="px-4 py-2 text-gray-500 hidden md:table-cell">
+                      {l.authorName}
+                    </td>
+                    <td className="px-4 py-2 text-gray-700">
+                      {l.lessonArg || l.evtText || "—"}
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -1,18 +1,18 @@
 {
-  "name": "classeviva-ui",
-  "version": "1.0.0",
-  "description": "Classeviva Web UI — Home Assistant Addon",
-  "private": true,
-  "type": "module",
-  "workspaces": [
-    "packages/core",
-    "packages/server",
-    "packages/ui"
-  ],
-  "scripts": {
-    "build:core": "npm run build -w packages/core",
-    "build:server": "npm run build -w packages/server",
-    "build:ui": "npm run build -w packages/ui",
-    "build": "npm run build:core && npm run build:server && npm run build:ui"
-  }
+      "name": "classeviva-ui",
+      "version": "1.0.0",
+      "description": "Classeviva Web UI — Home Assistant Addon",
+      "private": true,
+      "type": "module",
+      "workspaces": [
+            "packages/core",
+            "packages/server",
+            "packages/ui"
+      ],
+      "scripts": {
+            "build:core": "npm run build -w packages/core",
+            "build:server": "npm run build -w packages/server",
+            "build:ui": "npm run build -w packages/ui",
+            "build": "npm run build:core && npm run build:server && npm run build:ui"
+      }
 }

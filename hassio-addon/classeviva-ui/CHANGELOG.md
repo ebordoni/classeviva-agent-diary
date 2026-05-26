@@ -1,3 +1,9 @@
+## 1.0.1 — 2026-05-26
+
+- Fix: percorso file statici UI corretto (`../../ui/dist`)
+- Fix: errore Docker TS7016 causato da `tsconfig.tsbuildinfo` committato con path Windows
+- Aggiunto `.dockerignore` per escludere `dist/` e `node_modules/` dal build context
+
 ## 1.0.0 — 2026-05-26
 
 - Primo rilascio dell'addon Classeviva UI

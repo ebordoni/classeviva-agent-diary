@@ -7,6 +7,16 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.7.1] — 2026-05-26
+
+### Corretto
+
+- **Addon `classeviva-ui`**: fix percorso file statici UI nel server Express
+- **Addon `classeviva-ui`**: fix build Docker — `tsconfig.tsbuildinfo` rimosso dal repo per evitare errore TS7016
+- Aggiunto `.dockerignore` per `classeviva-ui`
+
+---
+
 ## [1.7.0] — 2026-05-26
 
 ### Aggiunto

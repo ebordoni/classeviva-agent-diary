@@ -7,6 +7,17 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.7.0] — 2026-05-26
+
+### Aggiunto
+
+- **Addon `classeviva-ui`**: interfaccia web per Home Assistant con accesso a tutte le funzionalità del registro (lezioni, voti, assenze, agenda, materie, compiti AI, note, bacheca, didattica)
+- Dashboard con riepilogo voti, prossimi eventi e assenze non giustificate
+- Supporto HA Ingress con pannello dedicato (`mdi:school-outline`)
+- Cache condivisa separata (`cache_ui.json`) per non interferire con il bot
+
+---
+
 ## [1.6.0] — 2026-04-24
 
 ### Aggiunto

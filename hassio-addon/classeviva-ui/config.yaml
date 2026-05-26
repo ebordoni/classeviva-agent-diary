@@ -1,0 +1,36 @@
+name: "Classeviva UI"
+description: "Interfaccia web per il registro Classeviva — consulta voti, lezioni, compiti e altro dal browser."
+version: "1.0.0"
+slug: "classeviva_ui"
+init: false
+
+arch:
+  - aarch64
+  - armv7
+  - amd64
+
+map:
+  - data:rw
+
+# Porta web + HA Ingress
+ports:
+  8099/tcp: null
+ports_description:
+  8099/tcp: "Web UI"
+
+ingress: true
+ingress_port: 8099
+panel_icon: mdi:school-outline
+panel_title: "Classeviva"
+
+options:
+  ai_provider: "openai"
+  ai_model: ""
+  ai_api_key: ""
+  session_secret: ""
+
+schema:
+  ai_provider: str
+  ai_model: str?
+  ai_api_key: str?
+  session_secret: str?

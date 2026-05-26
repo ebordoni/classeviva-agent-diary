@@ -1,0 +1,46 @@
+{
+      "name": "@classeviva/core",
+      "version": "2.0.0",
+      "description": "Classeviva TypeScript Core Library - API wrapper per Classeviva Spaggiari",
+      "main": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "type": "module",
+      "exports": {
+            ".": {
+                  "types": "./dist/index.d.ts",
+                  "import": "./dist/index.js"
+            }
+      },
+      "scripts": {
+            "build": "tsc",
+            "watch": "tsc --watch",
+            "clean": "rm -rf dist",
+            "prepublishOnly": "npm run clean && npm run build"
+      },
+      "keywords": [
+            "classeviva",
+            "api",
+            "spaggiari",
+            "registro-elettronico",
+            "typescript"
+      ],
+      "author": "Fork from FLAK-ZOSO Python version",
+      "license": "MIT",
+      "dependencies": {
+            "@ai-sdk/anthropic": "^3.0.58",
+            "@ai-sdk/google": "^3.0.43",
+            "@ai-sdk/groq": "^3.0.29",
+            "@ai-sdk/openai": "^3.0.41",
+            "@ai-sdk/xai": "^3.0.83",
+            "ai": "^6.0.116",
+            "axios": "^1.6.0",
+            "zod": "^4.3.6"
+      },
+      "devDependencies": {
+            "@types/node": "^20.10.0",
+            "typescript": "^5.3.3"
+      },
+      "engines": {
+            "node": ">=18.0.0"
+      }
+}

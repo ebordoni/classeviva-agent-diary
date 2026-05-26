@@ -57,7 +57,7 @@ app.use("/api/cache", cacheRouter);
 
 // Serve static UI (Vite build output)
 const uiDistPath =
-  process.env.UI_DIST_PATH ?? path.resolve(__dirname, "../../../ui/dist");
+  process.env.UI_DIST_PATH ?? path.resolve(__dirname, "../../ui/dist");
 
 app.use(express.static(uiDistPath));
 

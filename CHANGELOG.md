@@ -7,6 +7,20 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.8.1] — 2026-05-27
+
+### Corretto
+
+- **Addon `classeviva-ui`**: campo Student ID spariva durante la digitazione nel form login
+- **Addon `classeviva-ui`**: logout non reindirizzava alla pagina di login
+- **Addon `classeviva-ui`**: crash `Cannot read properties of undefined (reading 'replace')` con certi account
+- **Addon `classeviva-ui`**: switcher utente non cliccabile con un solo account salvato
+- **Addon `classeviva-ui`**: "Aggiungi account" non preservava la sessione corrente
+- **Addon `classeviva-ui`**: nome utente nella sidebar non si aggiornava dopo lo switch
+- **Addon `classeviva-ui`**: cartella `/data/` non creata automaticamente al primo avvio
+
+---
+
 ## [1.8.0] — 2026-05-27
 
 ### Aggiunto

@@ -43,4 +43,3 @@ export async function requireAuth(
   req.classeviva = client;
   next();
 }
-

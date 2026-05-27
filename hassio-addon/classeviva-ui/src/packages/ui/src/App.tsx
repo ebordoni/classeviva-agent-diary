@@ -1,7 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
-import { authApi } from "./api.ts";
+import {
+  HashRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import type { AccountInfo } from "./api.ts";
+import { authApi } from "./api.ts";
 import Layout from "./components/Layout.tsx";
 import Assenze from "./pages/Assenze.tsx";
 import Bacheca from "./pages/Bacheca.tsx";
@@ -12,6 +18,9 @@ import Login from "./pages/Login.tsx";
 import Voti from "./pages/Voti.tsx";
 
 function AppRoutes() {
+  const location = useLocation();
+  const addAccount =
+    (location.state as { addAccount?: boolean } | null)?.addAccount === true;
   const { data, isLoading } = useQuery({
     queryKey: ["me"],
     queryFn: authApi.me,
@@ -19,7 +28,7 @@ function AppRoutes() {
     staleTime: Infinity,
   });
 
-  if (isLoading) {
+  if (isLoading && location.pathname !== "/login") {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
@@ -37,10 +46,10 @@ function AppRoutes() {
       <Route
         path="/login"
         element={
-          authenticated ? (
+          authenticated && !addAccount ? (
             <Navigate to="/" replace />
           ) : (
-            <Login accounts={accounts} />
+            <Login accounts={accounts} forceNew={addAccount} />
           )
         }
       />
@@ -79,4 +88,3 @@ export default function App() {
     </HashRouter>
   );
 }
-

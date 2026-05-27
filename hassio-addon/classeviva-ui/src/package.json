@@ -13,6 +13,10 @@
             "build:core": "npm run build -w packages/core",
             "build:server": "npm run build -w packages/server",
             "build:ui": "npm run build -w packages/ui",
-            "build": "npm run build:core && npm run build:server && npm run build:ui"
+            "build": "npm run build:core && npm run build:server && npm run build:ui",
+            "dev": "concurrently -n server,ui -c cyan,magenta \"npm run dev -w packages/server\" \"npm run dev -w packages/ui\""
+      },
+      "devDependencies": {
+            "concurrently": "^9.0.0"
       }
 }

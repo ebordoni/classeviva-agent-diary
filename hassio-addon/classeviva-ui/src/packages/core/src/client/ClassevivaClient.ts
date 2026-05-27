@@ -104,9 +104,11 @@ export class ClassevivaClient {
     this.axiosInstance.defaults.headers.common["Z-Auth-Token"] = data.token;
 
     // Per account G (genitori) gli endpoint studente usano l'ID numerico
-    const numericId = data.ident.replace(/\D/g, "");
-    if (data.ident !== numericId) {
-      this.studentId = numericId;
+    if (data.ident) {
+      const numericId = data.ident.replace(/\D/g, "");
+      if (data.ident !== numericId) {
+        this.studentId = numericId;
+      }
     }
 
     this.loginTimestamp = Date.now();

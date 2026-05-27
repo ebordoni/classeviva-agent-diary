@@ -50,9 +50,12 @@ export default function Layout({
   const [switching, setSwitching] = useState(false);
 
   async function handleLogout() {
-    await authApi.logout();
-    queryClient.clear();
-    navigate("/login");
+    try {
+      await authApi.logout();
+    } finally {
+      queryClient.clear();
+      navigate("/login");
+    }
   }
 
   async function handleRefresh() {
@@ -71,13 +74,8 @@ export default function Layout({
     }
     setSwitching(true);
     try {
-      const result = await accountsApi.switch(studentId);
-      queryClient.setQueryData(["me"], (old: Record<string, unknown>) => ({
-        ...old,
-        user: result.user,
-        authenticated: true,
-      }));
-      queryClient.invalidateQueries({ queryKey: ["me"] });
+      await accountsApi.switch(studentId);
+      await queryClient.refetchQueries({ queryKey: ["me"] });
       queryClient.invalidateQueries();
     } finally {
       setSwitching(false);
@@ -85,30 +83,30 @@ export default function Layout({
     }
   }
 
-  const otherAccounts = accounts.filter(
-    (a) => a.studentId !== activeStudentId,
-  );
+  const otherAccounts = accounts.filter((a) => a.studentId !== activeStudentId);
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
       {/* Sidebar */}
       <aside className="flex flex-col w-56 bg-gray-900 text-gray-100 shrink-0">
         <div className="px-4 py-4 border-b border-gray-700">
-          <span className="text-lg font-bold tracking-tight">🏫 Classeviva</span>
+          <span className="text-lg font-bold tracking-tight">
+            🏫 Classeviva
+          </span>
 
           {/* User switcher */}
           <div className="relative mt-2">
             <button
               onClick={() => setSwitcherOpen((v) => !v)}
-              disabled={switching || accounts.length <= 1}
+              disabled={switching}
               className="flex items-center gap-1 w-full text-left text-xs text-gray-300 hover:text-white transition-colors disabled:opacity-60"
             >
               <UserCheck size={13} className="shrink-0" />
               <span className="truncate flex-1">{userName}</span>
-              {accounts.length > 1 && <ChevronDown size={13} className="shrink-0" />}
+              <ChevronDown size={13} className="shrink-0" />
             </button>
 
-            {switcherOpen && otherAccounts.length > 0 && (
+            {switcherOpen && (
               <div className="absolute left-0 top-full mt-1 w-full bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-50">
                 <p className="px-3 py-1.5 text-xs text-gray-400 border-b border-gray-700">
                   Cambia utente
@@ -126,7 +124,7 @@ export default function Layout({
                 <button
                   onClick={() => {
                     setSwitcherOpen(false);
-                    void handleLogout();
+                    navigate("/login", { state: { addAccount: true } });
                   }}
                   className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors border-t border-gray-700"
                 >
@@ -182,4 +180,3 @@ export default function Layout({
     </div>
   );
 }
-

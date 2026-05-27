@@ -132,9 +132,7 @@ export default function Dashboard() {
           <div className="space-y-2">
             {grades
               .slice()
-              .sort((a, b) =>
-                (b.evtDate ?? "").localeCompare(a.evtDate ?? ""),
-              )
+              .sort((a, b) => (b.evtDate ?? "").localeCompare(a.evtDate ?? ""))
               .slice(0, 6)
               .map((g, i) => (
                 <div key={i} className="flex items-center gap-3">

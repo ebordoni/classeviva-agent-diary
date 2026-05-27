@@ -1,3 +1,13 @@
+## 1.1.1 — 2026-05-27
+
+- Fix: campo Student ID spariva durante la digitazione (stato `isNewAccount` separato)
+- Fix: logout non reindirizzava al login (try/finally + skip spinner su `/login`)
+- Fix: crash `data.ident.replace` con account senza campo `ident` nella risposta API
+- Fix: switcher utente non visibile con un solo account salvato
+- Fix: aggiunta account non preservava la sessione corrente (`forceNew` prop)
+- Fix: nome utente nella sidebar non si aggiornava subito dopo lo switch (refetchQueries)
+- Fix: cartella `data/` non creata automaticamente alla prima scrittura di `accounts.json`
+
 ## 1.1.0 — 2026-05-27
 
 - Multi-utenza: supporto a più account Classeviva con switcher nella sidebar

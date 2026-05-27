@@ -5,9 +5,9 @@ import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import accountsRouter from "./routes/accounts.js";
 import agendaRouter from "./routes/agenda.js";
 import assenzeRouter from "./routes/assenze.js";
-import accountsRouter from "./routes/accounts.js";
 import authRouter from "./routes/auth.js";
 import bachecaRouter from "./routes/bacheca.js";
 import cacheRouter from "./routes/cache.js";

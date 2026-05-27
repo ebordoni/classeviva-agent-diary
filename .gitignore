@@ -50,6 +50,8 @@ password.txt
 *.db
 cache.json
 packages/bot/cache.json
+cache_ui.json
+data/accounts.json
 
 # File temporanei
 *.tmp

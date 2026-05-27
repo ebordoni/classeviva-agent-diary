@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import path from "node:path";
 
 export interface Account {
   studentId: string;
@@ -20,6 +21,7 @@ export async function loadAccounts(): Promise<Account[]> {
 }
 
 async function persistAccounts(accounts: Account[]): Promise<void> {
+  await mkdir(path.dirname(ACCOUNTS_PATH), { recursive: true });
   await writeFile(ACCOUNTS_PATH, JSON.stringify(accounts, null, 2), "utf-8");
 }
 

@@ -6,9 +6,13 @@ import { authApi } from "../api.ts";
 
 interface Props {
   accounts: AccountInfo[];
+  forceNew?: boolean;
 }
 
-export default function Login({ accounts }: Props) {
+export default function Login({ accounts, forceNew = false }: Props) {
+  const [isNewAccount, setIsNewAccount] = useState(
+    accounts.length === 0 || forceNew,
+  );
   const [studentId, setStudentId] = useState(accounts[0]?.studentId ?? "");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -21,11 +25,8 @@ export default function Login({ accounts }: Props) {
     setError(null);
     setLoading(true);
     try {
-      const result = await authApi.login(studentId, password);
-      queryClient.setQueryData(["me"], {
-        authenticated: true,
-        user: result.user,
-      });
+      await authApi.login(studentId, password);
+      await queryClient.invalidateQueries({ queryKey: ["me"] });
       navigate("/", { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Errore di login");
@@ -48,10 +49,17 @@ export default function Login({ accounts }: Props) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Student ID
             </label>
-            {accounts.length > 0 ? (
+            {accounts.length > 0 && !isNewAccount ? (
               <select
                 value={studentId}
-                onChange={(e) => setStudentId(e.target.value)}
+                onChange={(e) => {
+                  if (e.target.value === "__new__") {
+                    setIsNewAccount(true);
+                    setStudentId("");
+                  } else {
+                    setStudentId(e.target.value);
+                  }
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
               >
                 {accounts.map((a) => (
@@ -59,13 +67,13 @@ export default function Login({ accounts }: Props) {
                     {a.nome ? `${a.nome} (${a.studentId})` : a.studentId}
                   </option>
                 ))}
-                <option value="">+ Nuovo account…</option>
+                <option value="__new__">+ Nuovo account…</option>
               </select>
             ) : null}
-            {(accounts.length === 0 || studentId === "") && (
+            {isNewAccount && (
               <input
                 type="text"
-                value={studentId === "" ? "" : studentId}
+                value={studentId}
                 onChange={(e) => setStudentId(e.target.value)}
                 placeholder="S1234567"
                 required
@@ -84,7 +92,7 @@ export default function Login({ accounts }: Props) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              autoFocus={accounts.length > 0}
+              autoFocus={!isNewAccount && accounts.length > 0}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             />
           </div>
@@ -107,4 +115,3 @@ export default function Login({ accounts }: Props) {
     </div>
   );
 }
-

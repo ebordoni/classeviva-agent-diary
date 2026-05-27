@@ -1,6 +1,13 @@
+// Base path per HA Ingress: in produzione pathname = "api/hassio_ingress/TOKEN/"
+// in dev = "/". Usato per costruire URL API relativi al path corrente.
+const BASE_PATH = window.location.pathname.endsWith("/")
+  ? window.location.pathname
+  : window.location.pathname + "/";
+
 // Wrapper fetch con gestione errori uniforme
 
-async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
+async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const url = BASE_PATH + path;
   const res = await fetch(url, {
     credentials: "same-origin",
     headers: { "Content-Type": "application/json" },
@@ -24,14 +31,14 @@ export interface MeResponse {
 }
 
 export const authApi = {
-  me: () => apiFetch<MeResponse>("/api/auth/me"),
+  me: () => apiFetch<MeResponse>("api/auth/me"),
   login: (studentId: string, password: string) =>
     apiFetch<{ success: boolean; user: { nome: string; ident: string } }>(
-      "/api/auth/login",
+      "api/auth/login",
       { method: "POST", body: JSON.stringify({ studentId, password }) },
     ),
   logout: () =>
-    apiFetch<{ success: boolean }>("/api/auth/logout", { method: "POST" }),
+    apiFetch<{ success: boolean }>("api/auth/logout", { method: "POST" }),
 };
 
 // ─── Dati ────────────────────────────────────────────────────────
@@ -55,16 +62,16 @@ export const lezioniApi = {
     if (params.inizio) qs.set("inizio", params.inizio);
     if (params.fine) qs.set("fine", params.fine);
     if (params.giorni) qs.set("giorni", String(params.giorni));
-    return apiFetch<LezioniResponse>(`/api/lezioni?${qs}`);
+    return apiFetch<LezioniResponse>(`api/lezioni?${qs}`);
   },
 };
 
 export const votiApi = {
-  get: () => apiFetch<VotiResponse>("/api/voti"),
+  get: () => apiFetch<VotiResponse>("api/voti"),
 };
 
 export const assenzeApi = {
-  get: () => apiFetch<AssenzeResponse>("/api/assenze"),
+  get: () => apiFetch<AssenzeResponse>("api/assenze"),
 };
 
 export const agendaApi = {
@@ -72,12 +79,12 @@ export const agendaApi = {
     const qs = new URLSearchParams();
     if (params.inizio) qs.set("inizio", params.inizio);
     if (params.fine) qs.set("fine", params.fine);
-    return apiFetch<AgendaResponse>(`/api/agenda?${qs}`);
+    return apiFetch<AgendaResponse>(`api/agenda?${qs}`);
   },
 };
 
 export const materieApi = {
-  get: () => apiFetch<MaterieResponse>("/api/materie"),
+  get: () => apiFetch<MaterieResponse>("api/materie"),
 };
 
 export const compitiApi = {
@@ -89,35 +96,35 @@ export const compitiApi = {
     apiKey?: string;
     model?: string;
   }) =>
-    apiFetch<CompitiResponse>("/api/compiti", {
+    apiFetch<CompitiResponse>("api/compiti", {
       method: "POST",
       body: JSON.stringify(params),
     }),
 };
 
 export const noteApi = {
-  get: () => apiFetch<NoteResponse>("/api/note"),
+  get: () => apiFetch<NoteResponse>("api/note"),
   leggi: (eventCode: string, evtId: number) =>
-    apiFetch<{ success: boolean }>(`/api/note/${eventCode}/${evtId}/leggi`, {
+    apiFetch<{ success: boolean }>(`api/note/${eventCode}/${evtId}/leggi`, {
       method: "POST",
     }),
 };
 
 export const bachecaApi = {
-  get: () => apiFetch<BachecaResponse>("/api/bacheca"),
+  get: () => apiFetch<BachecaResponse>("api/bacheca"),
   leggi: (eventCode: string, pubId: number) =>
-    apiFetch<unknown>(`/api/bacheca/${eventCode}/${pubId}/leggi`, {
+    apiFetch<unknown>(`api/bacheca/${eventCode}/${pubId}/leggi`, {
       method: "POST",
     }),
 };
 
 export const didatticaApi = {
-  get: () => apiFetch<DidatticaResponse>("/api/didattica"),
+  get: () => apiFetch<DidatticaResponse>("api/didattica"),
   getFolder: (folderId: number) =>
-    apiFetch<ElementiDidatticaResponse>(`/api/didattica/${folderId}`),
+    apiFetch<ElementiDidatticaResponse>(`api/didattica/${folderId}`),
 };
 
 export const cacheApi = {
   invalida: () =>
-    apiFetch<{ success: boolean }>("/api/cache/invalida", { method: "POST" }),
+    apiFetch<{ success: boolean }>("api/cache/invalida", { method: "POST" }),
 };

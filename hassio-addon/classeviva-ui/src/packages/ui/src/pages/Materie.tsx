@@ -8,7 +8,7 @@ export default function Materie() {
   });
 
   const subjects = [...(data?.subjects ?? [])].sort((a, b) =>
-    a.subjectDesc.localeCompare(b.subjectDesc),
+    (a.subjectDesc ?? "").localeCompare(b.subjectDesc ?? ""),
   );
 
   return (

@@ -17,7 +17,7 @@ export default function Bacheca() {
   });
 
   const items = [...(data?.items ?? [])].sort((a, b) =>
-    b.pubDT.localeCompare(a.pubDT),
+    (b.pubDT ?? "").localeCompare(a.pubDT ?? ""),
   );
 
   return (

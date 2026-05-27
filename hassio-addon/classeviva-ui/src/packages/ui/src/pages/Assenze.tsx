@@ -25,7 +25,7 @@ export default function Assenze() {
   });
 
   const events: Assenza[] = [...(data?.events ?? [])].sort((a, b) =>
-    b.evtDate.localeCompare(a.evtDate),
+    (b.evtDate ?? "").localeCompare(a.evtDate ?? ""),
   );
 
   const totale = events.length;

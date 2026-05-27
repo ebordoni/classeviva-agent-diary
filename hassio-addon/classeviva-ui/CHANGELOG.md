@@ -1,3 +1,11 @@
+## 1.1.0 — 2026-05-27
+
+- Multi-utenza: supporto a più account Classeviva con switcher nella sidebar
+- Account salvati in `/data/accounts.json` con auto-reconnect al riavvio
+- Dashboard: box "Compiti degli ultimi 7 giorni" (da lezioni recenti)
+- Rimosse sezioni Agenda, Materie, Note, Didattica dalla navigazione
+- Login: dropdown degli account salvati con opzione "+ Nuovo account"
+
 ## 1.0.1 — 2026-05-26
 
 - Fix: percorso file statici UI corretto (`../../ui/dist`)

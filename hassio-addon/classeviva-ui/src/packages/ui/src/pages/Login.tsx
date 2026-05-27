@@ -1,14 +1,15 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import type { AccountInfo } from "../api.ts";
 import { authApi } from "../api.ts";
 
 interface Props {
-  savedStudentId: string | null | undefined;
+  accounts: AccountInfo[];
 }
 
-export default function Login({ savedStudentId }: Props) {
-  const [studentId, setStudentId] = useState(savedStudentId ?? "");
+export default function Login({ accounts }: Props) {
+  const [studentId, setStudentId] = useState(accounts[0]?.studentId ?? "");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -47,15 +48,31 @@ export default function Login({ savedStudentId }: Props) {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Student ID
             </label>
-            <input
-              type="text"
-              value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
-              placeholder="S1234567"
-              required
-              autoFocus={!savedStudentId}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
-            />
+            {accounts.length > 0 ? (
+              <select
+                value={studentId}
+                onChange={(e) => setStudentId(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              >
+                {accounts.map((a) => (
+                  <option key={a.studentId} value={a.studentId}>
+                    {a.nome ? `${a.nome} (${a.studentId})` : a.studentId}
+                  </option>
+                ))}
+                <option value="">+ Nuovo account…</option>
+              </select>
+            ) : null}
+            {(accounts.length === 0 || studentId === "") && (
+              <input
+                type="text"
+                value={studentId === "" ? "" : studentId}
+                onChange={(e) => setStudentId(e.target.value)}
+                placeholder="S1234567"
+                required
+                autoFocus
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm mt-2"
+              />
+            )}
           </div>
 
           <div>
@@ -67,7 +84,7 @@ export default function Login({ savedStudentId }: Props) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              autoFocus={!!savedStudentId}
+              autoFocus={accounts.length > 0}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
             />
           </div>
@@ -90,3 +107,4 @@ export default function Login({ savedStudentId }: Props) {
     </div>
   );
 }
+

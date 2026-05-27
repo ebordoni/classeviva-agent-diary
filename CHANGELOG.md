@@ -7,6 +7,20 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.8.0] — 2026-05-27
+
+### Aggiunto
+
+- **Addon `classeviva-ui`**: gestione multi-utenza — più account Classeviva con switcher nella sidebar, credenziali persistite in `/data/accounts.json`, auto-reconnect al riavvio del server
+- **Addon `classeviva-ui`**: box "Compiti degli ultimi 7 giorni" nella Dashboard (estratto da lezioni recenti)
+- **Addon `classeviva-ui`**: login con dropdown degli account salvati
+
+### Modificato
+
+- **Addon `classeviva-ui`**: rimosse sezioni Agenda, Materie, Note, Didattica dalla navigazione
+
+---
+
 ## [1.7.1] — 2026-05-26
 
 ### Corretto

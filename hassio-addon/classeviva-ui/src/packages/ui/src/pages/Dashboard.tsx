@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { format, isToday, isTomorrow, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
-import { Link } from "react-router-dom";
-import { agendaApi, assenzeApi, votiApi } from "../api.ts";
+import { assenzeApi, lezioniApi, votiApi } from "../api.ts";
 
 function toDateInput(d: Date) {
   return d.toISOString().split("T")[0]!;
@@ -17,8 +16,8 @@ function gradeColor(v: number): string {
 
 export default function Dashboard() {
   const oggi = new Date();
-  const tra14 = new Date();
-  tra14.setDate(oggi.getDate() + 14);
+  const sette = new Date();
+  sette.setDate(oggi.getDate() - 7);
 
   const { data: votiData } = useQuery({
     queryKey: ["voti"],
@@ -30,18 +29,21 @@ export default function Dashboard() {
     queryFn: assenzeApi.get,
   });
 
-  const { data: agendaData } = useQuery({
-    queryKey: ["agenda", toDateInput(oggi), toDateInput(tra14)],
+  const { data: lezioniData } = useQuery({
+    queryKey: ["lezioni", toDateInput(sette), toDateInput(oggi)],
     queryFn: () =>
-      agendaApi.get({ inizio: toDateInput(oggi), fine: toDateInput(tra14) }),
+      lezioniApi.get({ inizio: toDateInput(sette), fine: toDateInput(oggi) }),
   });
 
   const grades = votiData?.grades ?? [];
   const absences = assenzeData?.events ?? [];
-  const events = agendaData?.agenda ?? [];
 
   const nonGiustificate = absences.filter((a) => !a.isJustified).length;
-  const prossimi = events.slice(0, 5);
+
+  // Compiti: lezioni con lessonArg non vuoto, ordinate dalla più recente
+  const compiti = (lezioniData?.lessons ?? [])
+    .filter((l) => l.lessonArg && l.lessonArg.trim().length > 0)
+    .sort((a, b) => (b.evtDate ?? "").localeCompare(a.evtDate ?? ""));
 
   // Media generale
   const numerici = grades.filter(
@@ -60,34 +62,24 @@ export default function Dashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-        <Link
-          to="/voti"
-          className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-4 hover:border-indigo-200 transition-colors"
-        >
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-4">
           <p
             className={`text-3xl font-bold ${gradeColor(parseFloat(mediaGenerale))}`}
           >
             {mediaGenerale}
           </p>
           <p className="text-xs text-gray-500 mt-1">Media voti</p>
-        </Link>
-        <Link
-          to="/voti"
-          className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-4 hover:border-indigo-200 transition-colors"
-        >
+        </div>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-4">
           <p className="text-3xl font-bold text-gray-800">{grades.length}</p>
           <p className="text-xs text-gray-500 mt-1">Voti totali</p>
-        </Link>
-        <Link
-          to="/assenze"
-          className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-4 hover:border-indigo-200 transition-colors"
-        >
+        </div>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-4">
           <p className="text-3xl font-bold text-gray-800">{absences.length}</p>
           <p className="text-xs text-gray-500 mt-1">Assenze totali</p>
-        </Link>
-        <Link
-          to="/assenze"
-          className={`bg-white rounded-xl border shadow-sm px-4 py-4 hover:border-orange-200 transition-colors ${nonGiustificate > 0 ? "border-orange-200" : "border-gray-100"}`}
+        </div>
+        <div
+          className={`bg-white rounded-xl border shadow-sm px-4 py-4 ${nonGiustificate > 0 ? "border-orange-200" : "border-gray-100"}`}
         >
           <p
             className={`text-3xl font-bold ${nonGiustificate > 0 ? "text-orange-600" : "text-gray-800"}`}
@@ -95,70 +87,54 @@ export default function Dashboard() {
             {nonGiustificate}
           </p>
           <p className="text-xs text-gray-500 mt-1">Da giustificare</p>
-        </Link>
+        </div>
       </div>
 
-      {/* Prossimi eventi */}
+      {/* Compiti degli ultimi 7 giorni */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-gray-700">
-            Prossimi eventi
-          </h2>
-          <Link
-            to="/agenda"
-            className="text-xs text-indigo-600 hover:underline"
-          >
-            Vedi tutto
-          </Link>
-        </div>
-        {prossimi.length === 0 ? (
+        <h2 className="text-sm font-semibold text-gray-700 mb-3">
+          📚 Compiti degli ultimi 7 giorni
+        </h2>
+        {compiti.length === 0 ? (
           <p className="text-sm text-gray-400">
-            Nessun evento nei prossimi 14 giorni.
+            Nessun compito registrato negli ultimi 7 giorni.
           </p>
         ) : (
-          <div className="space-y-2">
-            {prossimi.map((e) => {
-              const date = parseISO(e.evtDatetimeBegin.split("T")[0]!);
-              const label = isToday(date)
-                ? "Oggi"
-                : isTomorrow(date)
-                  ? "Domani"
-                  : format(date, "d MMM", { locale: it });
-              return (
-                <div key={e.evtId} className="flex items-start gap-3">
-                  <span className="text-xs font-semibold text-indigo-600 w-14 shrink-0 pt-0.5">
-                    {label}
-                  </span>
-                  <div>
-                    {e.subjectDesc && (
-                      <span className="text-xs text-gray-400">
-                        {e.subjectDesc} —{" "}
-                      </span>
-                    )}
-                    <span className="text-sm text-gray-800">{e.evtText}</span>
-                  </div>
+          <div className="space-y-3">
+            {compiti.map((l) => (
+              <div
+                key={l.evtId}
+                className="flex items-start gap-3 pb-3 border-b border-gray-50 last:border-0 last:pb-0"
+              >
+                <span className="text-xs font-semibold text-indigo-600 w-16 shrink-0 pt-0.5">
+                  {format(parseISO(l.evtDate), "d MMM", { locale: it })}
+                </span>
+                <div>
+                  <p className="text-xs text-gray-400 mb-0.5">
+                    {l.subjectDesc}
+                  </p>
+                  <p className="text-sm text-gray-800">{l.lessonArg}</p>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         )}
       </div>
 
       {/* Ultimi voti */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-gray-700">Ultimi voti</h2>
-          <Link to="/voti" className="text-xs text-indigo-600 hover:underline">
-            Vedi tutto
-          </Link>
-        </div>
+        <h2 className="text-sm font-semibold text-gray-700 mb-3">
+          Ultimi voti
+        </h2>
         {grades.length === 0 ? (
           <p className="text-sm text-gray-400">Nessun voto disponibile.</p>
         ) : (
           <div className="space-y-2">
             {grades
               .slice()
-              .sort((a, b) => b.evtDate.localeCompare(a.evtDate))
+              .sort((a, b) =>
+                (b.evtDate ?? "").localeCompare(a.evtDate ?? ""),
+              )
               .slice(0, 6)
               .map((g, i) => (
                 <div key={i} className="flex items-center gap-3">

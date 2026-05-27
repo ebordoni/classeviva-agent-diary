@@ -2,26 +2,27 @@ import type { ClassevivaClient } from "@classeviva/core";
 
 declare module "express-session" {
   interface SessionData {
-    studentId?: string;
+    activeStudentId?: string;
     authenticated?: boolean;
   }
 }
 
+// Keyed by studentId: i client persistono tra sessioni diverse e riavvii
 const clientStore = new Map<string, ClassevivaClient>();
 
-export function getClientBySessionId(
-  sessionId: string,
+export function getClientByStudentId(
+  studentId: string,
 ): ClassevivaClient | undefined {
-  return clientStore.get(sessionId);
+  return clientStore.get(studentId);
 }
 
-export function setClientBySessionId(
-  sessionId: string,
+export function setClientByStudentId(
+  studentId: string,
   client: ClassevivaClient,
 ): void {
-  clientStore.set(sessionId, client);
+  clientStore.set(studentId, client);
 }
 
-export function clearClientBySessionId(sessionId: string): void {
-  clientStore.delete(sessionId);
+export function clearClientByStudentId(studentId: string): void {
+  clientStore.delete(studentId);
 }

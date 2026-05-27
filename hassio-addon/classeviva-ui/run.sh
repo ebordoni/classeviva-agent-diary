@@ -18,6 +18,7 @@ export AI_MODEL="$AI_MODEL"
 export AI_API_KEY="$AI_API_KEY"
 export SESSION_SECRET="$SESSION_SECRET"
 export CACHE_DB_PATH="/data/cache_ui.json"
+export ACCOUNTS_PATH="/data/accounts.json"
 export PORT="8099"
 export NODE_ENV="production"
 

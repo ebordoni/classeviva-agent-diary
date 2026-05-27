@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 
 import agendaRouter from "./routes/agenda.js";
 import assenzeRouter from "./routes/assenze.js";
+import accountsRouter from "./routes/accounts.js";
 import authRouter from "./routes/auth.js";
 import bachecaRouter from "./routes/bacheca.js";
 import cacheRouter from "./routes/cache.js";
@@ -44,6 +45,7 @@ app.use(
 
 // API routes
 app.use("/api/auth", authRouter);
+app.use("/api/accounts", accountsRouter);
 app.use("/api/lezioni", lezioniRouter);
 app.use("/api/voti", votiRouter);
 app.use("/api/assenze", assenzeRouter);

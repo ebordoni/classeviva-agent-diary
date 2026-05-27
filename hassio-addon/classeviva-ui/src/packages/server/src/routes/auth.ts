@@ -1,32 +1,39 @@
 import { ClassevivaClient } from "@classeviva/core";
 import type { Request, Response } from "express";
 import { Router } from "express";
-import {
-  clearSavedStudentId,
-  getSavedStudentId,
-  invalidateUser,
-  saveStudentId,
-} from "../cache.js";
-import {
-  clearClientBySessionId,
-  getClientBySessionId,
-  setClientBySessionId,
-} from "../session.js";
+import { loadAccounts, upsertAccount } from "../accounts.js";
+import { invalidateUser } from "../cache.js";
+import { getClientByStudentId, setClientByStudentId } from "../session.js";
 
 const router = Router();
 
 router.get("/me", async (req: Request, res: Response) => {
-  const sessionId = req.session.id;
-  const client = getClientBySessionId(sessionId);
+  const studentId = req.session.activeStudentId;
+  const accounts = await loadAccounts();
+  const publicAccounts = accounts.map((a) => ({
+    studentId: a.studentId,
+    nome: a.nome,
+  }));
 
+  if (!studentId || !req.session.authenticated) {
+    res.json({ authenticated: false, accounts: publicAccounts });
+    return;
+  }
+
+  const client = getClientByStudentId(studentId);
   if (!client || !client.connesso) {
-    const savedStudentId = await getSavedStudentId();
-    res.json({ authenticated: false, savedStudentId: savedStudentId ?? null });
+    const saved = accounts.find((a) => a.studentId === studentId);
+    res.json({
+      authenticated: true,
+      accounts: publicAccounts,
+      user: { nome: saved?.nome ?? studentId, ident: studentId },
+    });
     return;
   }
 
   res.json({
     authenticated: true,
+    accounts: publicAccounts,
     user: {
       nome: client.nomeCompleto,
       ident: client.datiUtente!.ident,
@@ -47,11 +54,11 @@ router.post("/login", async (req: Request, res: Response) => {
     const client = new ClassevivaClient(studentId, password);
     await client.accedi();
 
-    setClientBySessionId(req.session.id, client);
-    req.session.studentId = studentId;
+    setClientByStudentId(studentId, client);
+    req.session.activeStudentId = studentId;
     req.session.authenticated = true;
 
-    await saveStudentId(studentId);
+    await upsertAccount(studentId, password, client.nomeCompleto);
 
     res.json({
       success: true,
@@ -68,10 +75,8 @@ router.post("/login", async (req: Request, res: Response) => {
 });
 
 router.post("/logout", async (req: Request, res: Response) => {
-  const studentId = req.session.studentId;
-  clearClientBySessionId(req.session.id);
+  const studentId = req.session.activeStudentId;
   if (studentId) {
-    await clearSavedStudentId();
     await invalidateUser(studentId);
   }
   req.session.destroy(() => {
@@ -80,3 +85,4 @@ router.post("/logout", async (req: Request, res: Response) => {
 });
 
 export default router;
+

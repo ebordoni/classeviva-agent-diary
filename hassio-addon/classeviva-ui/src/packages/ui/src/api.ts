@@ -24,9 +24,14 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 
 // ─── Auth ────────────────────────────────────────────────────────
 
+export interface AccountInfo {
+  studentId: string;
+  nome?: string;
+}
+
 export interface MeResponse {
   authenticated: boolean;
-  savedStudentId?: string | null;
+  accounts?: AccountInfo[];
   user?: { nome: string; ident: string };
 }
 
@@ -127,4 +132,19 @@ export const didatticaApi = {
 export const cacheApi = {
   invalida: () =>
     apiFetch<{ success: boolean }>("api/cache/invalida", { method: "POST" }),
+};
+
+// ─── Accounts ────────────────────────────────────────────────────
+
+export const accountsApi = {
+  list: () => apiFetch<{ accounts: AccountInfo[] }>("api/accounts"),
+  remove: (studentId: string) =>
+    apiFetch<{ success: boolean }>(`api/accounts/${studentId}`, {
+      method: "DELETE",
+    }),
+  switch: (studentId: string) =>
+    apiFetch<{ success: boolean; user: { nome: string; ident: string } }>(
+      `api/accounts/switch/${studentId}`,
+      { method: "POST" },
+    ),
 };

@@ -1,9 +1,9 @@
 /**
- * Type definitions per l'API Classeviva
+ * Type definitions per la nuova API Classeviva /rest/w1
  */
 
 // ============================================================================
-// BASE TYPES
+// CONFIG
 // ============================================================================
 
 export interface ClassevivaConfig {
@@ -11,29 +11,206 @@ export interface ClassevivaConfig {
   timeout?: number;
 }
 
-export interface AuthResponse {
-  ident: string;
-  firstName: string;
-  lastName: string;
-  token: string;
-  release: string;
-  expire: string;
+// ============================================================================
+// AUTH — risposta di AuthApi4.php?a=aLoginPwd
+// ============================================================================
+
+export interface Auth4AccountInfo {
+  type: string; // "G" = genitore, "S" = studente
+  id: number;
+  cognome: string;
+  nome: string;
+  cid: string; // sede/school code
 }
 
-export interface AuthHeaders {
-  "User-Agent": string;
-  "Z-Dev-ApiKey": string;
-  "Z-Auth-Token"?: string;
-  "Content-Type": string;
+export interface Auth4Auth {
+  verified: boolean;
+  loggedIn: boolean;
+  actionRequested: boolean;
+  hints: string[];
+  errors: string[];
+  accountInfo: Auth4AccountInfo;
+  redirects: string[];
+  aMode: string;
+  mMode: string;
+  errCod: string[];
+}
+
+export interface Auth4Response {
+  time: string;
+  data: {
+    auth: Auth4Auth;
+    pfolio: boolean;
+  };
 }
 
 // ============================================================================
-// LEZIONI (LESSONS)
+// WHOAMI — GET /rest/w1/misc/whoami
+// ============================================================================
+
+export interface WhoAmI {
+  id: string;
+  account_type: string; // "G" = genitore, "S" = studente
+  sede_codice: string;
+  anno_scol: string;
+  cognome: string;
+  nome: string;
+  classe_ident: string;
+  classe_desc: string;
+  data_nascita: string; // YYYY-MM-DD
+  codice_fisc: string;
+  login_type: string | null;
+  last_login_at: string | null;
+  email: string | null;
+  schoolpass: string;
+}
+
+// ============================================================================
+// CARD — GET /rest/w1/students/{studentId}/card
+// ============================================================================
+
+export interface Card {
+  ident: string;
+  usrType: string;
+  usrId: number;
+  miurSchoolCode: string;
+  miurDivisionCode: string;
+  firstName: string;
+  lastName: string;
+  birthDate: string;
+  fiscalCode: string;
+  schCode: string;
+  schName: string;
+  schDedication: string;
+  schCity: string;
+  schProv: string;
+}
+
+export interface CardResponse {
+  card: Card;
+}
+
+// ============================================================================
+// PERIODI — GET /rest/w1/students/{studentId}/periods
+// ============================================================================
+
+export interface Periodo {
+  periodCode: string;
+  periodPos: number;
+  periodDesc: string;
+  periodLabel: string;
+  isFinal: boolean;
+  dateStart: string; // YYYY-MM-DD
+  dateEnd: string; // YYYY-MM-DD
+  miurDivisionCode: string | null;
+}
+
+export interface PeriodiResponse {
+  periods: Periodo[];
+}
+
+// ============================================================================
+// MATERIE — GET /rest/w1/students/{studentId}/subjects
+// ============================================================================
+
+export interface Docente {
+  teacherId: string;
+  teacherName: string;
+}
+
+export interface Materia {
+  id: number;
+  description: string;
+  order: number;
+  teachers: Docente[];
+}
+
+export interface MaterieResponse {
+  subjects: Materia[];
+}
+
+// ============================================================================
+// VOTI — GET /rest/w1/students/{studentId}/grades26
+// Risposta rinominata da grades → grades26; include skills[] per ogni voto
+// ============================================================================
+
+export interface Skill {
+  evtId: number;
+  evtCode: string;
+  evtDate: string;
+  decimalValue: number | null;
+  skillId: number;
+  gradeMasterId: number;
+  skillDesc: string;
+  skillCode: string;
+  skillMasterId: number;
+  displayValue: string;
+  skillValueDesc: string | null;
+  skillValueShortDesc: string | null;
+  skillValueNote: string | null;
+  evtPosition: string;
+}
+
+export interface Voto {
+  subjectId: number;
+  subjectCode: string;
+  subjectDesc: string;
+  evtId: number;
+  evtCode: string;
+  evtDate: string;
+  decimalValue: number | null;
+  displayValue: string;
+  displaPos: number;
+  notesForFamily: string;
+  color: string;
+  canceled: boolean;
+  underlined: boolean;
+  periodPos: number;
+  periodDesc: string;
+  periodLabel: string;
+  componentPos: number;
+  componentDesc: string;
+  weightFactor: number;
+  noAverage: boolean;
+  teacherName: string;
+  evtPosition: string;
+  skills: Skill[];
+}
+
+export interface VotiResponse {
+  grades: Voto[];
+}
+
+// ============================================================================
+// ASSENZE — GET /rest/w1/students/{studentId}/absences/details/
+// Cambio rispetto a v1: campo top-level è "events" (non "absences")
+// ============================================================================
+
+export interface Assenza {
+  evtId: number;
+  evtCode: string;
+  evtDate: string;
+  evtHPos: number;
+  evtValue: number;
+  isJustified: boolean;
+  justifReasonCode: string | null;
+  justifReasonDesc: string | null;
+  hoursAbsence: unknown[];
+  webJustifStatus: number;
+}
+
+export interface AssenzeResponse {
+  events: Assenza[];
+}
+
+// ============================================================================
+// LEZIONI — GET /rest/w1/students/{studentId}/lessons/{start}/{end}
+// Struttura identica alla v1
 // ============================================================================
 
 export interface Lezione {
   evtId: number;
-  evtDate: string; // YYYY-MM-DD
+  evtDate: string;
   evtCode: string;
   evtHPos: number;
   evtDuration: number;
@@ -43,8 +220,7 @@ export interface Lezione {
   subjectCode: string;
   subjectDesc: string;
   lessonType: string;
-  lessonArg?: string;
-  evtText?: string;
+  lessonArg: string;
 }
 
 export interface LezioniResponse {
@@ -52,145 +228,112 @@ export interface LezioniResponse {
 }
 
 // ============================================================================
-// VOTI (GRADES)
+// AGENDA — GET /rest/w1/students/{studentId}/agendav2/all/{start}/{end}
+// Rinominato da agenda → agendav2
 // ============================================================================
 
-export interface Voto {
-  subjectId: number;
-  subjectCode: string;
-  subjectDesc: string;
+export interface AgendaItem {
   evtId: number;
-  evtDate: string;
   evtCode: string;
-  decimalValue: number;
-  displayValue: string;
-  displaPos: number;
-  notesForFamily: string;
-  color: string;
-  canceled: boolean;
-  underlined: boolean;
-  periodPos: number;
-  periodDesc: string;
-  componentPos: number;
-  componentDesc: string;
-  weightFactor: number;
-  skillId: number;
-  gradeMasterId: number;
-  skillDesc: string;
-  skillCode: string;
-  skillMasterId: number;
-  skillValueDesc: string;
-  skillValueShortDesc: string;
-  oldskillId: number;
-  oldskillDesc: string;
-}
-
-export interface VotiResponse {
-  grades: Voto[];
-}
-
-// ============================================================================
-// ASSENZE (ABSENCES)
-// ============================================================================
-
-export interface Assenza {
-  evtId: number;
-  evtDate: string;
-  evtCode: string;
-  evtHPos: number;
-  evtValue: number;
-  isJustified: boolean;
-  justifReasonCode: string;
-  justifReasonDesc: string;
-  hoursAbsence?: number;
-}
-
-export interface AssenzeResponse {
-  events: Assenza[];
-}
-
-// ============================================================================
-// AGENDA
-// ============================================================================
-
-export interface EventoAgenda {
-  evtId: number;
   evtDatetimeBegin: string;
   evtDatetimeEnd: string;
-  evtCode: string;
-  evtText: string;
+  isFullDay: boolean;
+  notes: string;
   authorName: string;
   classDesc: string;
-  subjectId?: number;
-  subjectDesc?: string;
-  homeworkId?: number;
-  notes?: string;
+  subjectId: number | null;
+  subjectDesc: string | null;
+  homeworkId: number | null;
 }
 
 export interface AgendaResponse {
-  agenda: EventoAgenda[];
+  agenda: AgendaItem[];
 }
 
 // ============================================================================
-// MATERIE (SUBJECTS)
+// COMPITI — GET /rest/w1/students/{studentId}/homeworks/index
+// NUOVO endpoint dedicato ai compiti (non esisteva in v1)
 // ============================================================================
 
-export interface Materia {
+export interface Compito {
   id: number;
-  description: string;
-  order: number;
-  teachers: Array<{
-    teacherId: number;
-    teacherName: string;
-    teacherFirstName: string;
-    teacherLastName: string;
-  }>;
+  subjectId: number;
+  subjectDesc: string;
+  teacherName: string;
+  date: string;
+  dueDate: string;
+  text: string;
+  attachments: unknown[];
 }
 
-export interface MaterieResponse {
-  subjects: Materia[];
-}
-
-// ============================================================================
-// PERIODI (PERIODS)
-// ============================================================================
-
-export interface Periodo {
-  periodCode: string;
-  periodPos: number;
-  periodDesc: string;
-  isFinal: boolean;
-  dateStart: string;
-  dateEnd: string;
-}
-
-export interface PeriodiResponse {
-  periods: Periodo[];
+export interface CompitiResponse {
+  items: Compito[];
 }
 
 // ============================================================================
-// NOTE DISCIPLINARI (DISCIPLINARY NOTES)
+// NOTE DISCIPLINARI — GET /rest/w1/students/{studentId}/notes/all/
+// Cambio rispetto a v1: risposta è { NTTE, NTCL, NTWN, NTST } invece di array
 // ============================================================================
 
 export interface Nota {
   evtId: number;
-  evtDate: string;
-  evtCode: string;
   evtText: string;
+  evtDate: string;
   authorName: string;
   readStatus: boolean;
-  evtHPos?: number;
-  warningType?: string;
 }
 
 export interface NoteResponse {
-  NTTE: Nota[]; // Note disciplinari
-  NTCL: Nota[]; // Annotazioni
+  NTTE: Nota[]; // Annotazioni docente
+  NTCL: Nota[]; // Note disciplinari
   NTWN: Nota[]; // Richiami
+  NTST: Nota[]; // Sanzioni
 }
 
 // ============================================================================
-// BACHECA (NOTICEBOARD)
+// FUNCTIONS — GET /rest/w1/students/{studentId}/_functions
+// Nuovo: funzionalità abilitate per l'utente
+// ============================================================================
+
+export interface FunctionItem {
+  title: string;
+  desc: string;
+  type: string;
+  url: string | null;
+  options: Record<string, unknown> | unknown[];
+  readonly: boolean;
+}
+
+export interface FunctionsResponse {
+  functions: Record<string, FunctionItem>;
+  appEnabled: string[];
+  options: Record<string, unknown>;
+}
+
+// ============================================================================
+// LIBRETTO WEB — GET /rest/w1/students/{studentId}/absences/librettowebconf
+// ============================================================================
+
+export interface CausaleAssenza {
+  code: string;
+  usercode: string;
+  shortdesc: string;
+  longdesc: string;
+}
+
+export interface LibrettoWebConf {
+  enableJustA: boolean;
+  enableJustR: boolean;
+  enableJustU: boolean;
+  numDaysStopA: number;
+  numDaysStopR: number;
+  numDaysStopU: number;
+  otherInfo: unknown[];
+  causals: CausaleAssenza[];
+}
+
+// ============================================================================
+// BACHECA — GET /rest/w1/students/{studentId}/noticeboard
 // ============================================================================
 
 export interface ItemBacheca {
@@ -210,7 +353,7 @@ export interface ItemBacheca {
   needJoin: boolean;
   needReply: boolean;
   needFile: boolean;
-  evento?: any;
+  evento?: unknown;
 }
 
 export interface BachecaResponse {
@@ -219,14 +362,11 @@ export interface BachecaResponse {
 
 export interface ContenutoItem {
   text: string;
-  attachments?: Array<{
-    fileName: string;
-    attachNum: number;
-  }>;
+  attachments?: Array<{ fileName: string; attachNum: number }>;
 }
 
 // ============================================================================
-// DIDATTICA (EDUCATIONAL MATERIALS)
+// DIDATTICA — GET /rest/w1/students/{studentId}/didactics
 // ============================================================================
 
 export interface FolderDidattica {
@@ -252,21 +392,17 @@ export interface ElementiDidatticaResponse {
 }
 
 // ============================================================================
-// DOCUMENTI (DOCUMENTS)
+// AI SERVICE
 // ============================================================================
 
-export interface Documento {
-  fileName: string;
-  attachNum: number;
+export type AIProvider = "openai" | "google" | "anthropic" | "groq" | "xai";
+
+export interface AIServiceOptions {
+  provider?: AIProvider;
+  model?: string;
+  apiKey?: string;
+  temperature?: number;
 }
-
-export interface DocumentiResponse {
-  documents: Documento[];
-}
-
-// ============================================================================
-// AI TYPES
-// ============================================================================
 
 export interface CompitoEstratto {
   testo: string;
@@ -284,41 +420,4 @@ export interface CompitiEstrattiResponse {
     modello_utilizzato: string;
     timestamp: string;
   };
-}
-
-export type AIProvider = "openai" | "google" | "anthropic" | "groq" | "xai";
-
-export interface AIServiceOptions {
-  provider?: AIProvider;
-  model?: string;
-  apiKey?: string;
-  temperature?: number;
-}
-
-// ============================================================================
-// UTILITY TYPES
-// ============================================================================
-
-export interface DateRange {
-  start: string; // YYYY-MM-DD
-  end: string; // YYYY-MM-DD
-}
-
-export interface ErrorResponse {
-  statusCode: number;
-  message: string;
-  error?: string;
-}
-
-// ============================================================================
-// USER DATA
-// ============================================================================
-
-export interface UserData {
-  ident: string;
-  firstName: string;
-  lastName: string;
-  token?: string;
-  schoolName?: string;
-  schoolCode?: string;
 }

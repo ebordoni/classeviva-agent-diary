@@ -51,9 +51,13 @@ export class AIService {
 
   constructor(options?: AIServiceOptions) {
     this.provider =
-      options?.provider || (process.env.AI_PROVIDER as AIProvider) || "openai";
+      options?.provider ||
+      (process.env["AI_PROVIDER"] as AIProvider) ||
+      "openai";
     this.model =
-      options?.model || process.env.AI_MODEL || DEFAULT_MODELS[this.provider];
+      options?.model ||
+      process.env["AI_MODEL"] ||
+      DEFAULT_MODELS[this.provider];
     this.apiKey = options?.apiKey;
     this.temperature = options?.temperature ?? 0.1;
   }
@@ -111,9 +115,6 @@ LEZIONI DA ANALIZZARE:
 ${lezioniJSON}`;
   }
 
-  /**
-   * Estrae i compiti dalle lezioni usando un modello AI
-   */
   async estraiCompiti(
     lezioniResponse: LezioniResponse,
     modello?: string,
@@ -132,7 +133,6 @@ ${lezioniJSON}`;
       };
     }
 
-    // Se viene passato un modello diverso, crea una nuova istanza
     const service =
       modello && modello !== this.model
         ? new AIService({ ...this, model: modello })

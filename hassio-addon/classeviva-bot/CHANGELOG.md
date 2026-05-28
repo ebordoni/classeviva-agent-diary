@@ -1,3 +1,7 @@
+## 1.8.4 — 2026-05-28
+
+- Refactor: rinominato il pacchetto interno `core2` in `core` — nessuna modifica funzionale
+
 ## 1.8.3 — 2026-05-28
 
 - Fix: corretti import `@classeviva/core` nel workflow di sincronizzazione sorgenti (GitHub Actions copiava da `packages/core` invece di `packages/core` sovrascrivendo i fix manuali)

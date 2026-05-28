@@ -14,7 +14,8 @@ COPY src/ .
 
 # Installa le dipendenze e compila
 RUN npm install --workspace=packages/core --workspace=packages/bot --ignore-scripts
-RUN npm run build:core && npm run build:bot
+RUN npm run build:core && test -f packages/core/dist/index.js || (echo "ERROR: core build failed" && exit 1)
+RUN npm run build:bot && test -f packages/bot/dist/index.js || (echo "ERROR: bot build failed" && exit 1)
 RUN npm prune --omit=dev
 
 # Copia solo i file necessari nella cartella finale

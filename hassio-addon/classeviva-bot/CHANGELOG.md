@@ -1,3 +1,8 @@
+## 1.7.1 — 2026-05-28
+
+- Fix: `run.sh` ripristinato al contenuto corretto (era stato corrotto con il contenuto dell'addon UI)
+- Aggiunto guard esplicito nel Dockerfile sui file `dist/` prodotti da `tsc`
+
 ## 1.7.0 — 2026-05-28
 
 - Cache condivisa con l'addon `classeviva-ui`: i dati scaricati automaticamente dal digest giornaliero sono ora disponibili anche nella UI

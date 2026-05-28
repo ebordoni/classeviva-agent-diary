@@ -1,3 +1,7 @@
+## 1.2.1 — 2026-05-28
+
+- Fix: aggiunto guard esplicito nel Dockerfile sui file `dist/` prodotti da `tsc` per evitare immagini rotte in caso di errore silenzioso del build
+
 ## 1.2.0 — 2026-05-28
 
 - Cache condivisa con l'addon `classeviva-bot`: i dati già scaricati dal bot (compiti, voti, lezioni) sono disponibili subito nella UI senza ulteriori chiamate a Classeviva

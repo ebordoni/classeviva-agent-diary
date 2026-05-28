@@ -13,9 +13,9 @@ COPY src/ .
 
 RUN npm install --workspaces --ignore-scripts
 RUN find . -name "*.tsbuildinfo" -delete
-RUN npm run build:core
-RUN npm run build:server
-RUN npm run build:ui
+RUN npm run build:core && test -f packages/core/dist/index.js || (echo "ERROR: core build failed" && exit 1)
+RUN npm run build:server && test -f packages/server/dist/index.js || (echo "ERROR: server build failed" && exit 1)
+RUN npm run build:ui && test -f packages/ui/dist/index.html || (echo "ERROR: ui build failed" && exit 1)
 RUN npm prune --omit=dev
 
 RUN mkdir -p /app && \

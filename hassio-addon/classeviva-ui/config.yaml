@@ -1,6 +1,6 @@
 name: "Classeviva UI"
 description: "Interfaccia web per il registro Classeviva — consulta voti, lezioni, compiti e altro dal browser."
-version: "1.2.0"
+version: "1.2.1"
 slug: "classeviva_ui"
 init: false
 

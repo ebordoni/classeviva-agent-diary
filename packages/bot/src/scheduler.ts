@@ -1,4 +1,4 @@
-import { AIService, ClassevivaClient } from "@classeviva/core2";
+import { AIService, ClassevivaClient } from "@classeviva/core";
 import type { Telegraf } from "telegraf";
 import {
   getCompiti,

@@ -15,7 +15,7 @@
   - I giudizi (`OTTIMO`, `DISTINTO`, `BUONO`, `DISCRETO`, `SUFFICIENTE`, ecc.) vengono estratti dal campo `skillValueNote` con badge colorati
   - Media testuale calcolata tramite ranking dei giudizi
   - Vista espansa per ogni verifica: argomento e dettaglio per skill
-- Migrato core interno da API v1 a nuova API `/rest/w1` (`core2`)
+- Migrato core interno da API v1 a nuova API `/rest/w1` (`core`)
 - Fix: `WhoAmI.id` (era `.ident`) nei file di cache e autenticazione del server
 
 ## 1.2.2 — 2026-05-28

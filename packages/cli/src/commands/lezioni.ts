@@ -3,7 +3,7 @@
  * Recupera lezioni
  */
 
-import { ClassevivaClient, ultimiNGiorni } from "@classeviva/core2";
+import { ClassevivaClient, ultimiNGiorni } from "@classeviva/core";
 import { Command } from "commander";
 import { getCredentials } from "../utils/config.js";
 import {

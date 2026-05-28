@@ -9,7 +9,7 @@ import type {
   Lezione,
   Materia,
   Voto,
-} from "@classeviva/core2";
+} from "@classeviva/core";
 import chalk from "chalk";
 import Table from "cli-table3";
 

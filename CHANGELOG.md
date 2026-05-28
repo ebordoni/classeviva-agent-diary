@@ -7,11 +7,21 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.9.5] — 2026-05-28
+
+### Refactoring
+
+- Rinominato `packages/core2` → `packages/core` in tutto il monorepo (directory, import, tsconfig, package.json, workspace)
+- Aggiornati tutti gli import da `@classeviva/core2` a `@classeviva/core` in `packages/bot`, `packages/cli` e addon bot
+- Aggiornato `sync-addon-sources.yml`: rimosso il `sed` di sostituzione ora superfluo, trigger aggiornati a `packages/core/**`
+
+---
+
 ## [1.9.4] — 2026-05-28
 
 ### Corretto
 
-- **Addon `classeviva-bot` v1.8.3**: fix definitivo workflow GitHub Actions `sync-addon-sources.yml` — ora copia i sorgenti da `packages/core2` (nuova API) e sostituisce automaticamente `@classeviva/core2` → `@classeviva/core` negli import del bot
+- **Addon `classeviva-bot` v1.8.3**: fix definitivo workflow GitHub Actions `sync-addon-sources.yml` — ora copia i sorgenti da `packages/core` (nuova API) e sostituisce automaticamente `@classeviva/core` → `@classeviva/core` negli import del bot
 
 ---
 
@@ -27,7 +37,7 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ### Corretto
 
-- **Addon `classeviva-bot` v1.8.1**: fix build — ripristinati import `@classeviva/core` nei sorgenti del bot (erano stati erroneamente impostati a `@classeviva/core2`)
+- **Addon `classeviva-bot` v1.8.1**: fix build — ripristinati import `@classeviva/core` nei sorgenti del bot (erano stati erroneamente impostati a `@classeviva/core`)
 
 ---
 
@@ -50,7 +60,7 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ### Aggiunto
 
-- **`packages/core2` v0.2.0**: nuovo package che implementa la nuova API `/rest/w1` di Classeviva (autenticazione via `AuthApi4.php` + `PHPSESSID`)
+- **`packages/core` v0.2.0**: nuovo package che implementa la nuova API `/rest/w1` di Classeviva (autenticazione via `AuthApi4.php` + `PHPSESSID`)
   - Aggiunti metodi `lezioniGiorno`, `lezioniDaAMateria`, `assenzeDa`, `assenzeDaA`, `leggiNota`, `bacheca`, `bachecaLeggi`, `didattica`, `didatticaElemento`
   - Aggiunti helper `ultimiNGiorni`, `formattaData`
   - Aggiunti tipi per bacheca, didattica e skill dei voti (`Skill`, `ItemBacheca`, `BachecaResponse`, `DidatticaResponse`, `ElementiDidatticaResponse`)
@@ -58,10 +68,10 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ### Modificato
 
-- **`packages/bot` v1.8.0**, **`packages/cli` v2.1.0**, **`packages/tui` v2.1.0**: migrati da `@classeviva/core` a `@classeviva/core2`
+- **`packages/bot` v1.8.0**, **`packages/cli` v2.1.0**, **`packages/tui` v2.1.0**: migrati da `@classeviva/core` a `@classeviva/core`
   - Aggiornati tutti gli import e le dipendenze
   - Adattati i riferimenti ai tipi modificati (`WhoAmI.id`, `Voto.decimalValue: null`, `Docente.teacherName`, `AgendaItem`)
-- **Addon `classeviva-bot` v1.8.0** e **addon `classeviva-ui` v1.3.0**: sincronizzati con i sorgenti `core2`
+- **Addon `classeviva-bot` v1.8.0** e **addon `classeviva-ui` v1.3.0**: sincronizzati con i sorgenti `core`
 
 ### Migliorato
 

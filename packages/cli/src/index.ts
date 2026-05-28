@@ -6,7 +6,7 @@
  * CLI tool per interagire con Classeviva da terminale
  */
 
-import { VERSION } from "@classeviva/core2";
+import { VERSION } from "@classeviva/core";
 import { Command } from "commander";
 import "dotenv/config";
 import { printBanner } from "./utils/formatter.js";

@@ -3,7 +3,7 @@
  * Recupera assenze
  */
 
-import { ClassevivaClient } from "@classeviva/core2";
+import { ClassevivaClient } from "@classeviva/core";
 import { Command } from "commander";
 import { getCredentials } from "../utils/config.js";
 import {

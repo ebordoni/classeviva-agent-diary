@@ -9,7 +9,7 @@
     "packages/bot"
   ],
   "scripts": {
-    "build": "npm run build -w packages/core && npm run build -w packages/cli && npm run build -w packages/tui && npm run build -w packages/bot",
+    "build": "npm run build -w packages/core && npm run build -w packages/cli && npm run build -w packages/bot",
     "build:core": "npm run build -w packages/core",
     "build:cli": "npm run build -w packages/cli",
     "build:bot": "npm run build -w packages/bot",

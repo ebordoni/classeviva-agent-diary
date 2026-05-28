@@ -3,7 +3,7 @@
  * Estrae compiti con Vercel AI SDK
  */
 
-import { AIService, ClassevivaClient, ultimiNGiorni } from "@classeviva/core2";
+import { AIService, ClassevivaClient, ultimiNGiorni } from "@classeviva/core";
 import { Command } from "commander";
 import { writeFileSync } from "fs";
 import { getCredentials, loadConfig } from "../utils/config.js";

@@ -1,6 +1,6 @@
 /**
  * Test di autenticazione e chiamate base per la nuova API w1.
- * Esegui con: npm run test:auth -w packages/core2
+ * Esegui con: npm run test:auth -w packages/core
  *
  * Legge le credenziali dalle variabili d'ambiente:
  *   CV_USER=<studentId>  CV_PASS=<password>
@@ -14,7 +14,7 @@ const pass = process.env["CV_PASS"];
 if (!user || !pass) {
   console.error("Imposta CV_USER e CV_PASS come variabili d'ambiente.");
   console.error(
-    "Esempio: CV_USER=S0000001 CV_PASS=mypassword npm run test:auth -w packages/core2",
+    "Esempio: CV_USER=S0000001 CV_PASS=mypassword npm run test:auth -w packages/core",
   );
   process.exit(1);
 }

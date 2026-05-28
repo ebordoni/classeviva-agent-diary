@@ -3,7 +3,7 @@
  * Effettua login e salva credenziali
  */
 
-import { ClassevivaClient } from "@classeviva/core2";
+import { ClassevivaClient } from "@classeviva/core";
 import chalk from "chalk";
 import { Command } from "commander";
 import { clearConfig, getCredentials, saveConfig } from "../utils/config.js";

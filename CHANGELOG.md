@@ -7,6 +7,14 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.8.2] — 2026-05-28
+
+### Migliorato
+
+- **Addon `classeviva-ui`**: interfaccia responsive per mobile — sidebar collassabile (solo icone) su desktop, overlay slide-in con hamburger button su smartphone
+
+---
+
 ## [1.8.1] — 2026-05-27
 
 ### Corretto

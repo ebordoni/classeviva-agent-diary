@@ -1,3 +1,10 @@
+## 1.1.2 — 2026-05-28
+
+- UI responsive: sidebar collassabile (solo icone) su desktop, overlay slide-in su mobile
+- Aggiunto top bar con hamburger button su schermi piccoli
+- Chiusura automatica della sidebar alla navigazione su mobile
+- Backdrop semitrasparente sul menu aperto da mobile
+
 ## 1.1.1 — 2026-05-27
 
 - Fix: campo Student ID spariva durante la digitazione (stato `isNewAccount` separato)

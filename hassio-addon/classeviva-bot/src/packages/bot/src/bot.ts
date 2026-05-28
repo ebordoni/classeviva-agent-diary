@@ -1,4 +1,4 @@
-import { AIService, ClassevivaClient, ultimiNGiorni } from "@classeviva/core";
+import { AIService, ClassevivaClient, ultimiNGiorni } from "@classeviva/core2";
 import type { Context } from "telegraf";
 import { Telegraf } from "telegraf";
 import {

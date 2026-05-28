@@ -76,10 +76,15 @@ app.listen(port, "0.0.0.0", () => {
   const raw = process.env.ACCOUNTS_CONFIG;
   if (raw) {
     try {
-      const configAccounts = JSON.parse(raw) as Array<{ student_id: string; password: string }>;
+      const configAccounts = JSON.parse(raw) as Array<{
+        student_id: string;
+        password: string;
+      }>;
       if (Array.isArray(configAccounts) && configAccounts.length > 0) {
         syncConfigAccounts(configAccounts).then(() => {
-          console.log(`[classeviva-ui] Sincronizzati ${configAccounts.length} account da configurazione`);
+          console.log(
+            `[classeviva-ui] Sincronizzati ${configAccounts.length} account da configurazione`,
+          );
         });
       }
     } catch {

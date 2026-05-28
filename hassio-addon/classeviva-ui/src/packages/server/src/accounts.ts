@@ -70,7 +70,11 @@ export async function syncConfigAccounts(
       accounts[idx].password = ca.password;
       accounts[idx].fromConfig = true;
     } else {
-      accounts.push({ studentId: ca.student_id, password: ca.password, fromConfig: true });
+      accounts.push({
+        studentId: ca.student_id,
+        password: ca.password,
+        fromConfig: true,
+      });
     }
   }
 

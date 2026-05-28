@@ -22,10 +22,17 @@ router.get("/me", async (req: Request, res: Response) => {
       try {
         let client = getClientByStudentId(configAccount.studentId);
         if (!client || !client.connesso) {
-          client = new ClassevivaClient(configAccount.studentId, configAccount.password);
+          client = new ClassevivaClient(
+            configAccount.studentId,
+            configAccount.password,
+          );
           await client.accedi();
           setClientByStudentId(configAccount.studentId, client);
-          await upsertAccount(configAccount.studentId, configAccount.password, client.nomeCompleto);
+          await upsertAccount(
+            configAccount.studentId,
+            configAccount.password,
+            client.nomeCompleto,
+          );
         }
         req.session.activeStudentId = configAccount.studentId;
         req.session.authenticated = true;

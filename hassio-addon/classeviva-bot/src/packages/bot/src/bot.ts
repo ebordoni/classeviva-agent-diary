@@ -187,8 +187,8 @@ export function buildBot(
   bot.command("logout", async (ctx) => {
     const chatId = ctx.chat.id;
     const session = getSession(chatId);
-    if (session.client?.datiUtente?.ident) {
-      await invalidateUser(session.client.datiUtente.ident);
+    if (session.client?.datiUtente?.id) {
+      await invalidateUser(session.client.datiUtente.id);
     }
     await clearLoginState(chatId);
     await clearSavedStudentId(chatId);
@@ -397,7 +397,7 @@ export function buildBot(
     const client = await requireAuth(ctx);
     if (!client) return;
 
-    await invalidateUser(client.datiUtente!.ident);
+    await invalidateUser(client.datiUtente!.id);
     await ctx.reply(
       "🔄 Cache svuotata. I prossimi comandi recupereranno dati aggiornati da Classeviva.",
     );

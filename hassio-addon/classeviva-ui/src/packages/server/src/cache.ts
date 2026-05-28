@@ -192,7 +192,7 @@ export async function getLezioni(
   fine: string,
 ): Promise<{ data: LezioniResponse; fromCache: boolean }> {
   return getOrFetch(
-    key("lezioni", client.datiUtente!.ident, inizio, fine),
+    key("lezioni", client.datiUtente!.id, inizio, fine),
     TTL.lezioni,
     () => client.lezioniDaA(inizio, fine),
   );
@@ -201,7 +201,7 @@ export async function getLezioni(
 export async function getVoti(
   client: ClassevivaClient,
 ): Promise<{ data: VotiResponse; fromCache: boolean }> {
-  return getOrFetch(key("voti", client.datiUtente!.ident), TTL.voti, () =>
+  return getOrFetch(key("voti", client.datiUtente!.id), TTL.voti, () =>
     client.voti(),
   );
 }
@@ -209,7 +209,7 @@ export async function getVoti(
 export async function getAssenze(
   client: ClassevivaClient,
 ): Promise<{ data: AssenzeResponse; fromCache: boolean }> {
-  return getOrFetch(key("assenze", client.datiUtente!.ident), TTL.assenze, () =>
+  return getOrFetch(key("assenze", client.datiUtente!.id), TTL.assenze, () =>
     client.assenze(),
   );
 }
@@ -220,7 +220,7 @@ export async function getAgenda(
   fine: string,
 ): Promise<{ data: AgendaResponse; fromCache: boolean }> {
   return getOrFetch(
-    key("agenda", client.datiUtente!.ident, inizio, fine),
+    key("agenda", client.datiUtente!.id, inizio, fine),
     TTL.agenda,
     () => client.agendaDaA(inizio, fine),
   );
@@ -229,7 +229,7 @@ export async function getAgenda(
 export async function getMaterie(
   client: ClassevivaClient,
 ): Promise<{ data: MaterieResponse; fromCache: boolean }> {
-  return getOrFetch(key("materie", client.datiUtente!.ident), TTL.materie, () =>
+  return getOrFetch(key("materie", client.datiUtente!.id), TTL.materie, () =>
     client.materie(),
   );
 }
@@ -254,7 +254,7 @@ export async function getCompiti(
     dates.map((d) =>
       store
         .get<CompitiEstrattiResponse>(
-          key("compiti_giorno", client.datiUtente!.ident, d),
+          key("compiti_giorno", client.datiUtente!.id, d),
         )
         .then((v) => ({ date: d, value: v })),
     ),
@@ -301,7 +301,7 @@ export async function getCompiti(
         },
       };
       await store.set(
-        key("compiti_giorno", client.datiUtente!.ident, d!),
+        key("compiti_giorno", client.datiUtente!.id, d!),
         dayResult,
         ttl,
       );

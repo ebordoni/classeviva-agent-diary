@@ -20,15 +20,33 @@ export interface LezioniResponse {
   fromCache?: boolean;
 }
 
+export interface Skill {
+  evtId: number;
+  evtCode: string;
+  evtDate: string;
+  decimalValue: number | null;
+  skillId: number;
+  gradeMasterId: number;
+  skillDesc: string;
+  skillCode: string;
+  displayValue: string;
+  skillValueDesc: string | null;
+  skillValueShortDesc: string | null;
+  skillValueNote: string | null;
+  evtPosition: string;
+}
+
 export interface Voto {
   subjectId: number;
   evtDate: string;
-  decimalValue: number;
+  decimalValue: number | null;
   displayValue: string;
   color: string;
   periodDesc: string;
   skillDesc: string;
   subjectDesc: string;
+  notesForFamily: string;
+  skills: Skill[];
 }
 
 export interface VotiResponse {

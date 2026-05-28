@@ -3,13 +3,13 @@
  */
 
 import type {
-    Assenza,
-    CompitoEstratto,
-    EventoAgenda,
-    Lezione,
-    Materia,
-    Voto,
-} from "@classeviva/core";
+  Assenza,
+  CompitoEstratto,
+  AgendaItem as EventoAgenda,
+  Lezione,
+  Materia,
+  Voto,
+} from "@classeviva/core2";
 import chalk from "chalk";
 import Table from "cli-table3";
 
@@ -90,7 +90,7 @@ export function formatVotiTable(voti: Voto[]): void {
   // Calcola media
   const valoriNumerici = voti
     .map((v) => v.decimalValue)
-    .filter((v): v is number => v !== undefined && v > 0);
+    .filter((v): v is number => v != null && v > 0);
 
   if (valoriNumerici.length > 0) {
     const media =

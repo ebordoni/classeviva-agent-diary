@@ -7,6 +7,33 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.9.0] — 2026-05-28
+
+### Aggiunto
+
+- **`packages/core2` v0.2.0**: nuovo package che implementa la nuova API `/rest/w1` di Classeviva (autenticazione via `AuthApi4.php` + `PHPSESSID`)
+  - Aggiunti metodi `lezioniGiorno`, `lezioniDaAMateria`, `assenzeDa`, `assenzeDaA`, `leggiNota`, `bacheca`, `bachecaLeggi`, `didattica`, `didatticaElemento`
+  - Aggiunti helper `ultimiNGiorni`, `formattaData`
+  - Aggiunti tipi per bacheca, didattica e skill dei voti (`Skill`, `ItemBacheca`, `BachecaResponse`, `DidatticaResponse`, `ElementiDidatticaResponse`)
+  - Esportata costante `VERSION` e alias `EventoAgenda` per retrocompatibilità
+
+### Modificato
+
+- **`packages/bot` v1.8.0**, **`packages/cli` v2.1.0**, **`packages/tui` v2.1.0**: migrati da `@classeviva/core` a `@classeviva/core2`
+  - Aggiornati tutti gli import e le dipendenze
+  - Adattati i riferimenti ai tipi modificati (`WhoAmI.id`, `Voto.decimalValue: null`, `Docente.teacherName`, `AgendaItem`)
+- **Addon `classeviva-bot` v1.8.0** e **addon `classeviva-ui` v1.3.0**: sincronizzati con i sorgenti `core2`
+
+### Migliorato
+
+- **Addon `classeviva-ui` v1.3.0**: pagina **Voti** completamente riscritta
+  - Rilevamento automatico del tipo di valutazione (numerica vs. testuale per skill)
+  - Per le scuole primarie: i giudizi testuali (`OTTIMO`, `DISTINTO`, `BUONO`, `DISCRETO`, `SUFFICIENTE`, ecc.) vengono estratti da `skillValueNote` e visualizzati con badge colorati
+  - Media calcolata per entrambi i formati (numerica con decimali, testuale con ranking)
+  - Vista espansa per verifica: mostra argomento (`notesForFamily`) e dettaglio per ogni skill valutata
+
+---
+
 ## [1.8.4] — 2026-05-28
 
 ### Migliorato

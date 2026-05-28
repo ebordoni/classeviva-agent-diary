@@ -6,6 +6,7 @@
       "type": "module",
       "workspaces": [
             "packages/core",
+            "packages/core2",
             "packages/cli",
             "packages/tui",
             "packages/bot"

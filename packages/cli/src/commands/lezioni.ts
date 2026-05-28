@@ -3,7 +3,7 @@
  * Recupera lezioni
  */
 
-import { ClassevivaClient, ultimiNGiorni } from "@classeviva/core";
+import { ClassevivaClient, ultimiNGiorni } from "@classeviva/core2";
 import { Command } from "commander";
 import { getCredentials } from "../utils/config.js";
 import {
@@ -28,18 +28,18 @@ export function createLezioniCommand(): Command {
     .option("-p, --password <password>", "Password")
     .action(async (options) => {
       try {
-        // Login
-        const spinner = createSpinner("Login...");
-        spinner.start();
-
         const credentials = await getCredentials({
           studentId: options.user,
           password: options.password,
         });
 
+        // Login
+        const spinner = createSpinner("Login...");
+        spinner.start();
+
         const client = new ClassevivaClient(
           credentials.studentId,
-          credentials.password
+          credentials.password,
         );
 
         await client.accedi();
@@ -60,7 +60,7 @@ export function createLezioniCommand(): Command {
             lezioni = await client.lezioniDaAMateria(
               options.start,
               options.end,
-              parseInt(options.materia)
+              parseInt(options.materia),
             );
           } else {
             lezioni = await client.lezioniDaA(options.start, options.end);
@@ -81,7 +81,7 @@ export function createLezioniCommand(): Command {
 
           // Statistiche
           const materieUnique = new Set(
-            lezioni.lessons.map((l) => l.subjectDesc)
+            lezioni.lessons.map((l) => l.subjectDesc),
           );
           console.log(`📊 Materie: ${materieUnique.size}`);
           console.log(`   ${Array.from(materieUnique).join(", ")}\n`);

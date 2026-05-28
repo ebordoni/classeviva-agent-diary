@@ -36,7 +36,7 @@ router.get("/me", async (req: Request, res: Response) => {
     accounts: publicAccounts,
     user: {
       nome: client.nomeCompleto,
-      ident: client.datiUtente!.ident,
+      ident: client.datiUtente!.id,
     },
   });
 });
@@ -64,7 +64,7 @@ router.post("/login", async (req: Request, res: Response) => {
       success: true,
       user: {
         nome: client.nomeCompleto,
-        ident: client.datiUtente!.ident,
+        ident: client.datiUtente!.id,
       },
     });
   } catch (err) {

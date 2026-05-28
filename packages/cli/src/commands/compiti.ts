@@ -3,17 +3,17 @@
  * Estrae compiti con Vercel AI SDK
  */
 
-import { AIService, ClassevivaClient, ultimiNGiorni } from "@classeviva/core";
+import { AIService, ClassevivaClient, ultimiNGiorni } from "@classeviva/core2";
 import { Command } from "commander";
 import { writeFileSync } from "fs";
 import { getCredentials, loadConfig } from "../utils/config.js";
 import {
-    createSpinner,
-    formatCompitiTable,
-    formatJSON,
-    printDebugError,
-    printError,
-    printInfo,
+  createSpinner,
+  formatCompitiTable,
+  formatJSON,
+  printDebugError,
+  printError,
+  printInfo,
 } from "../utils/formatter.js";
 
 export function createCompitiCommand(): Command {
@@ -44,15 +44,16 @@ export function createCompitiCommand(): Command {
     )
     .action(async (options) => {
       // ── Step 1: Login ──────────────────────────────────────────────────────
-      const loginSpinner = createSpinner("Login Classeviva...");
-      loginSpinner.start();
-
       let client: ClassevivaClient;
       try {
         const credentials = await getCredentials({
           studentId: options.user,
           password: options.password,
         });
+
+        const loginSpinner = createSpinner("Login Classeviva...");
+        loginSpinner.start();
+
         client = new ClassevivaClient(
           credentials.studentId,
           credentials.password,
@@ -60,7 +61,6 @@ export function createCompitiCommand(): Command {
         await client.accedi();
         loginSpinner.succeed(`Connesso come: ${client.nomeCompleto}`);
       } catch (error: any) {
-        loginSpinner.fail("Login fallito");
         if (options.debug) printDebugError(error);
         printError("Impossibile autenticarsi su Classeviva", error);
         process.exit(1);

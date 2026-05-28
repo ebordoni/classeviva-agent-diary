@@ -3,7 +3,7 @@
  * Recupera assenze
  */
 
-import { ClassevivaClient } from "@classeviva/core";
+import { ClassevivaClient } from "@classeviva/core2";
 import { Command } from "commander";
 import { getCredentials } from "../utils/config.js";
 import {
@@ -25,18 +25,18 @@ export function createAssenzeCommand(): Command {
     .option("-p, --password <password>", "Password")
     .action(async (options) => {
       try {
-        // Login
-        const spinner = createSpinner("Login...");
-        spinner.start();
-
         const credentials = await getCredentials({
           studentId: options.user,
           password: options.password,
         });
 
+        // Login
+        const spinner = createSpinner("Login...");
+        spinner.start();
+
         const client = new ClassevivaClient(
           credentials.studentId,
-          credentials.password
+          credentials.password,
         );
 
         await client.accedi();

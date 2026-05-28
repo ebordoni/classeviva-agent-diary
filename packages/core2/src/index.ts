@@ -9,4 +9,4 @@ export * from "./utils/helpers.js";
 // Re-export AgendaItem con il vecchio nome per compatibilità
 export type { AgendaItem as EventoAgenda } from "./types/index.js";
 
-export const VERSION = "0.1.0";
+export const VERSION = "0.2.0";

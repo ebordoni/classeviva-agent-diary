@@ -1,3 +1,10 @@
+## 1.8.0 — 2026-05-28
+
+- Migrato da `@classeviva/core` (API v1) a `@classeviva/core2` (nuova API `/rest/w1`)
+- Autenticazione aggiornata: login via `AuthApi4.php` + cookie `PHPSESSID`
+- Aggiornati i riferimenti ai tipi: `WhoAmI.id` (era `.ident`), `Docente.teacherName`, `AgendaItem.notes`
+- Aggiunta gestione `decimalValue: null` nel calcolo delle medie dei voti
+
 ## 1.7.1 — 2026-05-28
 
 - Fix: `run.sh` ripristinato al contenuto corretto (era stato corrotto con il contenuto dell'addon UI)

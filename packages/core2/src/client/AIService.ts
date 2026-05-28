@@ -51,9 +51,13 @@ export class AIService {
 
   constructor(options?: AIServiceOptions) {
     this.provider =
-      options?.provider || (process.env["AI_PROVIDER"] as AIProvider) || "openai";
+      options?.provider ||
+      (process.env["AI_PROVIDER"] as AIProvider) ||
+      "openai";
     this.model =
-      options?.model || process.env["AI_MODEL"] || DEFAULT_MODELS[this.provider];
+      options?.model ||
+      process.env["AI_MODEL"] ||
+      DEFAULT_MODELS[this.provider];
     this.apiKey = options?.apiKey;
     this.temperature = options?.temperature ?? 0.1;
   }

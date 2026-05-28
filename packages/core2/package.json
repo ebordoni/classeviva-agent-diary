@@ -1,0 +1,38 @@
+{
+      "name": "@classeviva/core2",
+      "version": "0.2.0",
+      "description": "Classeviva Core v2 — wrapper per la nuova API REST /rest/w1",
+      "main": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "type": "module",
+      "exports": {
+            ".": {
+                  "types": "./dist/index.d.ts",
+                  "import": "./dist/index.js"
+            }
+      },
+      "scripts": {
+            "build": "tsc",
+            "watch": "tsc --watch",
+            "clean": "rm -rf dist",
+            "test:auth": "tsx src/test/auth.ts"
+      },
+      "dependencies": {
+            "@ai-sdk/anthropic": "^3.0.58",
+            "@ai-sdk/google": "^3.0.43",
+            "@ai-sdk/groq": "^3.0.29",
+            "@ai-sdk/openai": "^3.0.41",
+            "@ai-sdk/xai": "^3.0.83",
+            "ai": "^6.0.116",
+            "axios": "^1.6.0",
+            "zod": "^4.3.6"
+      },
+      "devDependencies": {
+            "@types/node": "^20.10.0",
+            "tsx": "^4.7.0",
+            "typescript": "^5.3.3"
+      },
+      "engines": {
+            "node": ">=18.0.0"
+      }
+}

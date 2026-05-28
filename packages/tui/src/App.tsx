@@ -1,5 +1,5 @@
-import type { AIProvider } from "@classeviva/core";
-import { AIService, ClassevivaClient, ultimiNGiorni } from "@classeviva/core";
+import type { AIProvider } from "@classeviva/core2";
+import { AIService, ClassevivaClient, ultimiNGiorni } from "@classeviva/core2";
 import { useApp } from "ink";
 import { useState } from "react";
 import { AgendaScreen } from "./screens/AgendaScreen.js";

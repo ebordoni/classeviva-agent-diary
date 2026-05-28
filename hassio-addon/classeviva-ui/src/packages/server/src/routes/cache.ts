@@ -8,7 +8,7 @@ const router = Router();
 router.post("/invalida", requireAuth, async (req: Request, res: Response) => {
   const client = req.classeviva!;
   try {
-    await invalidateUser(client.datiUtente!.ident);
+    await invalidateUser(client.datiUtente!.id);
     res.json({ success: true });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Errore";

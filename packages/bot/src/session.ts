@@ -1,4 +1,4 @@
-import type { ClassevivaClient } from "@classeviva/core";
+import type { ClassevivaClient } from "@classeviva/core2";
 
 export interface Session {
   client?: ClassevivaClient;

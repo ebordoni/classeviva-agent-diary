@@ -1,4 +1,4 @@
-import type { Voto } from "@classeviva/core";
+import type { Voto } from "@classeviva/core2";
 import { Box, Text, useInput } from "ink";
 import { useEffect, useState } from "react";
 import { ErrorBox } from "../components/ErrorBox.js";
@@ -49,7 +49,7 @@ export function VotiScreen({ utente, fetchVoti, onBack }: VotiScreenProps) {
         voti.reduce<Record<string, number[]>>((acc, v) => {
           const materia = v.subjectDesc;
           const val = v.decimalValue;
-          if (!isNaN(val)) {
+          if (val != null && !isNaN(val)) {
             acc[materia] = [...(acc[materia] ?? []), val];
           }
           return acc;
@@ -101,7 +101,12 @@ export function VotiScreen({ utente, fetchVoti, onBack }: VotiScreenProps) {
                     <Text color="white">
                       {v.subjectDesc.substring(0, 20).padEnd(21, " ")}
                     </Text>
-                    <Text color={isNaN(val) ? "white" : coloreVoto(val)} bold>
+                    <Text
+                      color={
+                        val == null || isNaN(val) ? "white" : coloreVoto(val)
+                      }
+                      bold
+                    >
                       {v.displayValue.padEnd(5, " ")}
                     </Text>
                     <Text color="gray">{v.evtCode}</Text>

@@ -421,4 +421,3 @@ export interface CompitiEstrattiResponse {
     timestamp: string;
   };
 }
-

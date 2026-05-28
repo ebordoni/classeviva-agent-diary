@@ -80,7 +80,7 @@ export function formatVoti(resp: VotiResponse): string {
   for (const [subject, grades] of [...bySubject.entries()].sort()) {
     const numerici = grades
       .map((g) => g.decimalValue)
-      .filter((n) => n > 0 && n <= 10);
+      .filter((n): n is number => n != null && n > 0 && n <= 10);
     const media = numerici.length
       ? (numerici.reduce((a, b) => a + b, 0) / numerici.length).toFixed(2)
       : "—";
@@ -142,7 +142,7 @@ export function formatAgenda(resp: AgendaResponse): string {
     for (const ev of events) {
       const tipo = TIPO[ev.evtCode] ?? "📌";
       const materia = ev.subjectDesc ? `<b>${e(ev.subjectDesc)}</b>` : "";
-      const testo = ev.evtText || ev.notes || "";
+      const testo = ev.notes || "";
       lines.push(`${tipo}${materia ? "  " + materia : ""}`);
       if (testo) lines.push(`   ${e(testo)}`);
     }
@@ -158,7 +158,7 @@ export function formatMaterie(resp: MaterieResponse): string {
     .sort((a, b) => a.order - b.order)
     .map((m) => {
       const docenti = m.teachers
-        .map((t) => `${e(t.teacherFirstName)} ${e(t.teacherLastName)}`)
+        .map((t) => e(t.teacherName))
         .join(", ");
       return `• <b>${e(m.description)}</b>${docenti ? `\n  <i>${docenti}</i>` : ""}`;
     })

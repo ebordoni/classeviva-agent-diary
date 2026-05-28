@@ -286,7 +286,10 @@ export class ClassevivaClient {
     return { events: tutto.events.filter((a) => a.evtDate >= dataInizio) };
   }
 
-  async assenzeDaA(dataInizio: string, dataFine: string): Promise<AssenzeResponse> {
+  async assenzeDaA(
+    dataInizio: string,
+    dataFine: string,
+  ): Promise<AssenzeResponse> {
     const tutto = await this.assenze();
     return {
       events: tutto.events.filter(
@@ -417,7 +420,9 @@ export class ClassevivaClient {
     return r.data;
   }
 
-  async didatticaElemento(folderId: number): Promise<ElementiDidatticaResponse> {
+  async didatticaElemento(
+    folderId: number,
+  ): Promise<ElementiDidatticaResponse> {
     this.verificaConnessione();
     const r = await this.axiosInstance.get<ElementiDidatticaResponse>(
       `/students/${this.sid}/didactics/${folderId}`,

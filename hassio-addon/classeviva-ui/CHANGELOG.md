@@ -1,3 +1,13 @@
+## 1.3.0 — 2026-05-28
+
+- Pagina **Voti** completamente riscritta per supportare le valutazioni testuali delle scuole primarie
+  - Rilevamento automatico: se `decimalValue` è `null` e sono presenti `skills[]`, la vista passa alla modalità testuale
+  - I giudizi (`OTTIMO`, `DISTINTO`, `BUONO`, `DISCRETO`, `SUFFICIENTE`, ecc.) vengono estratti dal campo `skillValueNote` con badge colorati
+  - Media testuale calcolata tramite ranking dei giudizi
+  - Vista espansa per ogni verifica: argomento e dettaglio per skill
+- Migrato core interno da API v1 a nuova API `/rest/w1` (`core2`)
+- Fix: `WhoAmI.id` (era `.ident`) nei file di cache e autenticazione del server
+
 ## 1.2.2 — 2026-05-28
 
 - Aggiornato font dell'interfaccia a **Geist Variable** (Vercel) — più moderno e leggibile

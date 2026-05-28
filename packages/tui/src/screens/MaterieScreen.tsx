@@ -1,4 +1,4 @@
-import type { Materia } from "@classeviva/core";
+import type { Materia } from "@classeviva/core2";
 import { Box, Text, useInput } from "ink";
 import { useEffect, useState } from "react";
 import { ErrorBox } from "../components/ErrorBox.js";

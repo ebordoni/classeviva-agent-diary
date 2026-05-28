@@ -6,7 +6,7 @@ import { UtenteErrore } from "../utils/exceptions.js";
 import { ClassevivaClient } from "./ClassevivaClient.js";
 
 export interface UtenteConfig {
-  studentId: string;
+  userId: string;
   password?: string;
 }
 
@@ -18,124 +18,59 @@ export class ListaUtenti {
 
     if (utentiConfig) {
       for (const config of utentiConfig) {
-        this.aggiungi(config.studentId, config.password);
+        this.aggiungi(config.userId, config.password);
       }
     }
   }
 
-  /**
-   * Aggiunge un nuovo utente alla lista
-   */
-  aggiungi(studentId: string, password?: string): ClassevivaClient {
-    if (this.utenti.has(studentId)) {
-      throw new UtenteErrore(
-        `L'utente ${studentId} è già presente nella lista`
-      );
+  aggiungi(userId: string, password?: string): ClassevivaClient {
+    if (this.utenti.has(userId)) {
+      throw new UtenteErrore(`L'utente ${userId} è già presente nella lista`);
     }
-
-    const client = new ClassevivaClient(studentId, password);
-    this.utenti.set(studentId, client);
+    const client = new ClassevivaClient(userId, password);
+    this.utenti.set(userId, client);
     return client;
   }
 
-  /**
-   * Rimuove un utente dalla lista
-   */
-  rimuovi(studentId: string): void {
-    if (!this.utenti.has(studentId)) {
-      throw new UtenteErrore(
-        `L'utente ${studentId} non è presente nella lista`
-      );
+  rimuovi(userId: string): void {
+    if (!this.utenti.has(userId)) {
+      throw new UtenteErrore(`L'utente ${userId} non è presente nella lista`);
     }
-
-    this.utenti.delete(studentId);
+    this.utenti.delete(userId);
   }
 
-  /**
-   * Ottiene un utente specifico
-   */
-  ottieni(studentId: string): ClassevivaClient {
-    const client = this.utenti.get(studentId);
-
+  ottieni(userId: string): ClassevivaClient {
+    const client = this.utenti.get(userId);
     if (!client) {
-      throw new UtenteErrore(
-        `L'utente ${studentId} non è presente nella lista`
-      );
+      throw new UtenteErrore(`L'utente ${userId} non è presente nella lista`);
     }
-
     return client;
   }
 
-  /**
-   * Verifica se un utente esiste
-   */
-  esiste(studentId: string): boolean {
-    return this.utenti.has(studentId);
+  esiste(userId: string): boolean {
+    return this.utenti.has(userId);
   }
 
-  /**
-   * Ottiene tutti gli ID utente
-   */
   get idUtenti(): string[] {
     return Array.from(this.utenti.keys());
   }
 
-  /**
-   * Ottiene tutti i client
-   */
   get tuttiUtenti(): ClassevivaClient[] {
     return Array.from(this.utenti.values());
   }
 
-  /**
-   * Numero di utenti
-   */
   get numeroUtenti(): number {
     return this.utenti.size;
   }
 
-  /**
-   * Effettua il login per tutti gli utenti
-   */
   async accediTutti(): Promise<void> {
-    const promesse = Array.from(this.utenti.values()).map((client) =>
-      client.accedi()
-    );
-    await Promise.all(promesse);
+    await Promise.all(Array.from(this.utenti.values()).map((c) => c.accedi()));
   }
 
-  /**
-   * Effettua il login per un sottogruppo di utenti
-   */
-  async accediMultipli(studentIds: string[]): Promise<void> {
-    const promesse = studentIds.map((id) => {
-      const client = this.ottieni(id);
-      return client.accedi();
-    });
-    await Promise.all(promesse);
+  async accediMultipli(userIds: string[]): Promise<void> {
+    await Promise.all(userIds.map((id) => this.ottieni(id).accedi()));
   }
 
-  /**
-   * Ottiene le lezioni per tutti gli utenti
-   */
-  async lezioniTutti(): Promise<Map<string, any>> {
-    const risultati = new Map();
-
-    for (const [id, client] of this.utenti) {
-      try {
-        const lezioni = await client.lezioni();
-        risultati.set(id, lezioni);
-      } catch (error) {
-        risultati.set(id, { errore: error });
-      }
-    }
-
-    return risultati;
-  }
-
-  /**
-   * Svuota la lista
-   */
   svuota(): void {
     this.utenti.clear();
   }

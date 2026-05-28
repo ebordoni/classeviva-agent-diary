@@ -1,6 +1,6 @@
 {
       "name": "@classeviva/bot",
-      "version": "1.7.1",
+      "version": "1.8.0",
       "description": "Telegram bot per Classeviva",
       "type": "module",
       "main": "./dist/index.js",
@@ -19,7 +19,7 @@
       "author": "ebordoni",
       "license": "MIT",
       "dependencies": {
-            "@classeviva/core": "file:../core",
+            "@classeviva/core2": "file:../core2",
             "dotenv": "^16.6.1",
             "keyv": "^5.6.0",
             "telegraf": "^4.16.3"

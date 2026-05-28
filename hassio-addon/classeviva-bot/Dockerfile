@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /build
 
-# v1.8.2 — cache bust
+# v1.8.3 — cache bust
 COPY src/ .
 
 # Installa le dipendenze e compila

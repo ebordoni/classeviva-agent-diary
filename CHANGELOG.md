@@ -7,6 +7,14 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.9.4] — 2026-05-28
+
+### Corretto
+
+- **Addon `classeviva-bot` v1.8.3**: fix definitivo workflow GitHub Actions `sync-addon-sources.yml` — ora copia i sorgenti da `packages/core2` (nuova API) e sostituisce automaticamente `@classeviva/core2` → `@classeviva/core` negli import del bot
+
+---
+
 ## [1.9.3] — 2026-05-28
 
 ### Corretto

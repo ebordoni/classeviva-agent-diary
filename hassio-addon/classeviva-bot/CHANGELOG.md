@@ -1,3 +1,7 @@
+## 1.8.3 — 2026-05-28
+
+- Fix: corretti import `@classeviva/core` nel workflow di sincronizzazione sorgenti (GitHub Actions copiava da `packages/core` invece di `packages/core2` sovrascrivendo i fix manuali)
+
 ## 1.8.2 — 2026-05-28
 
 - Fix: cache bust Docker per forzare il ricopiamento dei sorgenti corretti nell'immagine

@@ -1,6 +1,6 @@
 name: "Classeviva Bot"
 description: "Telegram bot per Classeviva — consulta voti, lezioni, compiti direttamente da Telegram."
-version: "1.6.0"
+version: "1.7.0"
 slug: "classeviva_bot"
 init: false
 
@@ -11,8 +11,10 @@ arch:
   - amd64
 
 # Volume /data persistente (cache, gestito da HA Supervisor)
+# Volume /share condiviso con altri addon (es. classeviva-ui)
 map:
   - data:rw
+  - share:rw
 
 # Opzioni configurabili dall'interfaccia HA
 options:

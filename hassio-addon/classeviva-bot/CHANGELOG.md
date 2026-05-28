@@ -1,3 +1,9 @@
+## 1.7.0 — 2026-05-28
+
+- Cache condivisa con l'addon `classeviva-ui`: i dati scaricati automaticamente dal digest giornaliero sono ora disponibili anche nella UI
+- `FileStore` aggiornato con rilevamento modifiche via `mtime` per garantire la coerenza tra i due processi che scrivono sullo stesso file
+- `CACHE_DB_PATH` spostato da `/data/cache.json` a `/share/classeviva_cache.json`
+
 ## 1.6.0 — 2026-04-24
 
 - Digest giornaliero automatico: invia i compiti del giorno ogni mattina

@@ -7,6 +7,15 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.8.3] — 2026-05-28
+
+### Aggiunto
+
+- **Addon `classeviva-bot` v1.7.0 / `classeviva-ui` v1.2.0**: cache condivisa tramite `/share/classeviva_cache.json` — i dati scaricati automaticamente dal digest giornaliero del bot sono ora disponibili direttamente nella UI senza nuove chiamate a Classeviva
+- **`FileStore`**: rilevamento modifiche via `mtime` con merge `pendingWrites` per garantire la coerenza dei dati tra i due processi concorrenti
+
+---
+
 ## [1.8.2] — 2026-05-28
 
 ### Migliorato

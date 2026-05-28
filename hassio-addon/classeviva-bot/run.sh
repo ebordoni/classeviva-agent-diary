@@ -1,36 +1,36 @@
 #!/usr/bin/env bash
 set -e
 
-# HA scrive le opzioni dell'add-on in /data/options.json
 OPTIONS="/data/options.json"
 
 if [ ! -f "$OPTIONS" ]; then
-  echo "[classeviva-bot] ERRORE: $OPTIONS non trovato."
-  exit 1
+    echo "[classeviva-ui] ERRORE: $OPTIONS non trovato."
+    exit 1
 fi
 
-TELEGRAM_TOKEN=$(jq -r '.telegram_token // empty' "$OPTIONS")
 AI_PROVIDER=$(jq -r '.ai_provider // "openai"' "$OPTIONS")
-AI_MODEL=$(jq -r '.ai_model // empty' "$OPTIONS")
-AI_API_KEY=$(jq -r '.ai_api_key // empty' "$OPTIONS")
-# Chat ID autorizzati come stringa separata da virgola (es. "123456,789012")
-ALLOWED_CHAT_IDS=$(jq -r '.allowed_chat_ids // ""' "$OPTIONS")
-# Orario digest giornaliero (es. "07:30", vuoto = disabilitato)
-DAILY_DIGEST_TIME=$(jq -r '.daily_digest_time // ""' "$OPTIONS")
+AI_MODEL=$(jq -r '.ai_model // ""' "$OPTIONS")
+AI_API_KEY=$(jq -r '.ai_api_key // ""' "$OPTIONS")
+SESSION_SECRET=$(jq -r '.session_secret // ""' "$OPTIONS")
 
-if [ -z "$TELEGRAM_TOKEN" ]; then
-  echo "[classeviva-bot] ERRORE: telegram_token non impostato!"
-  echo "  Vai su Impostazioni → Add-on → Classeviva Bot → Configurazione"
-  exit 1
-fi
+export AI_PROVIDER="$AI_PROVIDER"
+export AI_MODEL="$AI_MODEL"
+export AI_API_KEY="$AI_API_KEY"
+export SESSION_SECRET="$SESSION_SECRET"
+export CACHE_DB_PATH="/share/classeviva_cache.json"
+export ACCOUNTS_PATH="/data/accounts.json"
+export PORT="8099"
+export NODE_ENV="production"
 
-export TELEGRAM_BOT_TOKEN="$TELEGRAM_TOKEN"
+echo "[classeviva-ui] Avvio (provider AI: ${AI_PROVIDER}, porta: ${PORT})"
+
+exec node /app/packages/server/dist/index.js
 export AI_PROVIDER="$AI_PROVIDER"
 export AI_MODEL="$AI_MODEL"
 export AI_API_KEY="$AI_API_KEY"
 export ALLOWED_CHAT_IDS="$ALLOWED_CHAT_IDS"
 export DAILY_DIGEST_TIME="$DAILY_DIGEST_TIME"
-export CACHE_DB_PATH="/data/cache.json"
+export CACHE_DB_PATH="/share/classeviva_cache.json"
 export NODE_ENV="production"
 
 echo "[classeviva-bot] Avvio (provider AI: ${AI_PROVIDER})"

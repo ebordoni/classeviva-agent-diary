@@ -1,3 +1,9 @@
+## 1.2.0 — 2026-05-28
+
+- Cache condivisa con l'addon `classeviva-bot`: i dati già scaricati dal bot (compiti, voti, lezioni) sono disponibili subito nella UI senza ulteriori chiamate a Classeviva
+- `FileStore` aggiornato con rilevamento modifiche via `mtime` per garantire la coerenza tra i due processi che scrivono sullo stesso file
+- `CACHE_DB_PATH` spostato da `/data/cache_ui.json` a `/share/classeviva_cache.json`
+
 ## 1.1.2 — 2026-05-28
 
 - UI responsive: sidebar collassabile (solo icone) su desktop, overlay slide-in su mobile

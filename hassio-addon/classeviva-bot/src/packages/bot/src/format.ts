@@ -5,7 +5,7 @@ import type {
   LezioniResponse,
   MaterieResponse,
   VotiResponse,
-} from "@classeviva/core";
+} from "@classeviva/core2";
 
 /** Escape HTML per Telegram parse_mode HTML */
 function e(s: string | undefined | null): string {
@@ -157,9 +157,7 @@ export function formatMaterie(resp: MaterieResponse): string {
   return resp.subjects
     .sort((a, b) => a.order - b.order)
     .map((m) => {
-      const docenti = m.teachers
-        .map((t) => e(t.teacherName))
-        .join(", ");
+      const docenti = m.teachers.map((t) => e(t.teacherName)).join(", ");
       return `• <b>${e(m.description)}</b>${docenti ? `\n  <i>${docenti}</i>` : ""}`;
     })
     .join("\n");

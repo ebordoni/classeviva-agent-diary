@@ -1,63 +1,56 @@
+/**
+ * ClassevivaClient - Client TypeScript per l'API Classeviva
+ */
+
 import axios, { AxiosError, AxiosInstance } from "axios";
 import type {
   AgendaResponse,
   AssenzeResponse,
-  Auth4Response,
+  AuthResponse,
   BachecaResponse,
-  CardResponse,
   ClassevivaConfig,
-  CompitiResponse,
   ContenutoItem,
   DidatticaResponse,
+  DocumentiResponse,
   ElementiDidatticaResponse,
-  FunctionsResponse,
   LezioniResponse,
-  LibrettoWebConf,
   MaterieResponse,
   NoteResponse,
   PeriodiResponse,
+  UserData,
   VotiResponse,
-  WhoAmI,
 } from "../types/index.js";
+import { Collegamenti } from "../utils/endpoints.js";
 import {
   NonAccesso,
   PasswordNonValida,
   sollevaErroreHTTP,
 } from "../utils/exceptions.js";
 import {
-  AUTH_URL,
-  BASE_URL_W1,
+  intestazione,
   TEMPO_CONNESSIONE,
-  dataFineAnno,
-  dataInizioAnno,
-  toRestDate,
   validaDate,
 } from "../utils/helpers.js";
 
 export class ClassevivaClient {
-  private userId: string;
+  private studentId: string;
   private password?: string;
-  private auth4Data?: Auth4Response;
-  private whoAmIData?: WhoAmI;
-  private numericStudentId?: string;
-  private sessionCookie?: string;
+  private authData?: AuthResponse;
   private axiosInstance: AxiosInstance;
   private loginTimestamp?: number;
 
-  constructor(userId: string, password?: string, config?: ClassevivaConfig) {
-    this.userId = userId;
+  constructor(studentId: string, password?: string, config?: ClassevivaConfig) {
+    this.studentId = studentId;
     this.password = password;
 
+    // Configura axios
     this.axiosInstance = axios.create({
-      baseURL: config?.baseUrl ?? BASE_URL_W1,
-      timeout: config?.timeout ?? 30000,
-      headers: {
-        Accept: "application/json",
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      },
+      baseURL: config?.baseUrl || "https://web.spaggiari.eu/rest/v1",
+      timeout: config?.timeout || 30000,
+      headers: intestazione,
     });
 
+    // Interceptor per gestire errori
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       (error: AxiosError) => {
@@ -71,17 +64,19 @@ export class ClassevivaClient {
             message =
               (d["message"] as string) ||
               (d["error"] as string) ||
+              (d["descrizione"] as string) ||
               JSON.stringify(data);
           } else {
             message = `Errore HTTP ${error.response.status}`;
           }
           try {
             sollevaErroreHTTP(error.response.status, message);
-          } catch (customError: unknown) {
-            const e = customError as Error & Record<string, unknown>;
-            e["config"] = error.config;
-            e["response"] = error.response;
-            throw e;
+          } catch (customError: any) {
+            // Preserva le info di debug dell'errore Axios originale
+            customError.config = error.config;
+            customError.response = error.response;
+            customError.code = error.code;
+            throw customError;
           }
         }
         throw error;
@@ -89,266 +84,230 @@ export class ClassevivaClient {
     );
   }
 
-  // ============================================================================
-  // AUTH
-  // Login tramite AuthApi4.php (endpoint del vecchio portale PHP),
-  // ottiene il PHPSESSID che autentica le chiamate w1.
-  // ============================================================================
-
+  /**
+   * Effettua il login tramite REST API
+   */
   async accedi(password?: string): Promise<void> {
-    const pwd = password ?? this.password;
-    if (!pwd) throw new PasswordNonValida();
+    const pwd = password || this.password;
+    if (!pwd) throw new PasswordNonValida("Password non fornita");
 
-    const formData = new URLSearchParams({
-      cid: "",
-      uid: this.userId,
-      pwd,
-      pin: "",
-      target: "",
-    });
-
-    const loginResponse = await axios.post<Auth4Response>(
-      AUTH_URL,
-      formData.toString(),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/142.0",
-          Accept: "*/*",
-          Referer: "https://web.spaggiari.eu/home/app/default/login.php",
-          Origin: "https://web.spaggiari.eu",
-        },
-      },
+    const loginResponse = await axios.post<AuthResponse>(
+      Collegamenti.AUTH,
+      JSON.stringify({ uid: this.studentId, pass: pwd, ident: null }),
+      { headers: intestazione },
     );
 
     const data = loginResponse.data;
+    this.authData = data;
 
-    // Verifica che il login sia avvenuto con successo
-    if (!data.data?.auth?.loggedIn) {
-      const errors =
-        data.data?.auth?.errors?.join(", ") ?? "Credenziali non valide";
-      throw new PasswordNonValida(errors);
-    }
+    // Imposta il token di autenticazione per tutte le richieste successive
+    this.axiosInstance.defaults.headers.common["Z-Auth-Token"] = data.token;
 
-    this.auth4Data = data;
-
-    // Estrai il PHPSESSID dalla risposta
-    const setCookieHeader = (
-      loginResponse.headers as Record<string, string | string[] | undefined>
-    )["set-cookie"];
-    let phpsessid: string | undefined;
-    if (typeof setCookieHeader === "string") {
-      phpsessid = setCookieHeader.match(/PHPSESSID=([^;]+)/)?.[1];
-    } else if (Array.isArray(setCookieHeader)) {
-      for (const c of setCookieHeader) {
-        const m = c.match(/PHPSESSID=([^;]+)/);
-        if (m) {
-          phpsessid = m[1];
-          break;
-        }
+    // Per account G (genitori) gli endpoint studente usano l'ID numerico
+    if (data.ident) {
+      const numericId = data.ident.replace(/\D/g, "");
+      if (data.ident !== numericId) {
+        this.studentId = numericId;
       }
-    }
-
-    if (!phpsessid) {
-      throw new NonAccesso("PHPSESSID non ricevuto dopo il login");
-    }
-
-    this.sessionCookie = `PHPSESSID=${phpsessid}`;
-    this.axiosInstance.defaults.headers.common["Cookie"] = this.sessionCookie;
-
-    // ID numerico studente dall'auth response
-    const accountInfo = data.data?.auth?.accountInfo;
-    if (accountInfo?.id) {
-      this.numericStudentId = String(accountInfo.id);
-    }
-
-    // Carica whoami
-    this.whoAmIData = (
-      await this.axiosInstance.get<WhoAmI>("/misc/whoami")
-    ).data;
-
-    if (this.whoAmIData.id) {
-      this.numericStudentId = this.whoAmIData.id;
     }
 
     this.loginTimestamp = Date.now();
     this.password = pwd;
   }
 
+  /**
+   * Verifica se l'utente è connesso
+   */
   get connesso(): boolean {
-    if (!this.sessionCookie || !this.loginTimestamp) return false;
-    return (Date.now() - this.loginTimestamp) / 1000 < TEMPO_CONNESSIONE;
+    if (!this.authData || !this.loginTimestamp) {
+      return false;
+    }
+
+    const elapsed = (Date.now() - this.loginTimestamp) / 1000;
+    return elapsed < TEMPO_CONNESSIONE;
   }
 
+  /**
+   * Verifica connessione e solleva errore se non connesso
+   */
   private verificaConnessione(): void {
-    if (!this.connesso) throw new NonAccesso();
+    if (!this.connesso) {
+      throw new NonAccesso("Utente non connesso. Effettuare il login prima.");
+    }
   }
 
-  private get sid(): string {
-    return this.numericStudentId ?? this.userId;
-  }
+  /**
+   * Ottiene i dati utente
+   */
+  get datiUtente(): UserData | undefined {
+    if (!this.authData) {
+      return undefined;
+    }
 
-  // ============================================================================
-  // DATI UTENTE
-  // ============================================================================
-
-  get datiUtente(): WhoAmI | undefined {
-    return this.whoAmIData;
+    return {
+      ident: this.authData.ident,
+      firstName: this.authData.firstName,
+      lastName: this.authData.lastName,
+      token: this.authData.token,
+    };
   }
 
   get nome(): string | undefined {
-    return (
-      this.whoAmIData?.nome ?? this.auth4Data?.data?.auth?.accountInfo?.nome
-    );
+    return this.authData?.firstName;
   }
 
   get cognome(): string | undefined {
-    return (
-      this.whoAmIData?.cognome ??
-      this.auth4Data?.data?.auth?.accountInfo?.cognome
-    );
+    return this.authData?.lastName;
   }
 
   get nomeCompleto(): string | undefined {
-    const n = this.nome;
-    const c = this.cognome;
-    if (!n && !c) return this.userId;
-    return `${n} ${c}`.trim();
+    if (!this.authData) return undefined;
+    const nome = this.authData.firstName;
+    const cognome = this.authData.lastName;
+    if (!nome && !cognome) return this.studentId;
+    return `${nome} ${cognome}`.trim();
   }
 
-  async card(): Promise<CardResponse> {
+  // ============================================================================
+  // LEZIONI
+  // ============================================================================
+
+  /**
+   * Ottiene le lezioni di oggi
+   */
+  async lezioni(): Promise<LezioniResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<CardResponse>(
-      `/students/${this.sid}/card`,
-    );
-    return r.data;
+
+    const url = Collegamenti.getLessonsUrl(this.studentId);
+    const response = await this.axiosInstance.get<LezioniResponse>(url);
+    return response.data;
   }
 
-  async functions(): Promise<FunctionsResponse> {
-    this.verificaConnessione();
-    const r = await this.axiosInstance.get<FunctionsResponse>(
-      `/students/${this.sid}/_functions`,
-    );
-    return r.data;
-  }
-
-  // ============================================================================
-  // PERIODI
-  // ============================================================================
-
-  async periodi(): Promise<PeriodiResponse> {
-    this.verificaConnessione();
-    const r = await this.axiosInstance.get<PeriodiResponse>(
-      `/students/${this.sid}/periods`,
-    );
-    return r.data;
-  }
-
-  // ============================================================================
-  // MATERIE
-  // ============================================================================
-
-  async materie(): Promise<MaterieResponse> {
-    this.verificaConnessione();
-    const r = await this.axiosInstance.get<MaterieResponse>(
-      `/students/${this.sid}/subjects`,
-    );
-    return r.data;
-  }
-
-  // ============================================================================
-  // VOTI — endpoint rinominato: grades → grades26
-  // ============================================================================
-
-  async voti(): Promise<VotiResponse> {
-    this.verificaConnessione();
-    const r = await this.axiosInstance.get<VotiResponse>(
-      `/students/${this.sid}/grades26`,
-    );
-    return r.data;
-  }
-
-  // ============================================================================
-  // ASSENZE — risposta cambiata: "absences" → "events"
-  // ============================================================================
-
-  async assenze(): Promise<AssenzeResponse> {
-    this.verificaConnessione();
-    const r = await this.axiosInstance.get<AssenzeResponse>(
-      `/students/${this.sid}/absences/details/`,
-    );
-    return r.data;
-  }
-
-  async assenzeDa(dataInizio: string): Promise<AssenzeResponse> {
-    const tutto = await this.assenze();
-    return { events: tutto.events.filter((a) => a.evtDate >= dataInizio) };
-  }
-
-  async assenzeDaA(dataInizio: string, dataFine: string): Promise<AssenzeResponse> {
-    const tutto = await this.assenze();
-    return {
-      events: tutto.events.filter(
-        (a) => a.evtDate >= dataInizio && a.evtDate <= dataFine,
-      ),
-    };
-  }
-
-  async librettoWebConf(): Promise<LibrettoWebConf> {
-    this.verificaConnessione();
-    const r = await this.axiosInstance.get<LibrettoWebConf>(
-      `/students/${this.sid}/absences/librettowebconf`,
-    );
-    return r.data;
-  }
-
-  // ============================================================================
-  // LEZIONI — stessa struttura v1, range date in YYYYMMDD
-  // ============================================================================
-
-  async lezioniDaA(inizio: string, fine: string): Promise<LezioniResponse> {
-    this.verificaConnessione();
-    validaDate(inizio, fine);
-    const r = await this.axiosInstance.get<LezioniResponse>(
-      `/students/${this.sid}/lessons/${toRestDate(inizio)}/${toRestDate(fine)}`,
-    );
-    return r.data;
-  }
-
+  /**
+   * Ottiene le lezioni di un giorno specifico
+   */
   async lezioniGiorno(data: string): Promise<LezioniResponse> {
-    return this.lezioniDaA(data, data);
+    this.verificaConnessione();
+
+    const url = Collegamenti.getLessonsUrl(this.studentId, data);
+    const response = await this.axiosInstance.get<LezioniResponse>(url);
+    return response.data;
   }
 
+  /**
+   * Ottiene le lezioni in un intervallo di date
+   */
+  async lezioniDaA(
+    dataInizio: string,
+    dataFine: string,
+  ): Promise<LezioniResponse> {
+    this.verificaConnessione();
+    validaDate(dataInizio, dataFine);
+
+    const url = Collegamenti.getLessonsUrl(
+      this.studentId,
+      undefined,
+      dataInizio,
+      dataFine,
+    );
+    const response = await this.axiosInstance.get<LezioniResponse>(url);
+    return response.data;
+  }
+
+  /**
+   * Ottiene le lezioni per una materia specifica
+   */
   async lezioniDaAMateria(
-    inizio: string,
-    fine: string,
+    dataInizio: string,
+    dataFine: string,
     materiaId: number,
   ): Promise<LezioniResponse> {
-    const risposta = await this.lezioniDaA(inizio, fine);
-    return {
-      lessons: risposta.lessons.filter((l) => l.subjectId === materiaId),
-    };
-  }
-
-  async lezioniAnnoCorrente(): Promise<LezioniResponse> {
-    return this.lezioniDaA(dataInizioAnno(), dataFineAnno());
-  }
-
-  // ============================================================================
-  // AGENDA — endpoint rinominato: agenda → agendav2
-  // ============================================================================
-
-  async agendaDaA(inizio: string, fine: string): Promise<AgendaResponse> {
     this.verificaConnessione();
-    validaDate(inizio, fine);
-    const r = await this.axiosInstance.get<AgendaResponse>(
-      `/students/${this.sid}/agendav2/all/${toRestDate(inizio)}/${toRestDate(fine)}`,
+    validaDate(dataInizio, dataFine);
+
+    const url = Collegamenti.getLessonsUrl(
+      this.studentId,
+      undefined,
+      dataInizio,
+      dataFine,
+      materiaId,
     );
-    return r.data;
+    const response = await this.axiosInstance.get<LezioniResponse>(url);
+    return response.data;
   }
 
+  // ============================================================================
+  // VOTI
+  // ============================================================================
+
+  /**
+   * Ottiene tutti i voti
+   */
+  async voti(): Promise<VotiResponse> {
+    this.verificaConnessione();
+
+    const url = Collegamenti.formatUrl(Collegamenti.GRADES, {
+      studentId: this.studentId,
+    });
+    const response = await this.axiosInstance.get<VotiResponse>(url);
+    return response.data;
+  }
+
+  // ============================================================================
+  // ASSENZE
+  // ============================================================================
+
+  /**
+   * Ottiene tutte le assenze
+   */
+  async assenze(): Promise<AssenzeResponse> {
+    this.verificaConnessione();
+
+    const url = Collegamenti.getAbsencesUrl(this.studentId);
+    const response = await this.axiosInstance.get<AssenzeResponse>(url);
+    return response.data;
+  }
+
+  /**
+   * Ottiene le assenze da una data
+   */
+  async assenzeDa(dataInizio: string): Promise<AssenzeResponse> {
+    this.verificaConnessione();
+
+    const url = Collegamenti.getAbsencesUrl(this.studentId, dataInizio);
+    const response = await this.axiosInstance.get<AssenzeResponse>(url);
+    return response.data;
+  }
+
+  /**
+   * Ottiene le assenze in un intervallo
+   */
+  async assenzeDaA(
+    dataInizio: string,
+    dataFine: string,
+  ): Promise<AssenzeResponse> {
+    this.verificaConnessione();
+    validaDate(dataInizio, dataFine);
+
+    const url = Collegamenti.getAbsencesUrl(
+      this.studentId,
+      dataInizio,
+      dataFine,
+    );
+    const response = await this.axiosInstance.get<AssenzeResponse>(url);
+    return response.data;
+  }
+
+  // ============================================================================
+  // AGENDA
+  // ============================================================================
+
+  /**
+   * Ottiene l'agenda della settimana corrente
+   */
   async agenda(): Promise<AgendaResponse> {
+    this.verificaConnessione();
+
     const oggi = new Date();
     const lunedi = new Date(oggi);
     lunedi.setDate(
@@ -356,72 +315,187 @@ export class ClassevivaClient {
     );
     const domenica = new Date(lunedi);
     domenica.setDate(lunedi.getDate() + 6);
+
     return this.agendaDaA(
       lunedi.toISOString().slice(0, 10),
       domenica.toISOString().slice(0, 10),
     );
   }
 
-  // ============================================================================
-  // COMPITI — nuovo endpoint dedicato (non esisteva in v1)
-  // ============================================================================
-
-  async compiti(): Promise<CompitiResponse> {
+  /**
+   * Ottiene l'agenda in un intervallo di date (formato YYYY-MM-DD)
+   */
+  async agendaDaA(
+    dataInizio: string,
+    dataFine: string,
+  ): Promise<AgendaResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<CompitiResponse>(
-      `/students/${this.sid}/homeworks/index`,
-    );
-    return r.data;
+    validaDate(dataInizio, dataFine);
+
+    const url = Collegamenti.getAgendaUrl(this.studentId, dataInizio, dataFine);
+    const response = await this.axiosInstance.get<AgendaResponse>(url);
+    return response.data;
   }
 
   // ============================================================================
-  // NOTE DISCIPLINARI — risposta cambiata: array → { NTTE, NTCL, NTWN, NTST }
+  // MATERIE E PERIODI
   // ============================================================================
 
+  /**
+   * Ottiene tutte le materie
+   */
+  async materie(): Promise<MaterieResponse> {
+    this.verificaConnessione();
+
+    const url = Collegamenti.formatUrl(Collegamenti.SUBJECTS, {
+      studentId: this.studentId,
+    });
+    const response = await this.axiosInstance.get<MaterieResponse>(url);
+    return response.data;
+  }
+
+  /**
+   * Ottiene tutti i periodi
+   */
+  async periodi(): Promise<PeriodiResponse> {
+    this.verificaConnessione();
+
+    const url = Collegamenti.formatUrl(Collegamenti.PERIODS, {
+      studentId: this.studentId,
+    });
+    const response = await this.axiosInstance.get<PeriodiResponse>(url);
+    return response.data;
+  }
+
+  // ============================================================================
+  // NOTE
+  // ============================================================================
+
+  /**
+   * Ottiene tutte le note
+   */
   async note(): Promise<NoteResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<NoteResponse>(
-      `/students/${this.sid}/notes/all/`,
-    );
-    return r.data;
+
+    const url = Collegamenti.formatUrl(Collegamenti.NOTES, {
+      studentId: this.studentId,
+    });
+    const response = await this.axiosInstance.get<NoteResponse>(url);
+    return response.data;
   }
 
+  /**
+   * Legge una nota specifica
+   */
   async leggiNota(eventCode: string, evtId: number): Promise<void> {
     this.verificaConnessione();
-    await this.axiosInstance.post(
-      `/students/${this.sid}/notes/${eventCode}/${evtId}/read`,
-    );
+
+    const url = Collegamenti.getNotesReadUrl(this.studentId, eventCode, evtId);
+    await this.axiosInstance.post(url);
   }
 
+  // ============================================================================
+  // BACHECA
+  // ============================================================================
+
+  /**
+   * Ottiene la bacheca
+   */
   async bacheca(): Promise<BachecaResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<BachecaResponse>(
-      `/students/${this.sid}/noticeboard`,
-    );
-    return r.data;
+
+    const url = Collegamenti.formatUrl(Collegamenti.NOTICEBOARD, {
+      studentId: this.studentId,
+    });
+    const response = await this.axiosInstance.get<BachecaResponse>(url);
+    return response.data;
   }
 
+  /**
+   * Legge un elemento della bacheca
+   */
   async bachecaLeggi(eventCode: string, pubId: number): Promise<ContenutoItem> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.post<{ item: ContenutoItem }>(
-      `/students/${this.sid}/noticeboard/${eventCode}/${pubId}/read/`,
+
+    const url = Collegamenti.getNoticeboardReadUrl(
+      this.studentId,
+      eventCode,
+      pubId,
     );
-    return r.data.item;
+    const response = await this.axiosInstance.post<{ item: ContenutoItem }>(
+      url,
+    );
+    return response.data.item;
   }
 
+  // ============================================================================
+  // DIDATTICA
+  // ============================================================================
+
+  /**
+   * Ottiene i folder della didattica
+   */
   async didattica(): Promise<DidatticaResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<DidatticaResponse>(
-      `/students/${this.sid}/didactics`,
-    );
-    return r.data;
+
+    const url = Collegamenti.formatUrl(Collegamenti.DIDACTICS, {
+      studentId: this.studentId,
+    });
+    const response = await this.axiosInstance.get<DidatticaResponse>(url);
+    return response.data;
   }
 
-  async didatticaElemento(folderId: number): Promise<ElementiDidatticaResponse> {
+  /**
+   * Ottiene gli elementi di un folder
+   */
+  async didatticaElemento(
+    folderId: number,
+  ): Promise<ElementiDidatticaResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<ElementiDidatticaResponse>(
-      `/students/${this.sid}/didactics/${folderId}`,
-    );
-    return r.data;
+
+    const url = Collegamenti.getDidacticsItemUrl(this.studentId, folderId);
+    const response =
+      await this.axiosInstance.get<ElementiDidatticaResponse>(url);
+    return response.data;
+  }
+
+  // ============================================================================
+  // DOCUMENTI
+  // ============================================================================
+
+  /**
+   * Ottiene i documenti
+   */
+  async documenti(): Promise<DocumentiResponse> {
+    this.verificaConnessione();
+
+    const url = Collegamenti.formatUrl(Collegamenti.DOCUMENTS, {
+      studentId: this.studentId,
+    });
+    const response = await this.axiosInstance.get<DocumentiResponse>(url);
+    return response.data;
+  }
+
+  /**
+   * Controlla un documento specifico
+   */
+  async controllaDocumento(hash: string): Promise<any> {
+    this.verificaConnessione();
+
+    const url = Collegamenti.getDocumentsCheckUrl(this.studentId, hash);
+    const response = await this.axiosInstance.get(url);
+    return response.data;
+  }
+
+  // ============================================================================
+  // AVATAR (Bonus)
+  // ============================================================================
+
+  /**
+   * Ottiene l'URL dell'avatar
+   */
+  get avatar(): string | undefined {
+    if (!this.authData?.ident) return undefined;
+    return `https://web.spaggiari.eu/fml/app/images/studenti/${this.authData.ident}.jpg`;
   }
 }

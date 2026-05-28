@@ -51,7 +51,7 @@ password.txt
 cache.json
 packages/bot/cache.json
 cache_ui.json
-data/accounts.json
+hassio-addon/classeviva-ui/src/packages/server/data/accounts.json
 
 # File temporanei
 *.tmp

@@ -7,6 +7,21 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.9.1] — 2026-05-28
+
+### Migliorato
+
+- **Addon `classeviva-ui` v1.4.0**: miglioramenti alla Dashboard e alla pagina Compiti
+  - Media voti mostrata come giudizio testuale (calcolata includendo i voti testuali con valori numerici reali)
+  - Voti in Dashboard: badge colorato per giudizi testuali, valore numerico per voti classici
+  - Dashboard: la scheda "Compiti degli ultimi 7 giorni" usa ora i compiti estratti dall'AI dalla cache invece delle lezioni grezze
+  - Pagina Compiti: mostra i compiti in cache (ultimi 30 giorni) al caricamento, prima di qualsiasi analisi AI
+  - Nuova GET `api/compiti?giorni=N` per leggere i compiti senza invocare l'AI
+  - Estratta logica voti testuali in `gradeUtils.ts` condiviso tra Dashboard e pagina Voti
+  - Fix: badge voto non più duplicato nella lista skill
+
+---
+
 ## [1.9.0] — 2026-05-28
 
 ### Aggiunto

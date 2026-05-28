@@ -1,3 +1,13 @@
+## 1.4.0 — 2026-05-28
+
+- Media voti in Dashboard: calcolata su tutti i voti (numerici + testuali), mostrata come giudizio testuale (es. "Ottimo")
+- Voti in Dashboard: badge colorato per i voti testuali, valore numerico per i voti numerici
+- Compiti in Dashboard: usa i compiti già estratti dall'AI e salvati in cache invece delle lezioni grezze
+- Pagina Compiti: mostra subito i compiti in cache al caricamento, senza dover avviare una nuova analisi AI
+- Nuova route `GET /api/compiti?giorni=N`: legge i compiti già in cache senza chiamare l'AI
+- Estratta logica voti testuali nel modulo condiviso `gradeUtils.ts` (usato da Dashboard e Voti)
+- Fix: badge voto duplicato rimosso dalla lista skill in pagina Voti
+
 ## 1.3.0 — 2026-05-28
 
 - Pagina **Voti** completamente riscritta per supportare le valutazioni testuali delle scuole primarie

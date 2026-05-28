@@ -330,6 +330,41 @@ export async function getCompiti(
   return { data: merged, fromCache: allFromCache };
 }
 
+/** Legge dalla cache i compiti già estratti per un intervallo di date, senza chiamare l'AI. */
+export async function getCachedCompiti(
+  userId: string,
+  inizio: string,
+  fine: string,
+): Promise<CompitiEstrattiResponse> {
+  const dates: string[] = [];
+  const cur = new Date(inizio + "T00:00:00");
+  const end = new Date(fine + "T00:00:00");
+  while (cur <= end) {
+    dates.push(cur.toISOString().split("T")[0]!);
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  const cached = await Promise.all(
+    dates.map((d) =>
+      store.get<CompitiEstrattiResponse>(key("compiti_giorno", userId, d)),
+    ),
+  );
+
+  const allCompiti: CompitoEstratto[] = cached
+    .filter((v): v is CompitiEstrattiResponse => v !== undefined)
+    .flatMap((v) => v.compiti);
+
+  return {
+    compiti: allCompiti,
+    metadata: {
+      totale_lezioni: dates.length,
+      totale_compiti: allCompiti.length,
+      modello_utilizzato: "",
+      timestamp: new Date().toISOString(),
+    },
+  };
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Student ID ricordato (per pre-compilare il form di login)
 // ─────────────────────────────────────────────────────────────────

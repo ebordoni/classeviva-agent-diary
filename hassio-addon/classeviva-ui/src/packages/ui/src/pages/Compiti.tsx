@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { format, isPast, isToday, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
 import { useState } from "react";
@@ -17,6 +17,13 @@ export default function Compiti() {
   const [apiKey, setApiKey] = useState("");
   const [model, setModel] = useState("");
 
+  const { data: cachedData } = useQuery({
+    queryKey: ["compiti-cached"],
+    queryFn: () => compitiApi.getCached(30),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+
   const mutation = useMutation({
     mutationFn: () => {
       const fine = new Date();
@@ -32,7 +39,8 @@ export default function Compiti() {
     },
   });
 
-  const result: CompitiResponse | undefined = mutation.data;
+  const result: CompitiResponse | undefined = mutation.data ?? cachedData;
+  const isFromCache = !mutation.data && !!cachedData;
 
   const byDeadline = new Map<string, NonNullable<typeof result>["compiti"]>();
   for (const c of result?.compiti ?? []) {
@@ -130,7 +138,7 @@ export default function Compiti() {
               {result.metadata.totale_lezioni} giorni —{" "}
               {result.metadata.modello_utilizzato}
             </p>
-            {result.fromCache && (
+            {(result.fromCache || isFromCache) && (
               <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
                 📦 cache
               </span>

@@ -105,6 +105,8 @@ export const compitiApi = {
       method: "POST",
       body: JSON.stringify(params),
     }),
+  getCached: (giorni = 7) =>
+    apiFetch<CompitiResponse>(`api/compiti?giorni=${giorni}`),
 };
 
 export const noteApi = {

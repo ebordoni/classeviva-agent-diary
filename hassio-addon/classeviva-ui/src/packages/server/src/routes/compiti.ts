@@ -2,10 +2,28 @@ import type { AIProvider } from "@classeviva/core";
 import { AIService, ultimiNGiorni } from "@classeviva/core";
 import type { Request, Response } from "express";
 import { Router } from "express";
-import { getCompiti } from "../cache.js";
+import { getCachedCompiti, getCompiti } from "../cache.js";
 import { requireAuth } from "../middleware/auth.js";
 
 const router = Router();
+
+/** GET /api/compiti?giorni=7 — restituisce i compiti già in cache (niente AI) */
+router.get("/", requireAuth, async (req: Request, res: Response) => {
+  const client = req.classeviva!;
+  const giorni = parseInt((req.query.giorni as string) ?? "7", 10) || 7;
+  const range = ultimiNGiorni(giorni);
+  try {
+    const data = await getCachedCompiti(
+      client.datiUtente!.id,
+      range.inizio,
+      range.fine,
+    );
+    res.json({ ...data, fromCache: true });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Errore";
+    res.status(500).json({ error: message });
+  }
+});
 
 router.post("/", requireAuth, async (req: Request, res: Response) => {
   const client = req.classeviva!;

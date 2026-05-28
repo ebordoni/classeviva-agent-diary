@@ -7,6 +7,17 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.9.6] — 2026-05-28
+
+### Aggiunto
+
+- **Addon `classeviva-ui` v1.5.0**: account configurabili dalle opzioni dell'addon in Home Assistant
+  - Nuovo campo `accounts` (lista `student_id`/`password`) nel pannello Opzioni
+  - Auto-login automatico all'accesso se gli account sono preconfigurati, senza schermata di login
+  - Supporto multi-utenza: tutti gli account da config sono disponibili per il cambio utente
+
+---
+
 ## [1.9.5] — 2026-05-28
 
 ### Refactoring

@@ -1,3 +1,11 @@
+## 1.5.0 — 2026-05-28
+
+- Nuova funzionalità: account configurabili direttamente dalle opzioni dell'addon in Home Assistant
+  - Aggiunto campo `accounts` (lista `student_id`/`password`) nel pannello Opzioni dell'addon
+  - Al boot del server gli account vengono sincronizzati da `options.json` e marcati come `fromConfig`
+  - Auto-login automatico: se esistono account da config, la sessione viene autenticata senza schermata di login
+  - La schermata di login rimane visibile solo se nessun account è configurato o le credenziali non sono valide
+
 ## 1.4.0 — 2026-05-28
 
 - Media voti in Dashboard: calcolata su tutti i voti (numerici + testuali), mostrata come giudizio testuale (es. "Ottimo")

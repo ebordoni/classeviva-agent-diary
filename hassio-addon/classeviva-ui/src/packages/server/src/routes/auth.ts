@@ -8,12 +8,33 @@ import { getClientByStudentId, setClientByStudentId } from "../session.js";
 const router = Router();
 
 router.get("/me", async (req: Request, res: Response) => {
-  const studentId = req.session.activeStudentId;
+  let studentId = req.session.activeStudentId;
   const accounts = await loadAccounts();
   const publicAccounts = accounts.map((a) => ({
     studentId: a.studentId,
     nome: a.nome,
   }));
+
+  // Auto-login: se la sessione non è autenticata ma esistono account da config, effettua il login automatico
+  if (!studentId || !req.session.authenticated) {
+    const configAccount = accounts.find((a) => a.fromConfig);
+    if (configAccount) {
+      try {
+        let client = getClientByStudentId(configAccount.studentId);
+        if (!client || !client.connesso) {
+          client = new ClassevivaClient(configAccount.studentId, configAccount.password);
+          await client.accedi();
+          setClientByStudentId(configAccount.studentId, client);
+          await upsertAccount(configAccount.studentId, configAccount.password, client.nomeCompleto);
+        }
+        req.session.activeStudentId = configAccount.studentId;
+        req.session.authenticated = true;
+        studentId = configAccount.studentId;
+      } catch {
+        // credenziali non valide, mostra la schermata di login
+      }
+    }
+  }
 
   if (!studentId || !req.session.authenticated) {
     res.json({ authenticated: false, accounts: publicAccounts });

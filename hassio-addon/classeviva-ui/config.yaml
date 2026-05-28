@@ -1,6 +1,6 @@
 name: "Classeviva UI"
 description: "Interfaccia web per il registro Classeviva — consulta voti, lezioni, compiti e altro dal browser."
-version: "1.4.0"
+version: "1.5.0"
 slug: "classeviva_ui"
 init: false
 
@@ -25,12 +25,16 @@ panel_icon: mdi:school-outline
 panel_title: "Classeviva"
 
 options:
+  accounts: []
   ai_provider: "openai"
   ai_model: ""
   ai_api_key: ""
   session_secret: ""
 
 schema:
+  accounts:
+    - student_id: str
+      password: str
   ai_provider: str
   ai_model: str?
   ai_api_key: str?

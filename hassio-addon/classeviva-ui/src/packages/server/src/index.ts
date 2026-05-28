@@ -5,6 +5,7 @@ import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { syncConfigAccounts } from "./accounts.js";
 import accountsRouter from "./routes/accounts.js";
 import agendaRouter from "./routes/agenda.js";
 import assenzeRouter from "./routes/assenze.js";
@@ -70,4 +71,19 @@ app.get(/^(?!\/api).*/, (_req, res) => {
 
 app.listen(port, "0.0.0.0", () => {
   console.log(`[classeviva-ui] Server avviato su porta ${port}`);
+
+  // Sincronizza account da configurazione addon (ACCOUNTS_CONFIG env var)
+  const raw = process.env.ACCOUNTS_CONFIG;
+  if (raw) {
+    try {
+      const configAccounts = JSON.parse(raw) as Array<{ student_id: string; password: string }>;
+      if (Array.isArray(configAccounts) && configAccounts.length > 0) {
+        syncConfigAccounts(configAccounts).then(() => {
+          console.log(`[classeviva-ui] Sincronizzati ${configAccounts.length} account da configurazione`);
+        });
+      }
+    } catch {
+      console.warn("[classeviva-ui] ACCOUNTS_CONFIG non valido, ignorato");
+    }
+  }
 });

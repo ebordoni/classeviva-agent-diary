@@ -7,6 +7,14 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.9.2] — 2026-05-28
+
+### Corretto
+
+- **Addon `classeviva-bot` v1.8.1**: fix build — ripristinati import `@classeviva/core` nei sorgenti del bot (erano stati erroneamente impostati a `@classeviva/core2`)
+
+---
+
 ## [1.9.1] — 2026-05-28
 
 ### Migliorato

@@ -1,3 +1,7 @@
+## 1.8.1 — 2026-05-28
+
+- Fix: ripristinati import `@classeviva/core` nei file del bot dell'addon (erano stati erroneamente impostati a `@classeviva/core2` causando errore di build)
+
 ## 1.8.0 — 2026-05-28
 
 - Migrato da `@classeviva/core` (API v1) a `@classeviva/core2` (nuova API `/rest/w1`)

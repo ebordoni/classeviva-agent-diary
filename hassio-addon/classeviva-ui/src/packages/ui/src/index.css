@@ -1,3 +1,5 @@
+@import "@fontsource-variable/geist";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,5 +7,6 @@
 @layer base {
   body {
     @apply bg-gray-50 text-gray-900 antialiased;
+    font-family: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
   }
 }

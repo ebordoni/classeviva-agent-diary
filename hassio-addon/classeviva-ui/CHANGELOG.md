@@ -1,3 +1,7 @@
+## 1.2.2 — 2026-05-28
+
+- Aggiornato font dell'interfaccia a **Geist Variable** (Vercel) — più moderno e leggibile
+
 ## 1.2.1 — 2026-05-28
 
 - Fix: aggiunto guard esplicito nel Dockerfile sui file `dist/` prodotti da `tsc` per evitare immagini rotte in caso di errore silenzioso del build

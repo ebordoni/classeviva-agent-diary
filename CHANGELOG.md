@@ -7,6 +7,14 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.8.4] — 2026-05-28
+
+### Migliorato
+
+- **Addon `classeviva-ui` v1.2.2**: aggiornato font dell'interfaccia a **Geist Variable** — incluso nel bundle Vite, nessuna CDN esterna
+
+---
+
 ## [1.8.3] — 2026-05-28
 
 ### Aggiunto

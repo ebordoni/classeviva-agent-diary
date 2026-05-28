@@ -5,7 +5,7 @@ import type {
   LezioniResponse,
   MaterieResponse,
   VotiResponse,
-} from "@classeviva/core2";
+} from "@classeviva/core";
 
 /** Escape HTML per Telegram parse_mode HTML */
 function e(s: string | undefined | null): string {

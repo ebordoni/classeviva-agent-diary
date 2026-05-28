@@ -6,8 +6,8 @@ import type {
   LezioniResponse,
   MaterieResponse,
   VotiResponse,
-} from "@classeviva/core2";
-import { AIService, ClassevivaClient } from "@classeviva/core2";
+} from "@classeviva/core";
+import { AIService, ClassevivaClient } from "@classeviva/core";
 import Keyv from "keyv";
 import fs from "node:fs";
 import path from "node:path";

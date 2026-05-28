@@ -7,9 +7,9 @@ on:
       - "packages/bot/src/**"
       - "packages/bot/package.json"
       - "packages/bot/tsconfig.json"
-      - "packages/core/src/**"
-      - "packages/core/package.json"
-      - "packages/core/tsconfig.json"
+      - "packages/core2/src/**"
+      - "packages/core2/package.json"
+      - "packages/core2/tsconfig.json"
       - "package.json"
       - "tsconfig.base.json"
 
@@ -42,15 +42,23 @@ jobs:
           # package-lock.json se presente
           [ -f package-lock.json ] && cp package-lock.json "$ADDON_SRC/"
 
-          # pacchetto bot
+          # pacchetto bot: copia i sorgenti e sostituisce @classeviva/core2 → @classeviva/core
           cp packages/bot/package.json "$ADDON_SRC/packages/bot/"
           cp packages/bot/tsconfig.json "$ADDON_SRC/packages/bot/"
           cp -r packages/bot/src/. "$ADDON_SRC/packages/bot/src/"
+          find "$ADDON_SRC/packages/bot/src" -name "*.ts" -exec \
+            sed -i 's/@classeviva\/core2/@classeviva\/core/g' {} +
 
-          # pacchetto core
-          cp packages/core/package.json "$ADDON_SRC/packages/core/"
-          cp packages/core/tsconfig.json "$ADDON_SRC/packages/core/"
-          cp -r packages/core/src/. "$ADDON_SRC/packages/core/src/"
+          # pacchetto core (da core2, mantenendo il nome @classeviva/core per compatibilità)
+          # Il package.json è già configurato con name: @classeviva/core nel sorgente addon
+          cp hassio-addon/classeviva-bot/src/packages/core/package.json "$ADDON_SRC/packages/core/" 2>/dev/null || \
+            node -e "
+              const pkg = JSON.parse(require('fs').readFileSync('packages/core2/package.json','utf8'));
+              pkg.name = '@classeviva/core';
+              require('fs').writeFileSync('$ADDON_SRC/packages/core/package.json', JSON.stringify(pkg, null, 2));
+            "
+          cp packages/core2/tsconfig.json "$ADDON_SRC/packages/core/"
+          cp -r packages/core2/src/. "$ADDON_SRC/packages/core/src/"
 
       - name: Commit and push if changed
         run: |

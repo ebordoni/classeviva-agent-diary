@@ -1,3 +1,4 @@
+/// <reference types="node" />
 /**
  * AIService - Integrazione Vercel AI SDK per estrazione compiti dalle lezioni
  *

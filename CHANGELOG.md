@@ -7,6 +7,14 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.9.3] — 2026-05-28
+
+### Corretto
+
+- **Addon `classeviva-bot` v1.8.2**: fix build Docker — cache bust per garantire il ricopiamento dei sorgenti aggiornati
+
+---
+
 ## [1.9.2] — 2026-05-28
 
 ### Corretto

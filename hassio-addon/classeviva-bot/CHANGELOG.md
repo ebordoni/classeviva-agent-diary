@@ -1,3 +1,7 @@
+## 1.8.2 — 2026-05-28
+
+- Fix: cache bust Docker per forzare il ricopiamento dei sorgenti corretti nell'immagine
+
 ## 1.8.1 — 2026-05-28
 
 - Fix: ripristinati import `@classeviva/core` nei file del bot dell'addon (erano stati erroneamente impostati a `@classeviva/core2` causando errore di build)

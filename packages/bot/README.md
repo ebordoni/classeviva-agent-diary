@@ -81,4 +81,5 @@ npm run dev
 | `AI_API_KEY`         | Solo per `/compiti` | API key del provider AI                                   |
 | `AI_PROVIDER`        |         No          | Provider AI (default: `openai`)                           |
 | `AI_MODEL`           |         No          | Modello AI (default del provider se omesso)               |
+| `AI_FALLBACK_PROVIDERS` |      No          | Provider di riserva se il primario fallisce (es. `google,groq`), usano l'API key dal proprio env |
 | `CACHE_DB_PATH`      |         No          | Percorso file JSON per la cache (default: `./cache.json`) |

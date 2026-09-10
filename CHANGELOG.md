@@ -7,6 +7,16 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.9.9] — 2026-09-10
+
+### Migliorato
+
+- **Estrazione compiti con AI**: aggiunta validazione post-estrazione (`AIService`) che scarta i compiti con `data_lezione`/`scadenza` non valide o con `scadenza` precedente alla lezione
+- Aggiunto supporto a provider AI di riserva tramite `fallbackProviders`/`AI_FALLBACK_PROVIDERS`: se il provider primario fallisce, l'estrazione viene ritentata con i provider di riserva configurati (in ordine) prima di restituire un errore
+- **Bot v1.8.7**, **addon `classeviva-ui` v1.5.2**
+
+---
+
 ## [1.9.8] — 2026-09-10
 
 ### Migliorato

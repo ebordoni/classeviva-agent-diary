@@ -1,3 +1,8 @@
+## 1.5.2 — 2026-09-10
+
+- Validazione post-estrazione: i compiti con date non valide o con scadenza precedente alla lezione vengono scartati
+- Supporto a provider AI di riserva (`AI_FALLBACK_PROVIDERS`) in caso di fallimento del provider primario
+
 ## 1.5.1 — 2026-09-10
 
 - Migliorata l'estrazione compiti con AI: ogni lezione riporta ora il giorno della settimana già calcolato, riducendo gli errori di calcolo delle scadenze (es. "per venerdì")

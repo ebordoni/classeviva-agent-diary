@@ -402,6 +402,8 @@ export interface AIServiceOptions {
   model?: string;
   apiKey?: string;
   temperature?: number;
+  /** Provider da tentare in ordine se quello primario fallisce (usano le proprie API key da env) */
+  fallbackProviders?: AIProvider[];
 }
 
 export interface CompitoEstratto {

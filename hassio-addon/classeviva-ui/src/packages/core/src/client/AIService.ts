@@ -5,6 +5,7 @@
  * Configurazione tramite variabili d'ambiente:
  *   AI_PROVIDER=openai|google|anthropic|groq|xai
  *   AI_MODEL=gpt-4o-mini|gemini-2.0-flash|...
+ *   AI_FALLBACK_PROVIDERS=google,groq (provider di riserva, in ordine, se il primario fallisce)
  *   OPENAI_API_KEY, GOOGLE_GENERATIVE_AI_API_KEY, ANTHROPIC_API_KEY, GROQ_API_KEY, XAI_API_KEY
  */
 
@@ -67,11 +68,25 @@ interface LezionePerPrompt {
   argomento: string;
 }
 
+/** Verifica che una stringa sia una data YYYY-MM-DD reale (non "2025-02-30" ecc.). */
+function dataValida(iso: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return false;
+  const d = new Date(`${iso}T00:00:00Z`);
+  return !isNaN(d.getTime()) && d.toISOString().slice(0, 10) === iso;
+}
+
+interface CandidatoAI {
+  provider: AIProvider;
+  model: string;
+  apiKey?: string;
+}
+
 export class AIService {
   private provider: AIProvider;
   private model: string;
   private apiKey?: string;
   private temperature: number;
+  private fallbackProviders: AIProvider[];
 
   constructor(options?: AIServiceOptions) {
     this.provider =
@@ -84,33 +99,32 @@ export class AIService {
       DEFAULT_MODELS[this.provider];
     this.apiKey = options?.apiKey;
     this.temperature = options?.temperature ?? 0.1;
+    this.fallbackProviders =
+      options?.fallbackProviders ??
+      ((process.env["AI_FALLBACK_PROVIDERS"]
+        ?.split(",")
+        .map((p) => p.trim())
+        .filter(Boolean) as AIProvider[]) ||
+        []);
   }
 
-  private getModel() {
-    switch (this.provider) {
+  private resolveModel(provider: AIProvider, model: string, apiKey?: string) {
+    switch (provider) {
       case "openai":
-        return this.apiKey
-          ? createOpenAI({ apiKey: this.apiKey })(this.model)
-          : openai(this.model);
+        return apiKey ? createOpenAI({ apiKey })(model) : openai(model);
       case "google":
-        return this.apiKey
-          ? createGoogleGenerativeAI({ apiKey: this.apiKey })(this.model)
-          : google(this.model);
+        return apiKey
+          ? createGoogleGenerativeAI({ apiKey })(model)
+          : google(model);
       case "anthropic":
-        return this.apiKey
-          ? createAnthropic({ apiKey: this.apiKey })(this.model)
-          : anthropic(this.model);
+        return apiKey ? createAnthropic({ apiKey })(model) : anthropic(model);
       case "groq":
-        return this.apiKey
-          ? createGroq({ apiKey: this.apiKey })(this.model)
-          : groq(this.model);
+        return apiKey ? createGroq({ apiKey })(model) : groq(model);
       case "xai":
-        return this.apiKey
-          ? createXai({ apiKey: this.apiKey })(this.model)
-          : xai(this.model);
+        return apiKey ? createXai({ apiKey })(model) : xai(model);
       default:
         throw new Error(
-          `Provider non supportato: ${this.provider}. Usa: openai, google, anthropic, groq, xai`,
+          `Provider non supportato: ${provider}. Usa: openai, google, anthropic, groq, xai`,
         );
     }
   }
@@ -160,45 +174,75 @@ ${lezioniJSON}`;
       };
     }
 
-    const service =
-      modello && modello !== this.model
-        ? new AIService({ ...this, model: modello })
-        : this;
+    const prompt = this.creaPrompt(lezioniResponse.lessons);
 
-    const prompt = service.creaPrompt(lezioniResponse.lessons);
+    // Candidato primario + eventuali provider di fallback (stesso apiKey esplicito
+    // non ha senso per provider diversi: i fallback usano la chiave dal loro env).
+    const candidati: CandidatoAI[] = [
+      { provider: this.provider, model: modelName, apiKey: this.apiKey },
+      ...this.fallbackProviders
+        .filter((p) => p !== this.provider)
+        .map((p) => ({ provider: p, model: DEFAULT_MODELS[p] })),
+    ];
 
-    try {
-      const { object } = await generateObject({
-        model: service.getModel(),
-        schema: CompitiSchema,
-        prompt,
-        temperature: service.temperature,
-      });
+    const erroriPerCandidato: string[] = [];
 
-      return {
-        compiti: object.compiti,
-        metadata: {
-          totale_lezioni: lezioniResponse.lessons.length,
-          totale_compiti: object.compiti.length,
-          modello_utilizzato: `${service.provider}/${service.model}`,
-          timestamp: new Date().toISOString(),
-        },
-      };
-    } catch (err) {
-      const messaggio = err instanceof Error ? err.message : String(err);
-      console.error(
-        `[AIService] Estrazione compiti fallita (${service.provider}/${service.model}): ${messaggio}`,
-      );
-      return {
-        compiti: [],
-        metadata: {
-          totale_lezioni: lezioniResponse.lessons.length,
-          totale_compiti: 0,
-          modello_utilizzato: `${service.provider}/${service.model}`,
-          timestamp: new Date().toISOString(),
-          errore: messaggio,
-        },
-      };
+    for (const candidato of candidati) {
+      try {
+        const { object } = await generateObject({
+          model: this.resolveModel(
+            candidato.provider,
+            candidato.model,
+            candidato.apiKey,
+          ),
+          schema: CompitiSchema,
+          prompt,
+          temperature: this.temperature,
+        });
+
+        const compitiValidati = object.compiti.filter((c) => {
+          if (!dataValida(c.data_lezione) || !dataValida(c.scadenza)) {
+            console.warn(
+              `[AIService] Compito scartato per data non valida: ${JSON.stringify(c)}`,
+            );
+            return false;
+          }
+          if (c.scadenza < c.data_lezione) {
+            console.warn(
+              `[AIService] Compito scartato: scadenza (${c.scadenza}) precedente alla lezione (${c.data_lezione})`,
+            );
+            return false;
+          }
+          return true;
+        });
+
+        return {
+          compiti: compitiValidati,
+          metadata: {
+            totale_lezioni: lezioniResponse.lessons.length,
+            totale_compiti: compitiValidati.length,
+            modello_utilizzato: `${candidato.provider}/${candidato.model}`,
+            timestamp: new Date().toISOString(),
+          },
+        };
+      } catch (err) {
+        const messaggio = err instanceof Error ? err.message : String(err);
+        console.error(
+          `[AIService] Estrazione compiti fallita (${candidato.provider}/${candidato.model}): ${messaggio}`,
+        );
+        erroriPerCandidato.push(`${candidato.provider}: ${messaggio}`);
+      }
     }
+
+    return {
+      compiti: [],
+      metadata: {
+        totale_lezioni: lezioniResponse.lessons.length,
+        totale_compiti: 0,
+        modello_utilizzato: `${this.provider}/${modelName}`,
+        timestamp: new Date().toISOString(),
+        errore: erroriPerCandidato.join(" | "),
+      },
+    };
   }
 }

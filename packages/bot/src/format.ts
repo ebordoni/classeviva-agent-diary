@@ -164,6 +164,8 @@ export function formatMaterie(resp: MaterieResponse): string {
 }
 
 export function formatCompiti(resp: CompitiEstrattiResponse): string {
+  if (resp.metadata.errore)
+    return `⚠️ Estrazione AI non riuscita: ${e(resp.metadata.errore)}`;
   if (!resp.compiti.length)
     return "Nessun compito trovato nelle lezioni analizzate.";
 

@@ -1,3 +1,9 @@
+## 1.5.1 — 2026-09-10
+
+- Migliorata l'estrazione compiti con AI: ogni lezione riporta ora il giorno della settimana già calcolato, riducendo gli errori di calcolo delle scadenze (es. "per venerdì")
+- Ridotto il payload inviato al modello AI ai soli campi rilevanti, abbassando token/costi
+- In caso di errore del provider AI, la pagina Compiti mostra ora un avviso chiaro invece di un risultato vuoto senza spiegazione
+
 ## 1.5.0 — 2026-05-28
 
 - Nuova funzionalità: account configurabili direttamente dalle opzioni dell'addon in Home Assistant

@@ -1,3 +1,9 @@
+## 1.8.6 — 2026-09-10
+
+- Migliorata l'estrazione compiti con AI: ogni lezione riporta ora il giorno della settimana già calcolato (il modello non deve più dedurlo dalla data), riducendo gli errori di calcolo delle scadenze
+- Ridotto il payload inviato al modello AI ai soli campi rilevanti (materia, docente, data, argomento), abbassando token/costi e rumore
+- L'estrazione AI non fallisce più con un errore non gestito: in caso di errore del provider viene restituito un messaggio chiaro invece di un digest che si interrompe silenziosamente
+
 ## 1.8.5 — 2026-09-10
 
 - Hardening: il file `cache.json` (contiene credenziali) viene ora creato con permessi ristretti (`0600` file, `0700` directory)

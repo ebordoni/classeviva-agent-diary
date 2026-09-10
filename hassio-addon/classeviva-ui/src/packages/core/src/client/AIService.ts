@@ -1,4 +1,3 @@
-/// <reference types="node" />
 /**
  * AIService - Integrazione Vercel AI SDK per estrazione compiti dalle lezioni
  *
@@ -44,6 +43,30 @@ const CompitiSchema = z.object({
   ),
 });
 
+const GIORNI_SETTIMANA = [
+  "domenica",
+  "lunedì",
+  "martedì",
+  "mercoledì",
+  "giovedì",
+  "venerdì",
+  "sabato",
+];
+
+/** Calcola il giorno della settimana in italiano per una data YYYY-MM-DD. */
+function giornoSettimana(evtDate: string): string {
+  return GIORNI_SETTIMANA[new Date(`${evtDate}T00:00:00`).getDay()]!;
+}
+
+/** Sottoinsieme di campi di una lezione rilevanti per l'estrazione dei compiti. */
+interface LezionePerPrompt {
+  materia: string;
+  docente: string;
+  data: string;
+  giorno_settimana: string;
+  argomento: string;
+}
+
 export class AIService {
   private provider: AIProvider;
   private model: string;
@@ -52,9 +75,13 @@ export class AIService {
 
   constructor(options?: AIServiceOptions) {
     this.provider =
-      options?.provider || (process.env["AI_PROVIDER"] as AIProvider) || "openai";
+      options?.provider ||
+      (process.env["AI_PROVIDER"] as AIProvider) ||
+      "openai";
     this.model =
-      options?.model || process.env["AI_MODEL"] || DEFAULT_MODELS[this.provider];
+      options?.model ||
+      process.env["AI_MODEL"] ||
+      DEFAULT_MODELS[this.provider];
     this.apiKey = options?.apiKey;
     this.temperature = options?.temperature ?? 0.1;
   }
@@ -89,24 +116,27 @@ export class AIService {
   }
 
   private creaPrompt(lezioni: Lezione[]): string {
-    const lezioniJSON = JSON.stringify(lezioni, null, 2);
+    const lezioniPerPrompt: LezionePerPrompt[] = lezioni.map((l) => ({
+      materia: l.subjectDesc,
+      docente: l.authorName,
+      data: l.evtDate,
+      giorno_settimana: giornoSettimana(l.evtDate),
+      argomento: l.lessonArg,
+    }));
+    const lezioniJSON = JSON.stringify(lezioniPerPrompt, null, 2);
 
     return `Sei un assistente che estrae compiti dalle lezioni scolastiche.
 Analizza TUTTE le lezioni fornite e identifica TUTTI i compiti assegnati.
 
 IMPORTANTE:
-1. Per ogni compito trovato, calcola la data di scadenza basandoti su:
-   - Indicazioni come "per domani", "per venerdì", "per la prossima settimana"
-   - La data della lezione (evtDate) come punto di riferimento
+1. Ogni lezione riporta già il proprio "giorno_settimana": usalo per calcolare la
+   scadenza quando l'argomento fa riferimento a un giorno (es. "per domani", "per
+   venerdì", "per lunedì prossimo") invece di calcolare tu il giorno della settimana
+   dalla data.
 
-2. Formatta SEMPRE le date nel formato ISO: YYYY-MM-DD
+2. Formatta SEMPRE le date (data_lezione e scadenza) nel formato ISO: YYYY-MM-DD
 
-3. ESEMPI DI CALCOLO DATE:
-   - Lezione lunedì 2025-09-15 + "per domani" → scadenza: 2025-09-16
-   - Lezione lunedì 2025-09-15 + "per venerdì" → scadenza: 2025-09-19
-   - Lezione venerdì 2025-09-19 + "per lunedì" → scadenza: 2025-09-22
-
-4. Se non trovi compiti, restituisci un array vuoto.
+3. Se non trovi compiti, restituisci un array vuoto.
 
 LEZIONI DA ANALIZZARE:
 ${lezioniJSON}`;
@@ -137,21 +167,38 @@ ${lezioniJSON}`;
 
     const prompt = service.creaPrompt(lezioniResponse.lessons);
 
-    const { object } = await generateObject({
-      model: service.getModel(),
-      schema: CompitiSchema,
-      prompt,
-      temperature: service.temperature,
-    });
+    try {
+      const { object } = await generateObject({
+        model: service.getModel(),
+        schema: CompitiSchema,
+        prompt,
+        temperature: service.temperature,
+      });
 
-    return {
-      compiti: object.compiti,
-      metadata: {
-        totale_lezioni: lezioniResponse.lessons.length,
-        totale_compiti: object.compiti.length,
-        modello_utilizzato: `${service.provider}/${service.model}`,
-        timestamp: new Date().toISOString(),
-      },
-    };
+      return {
+        compiti: object.compiti,
+        metadata: {
+          totale_lezioni: lezioniResponse.lessons.length,
+          totale_compiti: object.compiti.length,
+          modello_utilizzato: `${service.provider}/${service.model}`,
+          timestamp: new Date().toISOString(),
+        },
+      };
+    } catch (err) {
+      const messaggio = err instanceof Error ? err.message : String(err);
+      console.error(
+        `[AIService] Estrazione compiti fallita (${service.provider}/${service.model}): ${messaggio}`,
+      );
+      return {
+        compiti: [],
+        metadata: {
+          totale_lezioni: lezioniResponse.lessons.length,
+          totale_compiti: 0,
+          modello_utilizzato: `${service.provider}/${service.model}`,
+          timestamp: new Date().toISOString(),
+          errore: messaggio,
+        },
+      };
+    }
   }
 }

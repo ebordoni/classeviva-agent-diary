@@ -7,6 +7,17 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.9.8] — 2026-09-10
+
+### Migliorato
+
+- **Estrazione compiti con AI** (`AIService`): ogni lezione include ora il giorno della settimana già calcolato, così il modello non deve più dedurlo dalla data per risolvere riferimenti come "per venerdì"
+- Il payload inviato al modello AI è stato ridotto ai soli campi rilevanti (materia, docente, data, argomento), abbassando token/costi e rumore
+- Gli errori del provider AI (`generateObject`) non propagano più un'eccezione non gestita: viene restituito un risultato con `metadata.errore` valorizzato, mostrato chiaramente da UI, bot e CLI; in cache viene usato un TTL breve per ritentare a breve
+- **Bot v1.8.6**, **addon `classeviva-ui` v1.5.1**
+
+---
+
 ## [1.9.7] — 2026-09-10
 
 ### Sicurezza

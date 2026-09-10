@@ -114,6 +114,7 @@ export interface CompitiResponse {
     totale_compiti: number;
     modello_utilizzato: string;
     timestamp: string;
+    errore?: string;
   };
   fromCache?: boolean;
 }

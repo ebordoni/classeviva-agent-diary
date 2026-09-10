@@ -145,10 +145,16 @@ export default function Compiti() {
             )}
           </div>
 
-          {result.compiti.length === 0 && (
+          {result.compiti.length === 0 && !result.metadata.errore && (
             <p className="text-gray-500 text-sm">
               🎉 Nessun compito trovato nel periodo.
             </p>
+          )}
+
+          {result.metadata.errore && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-700 text-sm px-4 py-3 rounded-lg mb-4">
+              ⚠️ Estrazione AI non riuscita: {result.metadata.errore}
+            </div>
           )}
 
           {deadlines.map((deadline) => {

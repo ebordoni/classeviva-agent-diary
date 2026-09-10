@@ -311,7 +311,12 @@ export async function getCompiti(
     // Cacha il risultato per ogni giorno mancante separatamente
     for (const d of missDates) {
       const dayCompiti = compitiByDate.get(d) ?? [];
-      const ttl = d < oggi ? 30 * 24 * 60 * 60 * 1000 : 4 * 60 * 60 * 1000;
+      // In caso di errore AI usa un TTL breve per ritentare al prossimo giro
+      const ttl = aiResult?.metadata.errore
+        ? 5 * 60 * 1000
+        : d < oggi
+          ? 30 * 24 * 60 * 60 * 1000
+          : 4 * 60 * 60 * 1000;
       const dayResult: CompitiEstrattiResponse = {
         compiti: dayCompiti,
         metadata: {
@@ -319,6 +324,7 @@ export async function getCompiti(
           totale_compiti: dayCompiti.length,
           modello_utilizzato: aiResult?.metadata.modello_utilizzato ?? "",
           timestamp: new Date().toISOString(),
+          ...(aiResult?.metadata.errore && { errore: aiResult.metadata.errore }),
         },
       };
       await store.set(
@@ -336,6 +342,11 @@ export async function getCompiti(
     ...missDates.flatMap((d) => newByDate.get(d)?.compiti ?? []),
   ];
 
+  const erroreGiorno = [
+    ...hitDates.map((c) => c.value),
+    ...newByDate.values(),
+  ].find((v) => v?.metadata.errore)?.metadata.errore;
+
   const merged: CompitiEstrattiResponse = {
     compiti: allCompiti,
     metadata: {
@@ -346,6 +357,7 @@ export async function getCompiti(
         hitDates[0]?.value?.metadata.modello_utilizzato ??
         "",
       timestamp: new Date().toISOString(),
+      ...(erroreGiorno && { errore: erroreGiorno }),
     },
   };
 

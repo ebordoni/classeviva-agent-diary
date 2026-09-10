@@ -107,6 +107,14 @@ export function createCompitiCommand(): Command {
       let compiti;
       try {
         compiti = await ai.estraiCompiti(lezioni);
+        if (compiti.metadata.errore) {
+          aiSpinner.fail("Estrazione AI fallita");
+          printError(
+            `Errore durante la chiamata al provider AI (${provider})`,
+            new Error(compiti.metadata.errore),
+          );
+          process.exit(1);
+        }
         aiSpinner.succeed(
           `Estratti ${compiti.metadata.totale_compiti} compiti`,
         );

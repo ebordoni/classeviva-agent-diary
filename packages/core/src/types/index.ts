@@ -419,5 +419,7 @@ export interface CompitiEstrattiResponse {
     totale_compiti: number;
     modello_utilizzato: string;
     timestamp: string;
+    /** Presente se l'estrazione AI è fallita: i compiti restituiti sono vuoti/parziali */
+    errore?: string;
   };
 }

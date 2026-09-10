@@ -21,7 +21,8 @@ router.get("/", requireAuth, async (req: Request, res: Response) => {
     dataInizio = inizio;
     dataFine = fine;
   } else {
-    const n = parseInt(giorni ?? "7", 10);
+    const parsed = parseInt(giorni ?? "7", 10);
+    const n = Number.isFinite(parsed) && parsed > 0 ? parsed : 7;
     const range = ultimiNGiorni(n);
     dataInizio = range.inizio;
     dataFine = range.fine;

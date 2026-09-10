@@ -1,3 +1,7 @@
+## 1.8.5 — 2026-09-10
+
+- Hardening: il file `cache.json` (contiene credenziali) viene ora creato con permessi ristretti (`0600` file, `0700` directory)
+
 ## 1.8.4 — 2026-05-28
 
 - Refactor: rinominato il pacchetto interno `core2` in `core` — nessuna modifica funzionale

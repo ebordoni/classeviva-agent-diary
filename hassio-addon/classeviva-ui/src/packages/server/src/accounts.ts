@@ -22,8 +22,11 @@ export async function loadAccounts(): Promise<Account[]> {
 }
 
 async function persistAccounts(accounts: Account[]): Promise<void> {
-  await mkdir(path.dirname(ACCOUNTS_PATH), { recursive: true });
-  await writeFile(ACCOUNTS_PATH, JSON.stringify(accounts, null, 2), "utf-8");
+  await mkdir(path.dirname(ACCOUNTS_PATH), { recursive: true, mode: 0o700 });
+  await writeFile(ACCOUNTS_PATH, JSON.stringify(accounts, null, 2), {
+    encoding: "utf-8",
+    mode: 0o600,
+  });
 }
 
 export async function upsertAccount(

@@ -65,9 +65,9 @@ class FileStore {
         /* file non ancora esistente */
       }
       const dir = path.dirname(this.filename);
-      fs.mkdirSync(dir, { recursive: true });
+      fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
       const tmp = this.filename + ".tmp";
-      fs.writeFileSync(tmp, JSON.stringify(this.data));
+      fs.writeFileSync(tmp, JSON.stringify(this.data), { mode: 0o600 });
       fs.renameSync(tmp, this.filename);
       try {
         this.lastMtime = fs.statSync(this.filename).mtimeMs;

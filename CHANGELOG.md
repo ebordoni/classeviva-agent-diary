@@ -7,6 +7,21 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.9.7] — 2026-09-10
+
+### Sicurezza
+
+- **Bot v1.8.5**: `cache.json` (contiene le credenziali) viene ora creato con permessi ristretti (`0600` file, `0700` directory)
+- **Addon `classeviva-ui`**: cookie di sessione ora marcato `secure` in produzione; `accounts.json` creato con permessi ristretti (`0600`/`0700`)
+- CLI: `~/.classeviva/config.json` creato con permessi ristretti (`0600`/`0700`)
+
+### Corretto
+
+- Allineata la costante `VERSION` del package `core` copiato nell'addon `classeviva-ui` (era rimasta a `0.1.0` invece di `0.2.0`)
+- Route `/api/lezioni`: il parametro `giorni` non numerico non produce più un range di date invalido
+
+---
+
 ## [1.9.6] — 2026-05-28
 
 ### Aggiunto

@@ -51,7 +51,7 @@ export function loadConfig(): CliConfig {
  */
 export function saveConfig(config: CliConfig): void {
   if (!existsSync(CONFIG_DIR)) {
-    mkdirSync(CONFIG_DIR, { recursive: true });
+    mkdirSync(CONFIG_DIR, { recursive: true, mode: 0o700 });
   }
 
   const existing = existsSync(CONFIG_FILE)
@@ -59,7 +59,7 @@ export function saveConfig(config: CliConfig): void {
     : {};
 
   const merged = { ...existing, ...config };
-  writeFileSync(CONFIG_FILE, JSON.stringify(merged, null, 2));
+  writeFileSync(CONFIG_FILE, JSON.stringify(merged, null, 2), { mode: 0o600 });
 }
 
 /**

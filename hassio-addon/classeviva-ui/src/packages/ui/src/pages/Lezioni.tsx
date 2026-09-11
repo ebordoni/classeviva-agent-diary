@@ -129,9 +129,6 @@ export default function Lezioni() {
                 <tr className="bg-gray-50 text-gray-500 text-xs uppercase">
                   <th className="px-4 py-2 text-left w-8">Ora</th>
                   <th className="px-4 py-2 text-left">Materia</th>
-                  <th className="px-4 py-2 text-left hidden md:table-cell">
-                    Docente
-                  </th>
                   <th className="px-4 py-2 text-left">Argomento</th>
                 </tr>
               </thead>
@@ -146,11 +143,11 @@ export default function Lezioni() {
                         ? `${r.oreInizio}ª`
                         : `${r.oreInizio}ª-${r.oreFine}ª`}
                     </td>
-                    <td className="px-4 py-2 font-medium text-gray-800">
-                      {r.subjectDesc}
-                    </td>
-                    <td className="px-4 py-2 text-gray-500 hidden md:table-cell">
-                      {r.authorName}
+                    <td className="px-4 py-2">
+                      <p className="font-medium text-gray-800">
+                        {r.subjectDesc}
+                      </p>
+                      <p className="text-xs text-gray-400">{r.authorName}</p>
                     </td>
                     <td className="px-4 py-2 text-gray-700">{r.argomento}</td>
                   </tr>

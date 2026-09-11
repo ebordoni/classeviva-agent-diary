@@ -1,3 +1,7 @@
+## 1.6.3 — 2026-09-11
+
+- Fix: pagina Lezioni, la colonna "Docente" non veniva più mostrata su schermi stretti (mobile); ora è sempre visibile, spostata sotto il nome della materia nella stessa cella
+
 ## 1.6.2 — 2026-09-11
 
 - Fix: pagina Lezioni ora ordinata dal giorno più recente al meno recente (prima era in ordine crescente)

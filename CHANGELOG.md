@@ -7,6 +7,14 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.10.3] — 2026-09-11
+
+### Corretto
+
+- **Addon `classeviva-ui` v1.6.3**: pagina Lezioni, la colonna "Docente" (nascosta su schermi stretti) è stata rimossa e il nome del docente è ora mostrato sotto la materia nella stessa cella, sempre visibile anche su mobile
+
+---
+
 ## [1.10.2] — 2026-09-11
 
 ### Corretto

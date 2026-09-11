@@ -1,3 +1,9 @@
+## 1.6.0 — 2026-09-11
+
+- Il cambio utente (figlio/account) è stato spostato dalla sidebar a una barra superiore sempre visibile, su tutte le pagine e sia su desktop che su mobile
+- Nuovo componente `AccountSwitcher`: avatar circolari con le iniziali di ogni account, colore distintivo per account, click diretto per cambiare utente (nessun menu a tendina da aprire)
+- Su mobile non è più necessario aprire la sidebar per cambiare figlio
+
 ## 1.5.2 — 2026-09-10
 
 - Validazione post-estrazione: i compiti con date non valide o con scadenza precedente alla lezione vengono scartati

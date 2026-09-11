@@ -3,7 +3,6 @@ import {
   Bell,
   BookOpen,
   Brain,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   LayoutDashboard,
@@ -11,13 +10,13 @@ import {
   Menu,
   RefreshCw,
   Star,
-  UserCheck,
   Users,
 } from "lucide-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import type { AccountInfo } from "../api.ts";
 import { accountsApi, authApi, cacheApi } from "../api.ts";
+import AccountSwitcher from "./AccountSwitcher.tsx";
 
 interface NavItem {
   to: string;
@@ -54,7 +53,6 @@ export default function Layout({
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
-  const [switcherOpen, setSwitcherOpen] = useState(false);
   const [switching, setSwitching] = useState(false);
   const [isMobile, setIsMobile] = useState(isMobileViewport);
   // Mobile: overlay open/closed — Desktop: expanded/collapsed
@@ -98,10 +96,7 @@ export default function Layout({
   }
 
   async function handleSwitch(studentId: string) {
-    if (studentId === activeStudentId) {
-      setSwitcherOpen(false);
-      return;
-    }
+    if (studentId === activeStudentId) return;
     setSwitching(true);
     try {
       await accountsApi.switch(studentId);
@@ -109,11 +104,9 @@ export default function Layout({
       queryClient.invalidateQueries();
     } finally {
       setSwitching(false);
-      setSwitcherOpen(false);
     }
   }
 
-  const otherAccounts = accounts.filter((a) => a.studentId !== activeStudentId);
   const expanded = sidebarOpen;
 
   return (
@@ -140,7 +133,7 @@ export default function Layout({
           <div
             className={`flex items-center ${expanded ? "justify-between" : "justify-center"}`}
           >
-            {expanded && (
+            {expanded && isMobile && (
               <span className="text-base font-bold tracking-tight whitespace-nowrap">
                 🏫 Classeviva
               </span>
@@ -160,48 +153,6 @@ export default function Layout({
               </button>
             )}
           </div>
-
-          {/* User switcher — visibile solo quando espanso */}
-          {expanded && (
-            <div className="relative mt-2">
-              <button
-                onClick={() => setSwitcherOpen((v) => !v)}
-                disabled={switching}
-                className="flex items-center gap-1 w-full text-left text-xs text-gray-300 hover:text-white transition-colors disabled:opacity-60"
-              >
-                <UserCheck size={13} className="shrink-0" />
-                <span className="truncate flex-1">{userName}</span>
-                <ChevronDown size={13} className="shrink-0" />
-              </button>
-
-              {switcherOpen && (
-                <div className="absolute left-0 top-full mt-1 w-full bg-gray-800 border border-gray-600 rounded-lg shadow-xl z-50">
-                  <p className="px-3 py-1.5 text-xs text-gray-400 border-b border-gray-700">
-                    Cambia utente
-                  </p>
-                  {otherAccounts.map((a) => (
-                    <button
-                      key={a.studentId}
-                      onClick={() => handleSwitch(a.studentId)}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-200 hover:bg-indigo-600 hover:text-white transition-colors"
-                    >
-                      <UserCheck size={14} />
-                      <span className="truncate">{a.nome ?? a.studentId}</span>
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => {
-                      setSwitcherOpen(false);
-                      navigate("/login", { state: { addAccount: true } });
-                    }}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors border-t border-gray-700"
-                  >
-                    + Aggiungi account
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Nav */}
@@ -259,19 +210,30 @@ export default function Layout({
 
       {/* Area principale */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        {/* Top bar mobile */}
-        {isMobile && (
-          <header className="flex items-center gap-3 px-4 py-3 bg-gray-900 text-white shrink-0 shadow-md">
+        {/* Top bar — sempre visibile, così il cambio utente non richiede aprire la sidebar */}
+        <header className="flex items-center gap-3 px-4 py-3 bg-gray-900 text-white shrink-0 shadow-md">
+          {isMobile && (
             <button
               onClick={() => setSidebarOpen((v) => !v)}
-              className="p-1 text-gray-300 hover:text-white transition-colors"
+              className="p-1 text-gray-300 hover:text-white transition-colors shrink-0"
               aria-label="Apri menu"
             >
               <Menu size={22} />
             </button>
-            <span className="text-base font-bold">🏫 Classeviva</span>
-          </header>
-        )}
+          )}
+          <span className="text-base font-bold shrink-0">🏫 Classeviva</span>
+          <span className="hidden sm:inline text-sm text-gray-400 truncate">
+            {userName}
+          </span>
+          <div className="flex-1" />
+          <AccountSwitcher
+            accounts={accounts}
+            activeStudentId={activeStudentId}
+            switching={switching}
+            onSwitch={handleSwitch}
+            onAddAccount={() => navigate("/login", { state: { addAccount: true } })}
+          />
+        </header>
 
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-5xl mx-auto px-4 py-4 md:px-6 md:py-6">

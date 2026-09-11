@@ -7,6 +7,16 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.10.0] — 2026-09-11
+
+### Migliorato
+
+- **Addon `classeviva-ui` v1.6.0**: il cambio utente (figlio/account) è stato spostato dalla sidebar a una barra superiore sempre visibile su tutte le pagine, sia desktop che mobile
+  - Nuovo componente `AccountSwitcher`: avatar circolari con iniziali e colore distintivo per account, click diretto per cambiare utente senza aprire menu a tendina
+  - Su mobile non è più necessario aprire la sidebar per cambiare figlio
+
+---
+
 ## [1.9.9] — 2026-09-10
 
 ### Migliorato

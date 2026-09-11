@@ -7,6 +7,14 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.10.6] — 2026-09-11
+
+### Corretto
+
+- **Addon `classeviva-ui` v1.6.6**: l'indicatore di account attivo nell'`AccountSwitcher` era troppo sottile per essere notato. Ora l'account non attivo è desaturato in scala di grigi, mentre l'attivo mantiene il colore pieno con anello bianco e pallino: contrasto colore-vs-grigio, non solo opacità/anello
+
+---
+
 ## [1.10.5] — 2026-09-11
 
 ### Corretto

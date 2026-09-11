@@ -1,3 +1,7 @@
+## 1.6.6 — 2026-09-11
+
+- Fix: nell'`AccountSwitcher` l'indicatore di account attivo (anello + puntino) era troppo sottile per essere notato. L'account non attivo ora è desaturato in scala di grigi (`grayscale`), mentre l'attivo mantiene il colore pieno con anello bianco e un pallino pieno sotto l'avatar: il contrasto colore-vs-grigio rende lo stato selezionato inequivocabile anche a colpo d'occhio
+
 ## 1.6.5 — 2026-09-11
 
 - Fix critico: rimosso il flag `secure` sul cookie di sessione, introdotto per hardening in 1.5.2. Su percorsi di accesso in solo HTTP (ingress locale non proxato via HTTPS, accesso diretto alla porta 8099) il browser rifiutava di salvare il cookie, causando login "fantasma" o mancata autenticazione su alcuni dispositivi (tipicamente smartphone) mentre altri (PC) apparivano autenticati

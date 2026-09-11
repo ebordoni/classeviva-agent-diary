@@ -55,25 +55,28 @@ export default function AccountSwitcher({
             onClick={() => onSwitch(a.studentId)}
             disabled={switching}
             title={a.nome ?? a.studentId}
+            aria-pressed={isActive}
             className="flex flex-col items-center gap-1 shrink-0 disabled:opacity-60"
           >
             <span
               className={[
-                "flex items-center justify-center w-9 h-9 rounded-full text-xs font-semibold text-white transition-all",
+                "flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold text-white transition-all",
                 colorFor(a.studentId),
                 isActive
                   ? "ring-2 ring-white ring-offset-2 ring-offset-gray-900 scale-110"
-                  : "opacity-50 hover:opacity-80",
+                  : "grayscale opacity-60 hover:grayscale-0 hover:opacity-100",
               ].join(" ")}
             >
               {initials(a)}
             </span>
             <span
               className={[
-                "w-1.5 h-1.5 rounded-full transition-colors",
-                isActive ? "bg-white" : "bg-transparent",
+                "text-[10px] font-semibold leading-none transition-colors",
+                isActive ? "text-white" : "text-transparent",
               ].join(" ")}
-            />
+            >
+              ●
+            </span>
           </button>
         );
       })}
@@ -85,7 +88,7 @@ export default function AccountSwitcher({
         >
           <Plus size={16} />
         </button>
-        <span className="w-1.5 h-1.5" />
+        <span className="text-[10px] leading-none text-transparent">●</span>
       </div>
     </div>
   );

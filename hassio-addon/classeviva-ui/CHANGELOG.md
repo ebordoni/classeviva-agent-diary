@@ -1,3 +1,8 @@
+## 1.6.5 — 2026-09-11
+
+- Fix critico: rimosso il flag `secure` sul cookie di sessione, introdotto per hardening in 1.5.2. Su percorsi di accesso in solo HTTP (ingress locale non proxato via HTTPS, accesso diretto alla porta 8099) il browser rifiutava di salvare il cookie, causando login "fantasma" o mancata autenticazione su alcuni dispositivi (tipicamente smartphone) mentre altri (PC) apparivano autenticati
+- Fix: il pulsante Logout non funzionava piu se erano configurati account da opzioni addon (`accounts`) — l'auto-login da config riautenticava subito l'utente alla richiesta successiva di `/api/auth/me`. Ora un logout esplicito viene ricordato nella sessione e l'auto-login viene saltato finche' l'utente non effettua un nuovo login manuale
+
 ## 1.6.4 — 2026-09-11
 
 - Fix: nell'`AccountSwitcher` l'avatar dell'account attivo non era distinguibile dagli altri (l'anello di evidenziazione non era visibile sulla barra scura). Ora l'account attivo ha un anello bianco ben visibile, dimensione leggermente maggiore e un puntino sotto l'avatar; gli altri account sono semi-trasparenti

@@ -39,7 +39,9 @@ app.use(
     cookie: {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      // niente "secure": l'addon è raggiungibile anche in HTTP puro (ingress locale,
+      // accesso diretto alla porta) — con "secure" il cookie non veniva salvato dal
+      // browser su quei percorsi, causando login "fantasma" su alcuni dispositivi
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 giorni
     },
   }),

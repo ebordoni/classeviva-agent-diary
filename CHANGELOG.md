@@ -7,6 +7,16 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.10.5] — 2026-09-11
+
+### Corretto
+
+- **Addon `classeviva-ui` v1.6.5**: due bug di autenticazione
+  - Rimosso il flag `secure` sul cookie di sessione (introdotto per hardening in 1.5.2): su percorsi di accesso in solo HTTP il browser non salvava il cookie, causando autenticazione incoerente tra dispositivi (es. PC autenticato, smartphone no)
+  - Il pulsante Logout non funzionava con account configurati da opzioni addon: l'auto-login da config riautenticava subito l'utente. Ora un logout esplicito viene ricordato e l'auto-login viene saltato finché non si rifà login manualmente
+
+---
+
 ## [1.10.4] — 2026-09-11
 
 ### Corretto

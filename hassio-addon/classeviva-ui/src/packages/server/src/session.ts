@@ -4,6 +4,8 @@ declare module "express-session" {
   interface SessionData {
     activeStudentId?: string;
     authenticated?: boolean;
+    /** Impostato al logout esplicito per non essere ri-autenticati subito dall'auto-login da config */
+    manualLogout?: boolean;
   }
 }
 

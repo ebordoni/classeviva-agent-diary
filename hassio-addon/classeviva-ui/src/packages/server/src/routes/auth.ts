@@ -16,7 +16,8 @@ router.get("/me", async (req: Request, res: Response) => {
   }));
 
   // Auto-login: se la sessione non è autenticata ma esistono account da config, effettua il login automatico
-  if (!studentId || !req.session.authenticated) {
+  // (salvo che l'utente abbia fatto logout esplicitamente in questa sessione)
+  if ((!studentId || !req.session.authenticated) && !req.session.manualLogout) {
     const configAccount = accounts.find((a) => a.fromConfig);
     if (configAccount) {
       try {
@@ -85,6 +86,7 @@ router.post("/login", async (req: Request, res: Response) => {
     setClientByStudentId(studentId, client);
     req.session.activeStudentId = studentId;
     req.session.authenticated = true;
+    req.session.manualLogout = false;
 
     await upsertAccount(studentId, password, client.nomeCompleto);
 
@@ -107,8 +109,13 @@ router.post("/logout", async (req: Request, res: Response) => {
   if (studentId) {
     await invalidateUser(studentId);
   }
-  req.session.destroy(() => {
-    res.json({ success: true });
+  // Non usiamo session.destroy(): dobbiamo mantenere la sessione per ricordare
+  // che l'utente ha fatto logout esplicito e impedire il re-login automatico da config
+  req.session.activeStudentId = undefined;
+  req.session.authenticated = false;
+  req.session.manualLogout = true;
+  req.session.save((err) => {
+    res.json({ success: !err });
   });
 });
 

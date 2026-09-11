@@ -7,6 +7,14 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.10.4] — 2026-09-11
+
+### Corretto
+
+- **Addon `classeviva-ui` v1.6.4**: nell'`AccountSwitcher` l'account attivo non era distinguibile dagli altri (anello di evidenziazione invisibile sulla barra scura). Ora ha un anello bianco ben visibile, dimensione leggermente maggiore e un puntino indicatore sotto l'avatar
+
+---
+
 ## [1.10.3] — 2026-09-11
 
 ### Corretto

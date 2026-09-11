@@ -46,7 +46,7 @@ export default function AccountSwitcher({
   if (accounts.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-3">
       {accounts.map((a) => {
         const isActive = a.studentId === activeStudentId;
         return (
@@ -55,25 +55,38 @@ export default function AccountSwitcher({
             onClick={() => onSwitch(a.studentId)}
             disabled={switching}
             title={a.nome ?? a.studentId}
-            className={[
-              "flex items-center justify-center w-9 h-9 rounded-full text-xs font-semibold text-white shrink-0 transition-all disabled:opacity-60",
-              colorFor(a.studentId),
-              isActive
-                ? "ring-2 ring-offset-2 ring-indigo-500 scale-105"
-                : "opacity-60 hover:opacity-100",
-            ].join(" ")}
+            className="flex flex-col items-center gap-1 shrink-0 disabled:opacity-60"
           >
-            {initials(a)}
+            <span
+              className={[
+                "flex items-center justify-center w-9 h-9 rounded-full text-xs font-semibold text-white transition-all",
+                colorFor(a.studentId),
+                isActive
+                  ? "ring-2 ring-white ring-offset-2 ring-offset-gray-900 scale-110"
+                  : "opacity-50 hover:opacity-80",
+              ].join(" ")}
+            >
+              {initials(a)}
+            </span>
+            <span
+              className={[
+                "w-1.5 h-1.5 rounded-full transition-colors",
+                isActive ? "bg-white" : "bg-transparent",
+              ].join(" ")}
+            />
           </button>
         );
       })}
-      <button
-        onClick={onAddAccount}
-        title="Aggiungi account"
-        className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-dashed border-gray-300 text-gray-400 hover:border-indigo-400 hover:text-indigo-500 transition-colors shrink-0"
-      >
-        <Plus size={16} />
-      </button>
+      <div className="flex flex-col items-center gap-1 shrink-0">
+        <button
+          onClick={onAddAccount}
+          title="Aggiungi account"
+          className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-dashed border-gray-300 text-gray-400 hover:border-indigo-400 hover:text-indigo-500 transition-colors"
+        >
+          <Plus size={16} />
+        </button>
+        <span className="w-1.5 h-1.5" />
+      </div>
     </div>
   );
 }

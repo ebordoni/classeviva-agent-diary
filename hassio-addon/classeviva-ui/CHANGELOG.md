@@ -1,3 +1,7 @@
+## 1.6.4 — 2026-09-11
+
+- Fix: nell'`AccountSwitcher` l'avatar dell'account attivo non era distinguibile dagli altri (l'anello di evidenziazione non era visibile sulla barra scura). Ora l'account attivo ha un anello bianco ben visibile, dimensione leggermente maggiore e un puntino sotto l'avatar; gli altri account sono semi-trasparenti
+
 ## 1.6.3 — 2026-09-11
 
 - Fix: pagina Lezioni, la colonna "Docente" non veniva più mostrata su schermi stretti (mobile); ora è sempre visibile, spostata sotto il nome della materia nella stessa cella

@@ -3,6 +3,7 @@ import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
 import { useState } from "react";
 import { lezioniApi } from "../api.ts";
+import type { Lezione } from "../types.ts";
 
 function toDateInput(d: Date) {
   return d.toISOString().split("T")[0]!;
@@ -13,6 +14,50 @@ function defaultRange() {
   const inizio = new Date();
   inizio.setDate(fine.getDate() - 7);
   return { inizio: toDateInput(inizio), fine: toDateInput(fine) };
+}
+
+interface RigaLezione {
+  evtId: number;
+  oreInizio: number;
+  oreFine: number;
+  subjectDesc: string;
+  authorName: string;
+  argomento: string;
+}
+
+/**
+ * Ordina per ora e accorpa le lezioni consecutive identiche (stessa materia,
+ * stesso docente, stesso argomento): Classeviva a volte restituisce la stessa
+ * voce ripetuta su più ore consecutive.
+ */
+function raggruppaLezioni(lessons: Lezione[]): RigaLezione[] {
+  const ordinate = [...lessons].sort((a, b) => a.evtHPos - b.evtHPos);
+  const righe: RigaLezione[] = [];
+
+  for (const l of ordinate) {
+    const argomento = l.lessonArg || "—";
+    const precedente = righe[righe.length - 1];
+    if (
+      precedente &&
+      precedente.subjectDesc === l.subjectDesc &&
+      precedente.authorName === l.authorName &&
+      precedente.argomento === argomento &&
+      precedente.oreFine === l.evtHPos - 1
+    ) {
+      precedente.oreFine = l.evtHPos;
+    } else {
+      righe.push({
+        evtId: l.evtId,
+        oreInizio: l.evtHPos,
+        oreFine: l.evtHPos,
+        subjectDesc: l.subjectDesc,
+        authorName: l.authorName,
+        argomento,
+      });
+    }
+  }
+
+  return righe;
 }
 
 export default function Lezioni() {
@@ -28,7 +73,7 @@ export default function Lezioni() {
     if (!byDate.has(l.evtDate)) byDate.set(l.evtDate, []);
     byDate.get(l.evtDate)!.push(l);
   }
-  const dates = [...byDate.keys()].sort();
+  const dates = [...byDate.keys()].sort((a, b) => b.localeCompare(a));
 
   return (
     <div>
@@ -91,23 +136,23 @@ export default function Lezioni() {
                 </tr>
               </thead>
               <tbody>
-                {(byDate.get(date) ?? []).map((l, i) => (
+                {raggruppaLezioni(byDate.get(date) ?? []).map((r, i) => (
                   <tr
-                    key={l.evtId}
+                    key={r.evtId}
                     className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}
                   >
                     <td className="px-4 py-2 text-gray-400 font-mono">
-                      {i + 1}ª
+                      {r.oreInizio === r.oreFine
+                        ? `${r.oreInizio}ª`
+                        : `${r.oreInizio}ª-${r.oreFine}ª`}
                     </td>
                     <td className="px-4 py-2 font-medium text-gray-800">
-                      {l.subjectDesc}
+                      {r.subjectDesc}
                     </td>
                     <td className="px-4 py-2 text-gray-500 hidden md:table-cell">
-                      {l.authorName}
+                      {r.authorName}
                     </td>
-                    <td className="px-4 py-2 text-gray-700">
-                      {l.lessonArg || l.evtText || "—"}
-                    </td>
+                    <td className="px-4 py-2 text-gray-700">{r.argomento}</td>
                   </tr>
                 ))}
               </tbody>

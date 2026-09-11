@@ -7,6 +7,17 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.10.2] — 2026-09-11
+
+### Corretto
+
+- **Addon `classeviva-ui` v1.6.2**: pagina Lezioni
+  - Ordinamento dal giorno più recente al meno recente (prima era crescente)
+  - Le lezioni di uno stesso giorno sono ora ordinate per ora effettiva (`evtHPos`)
+  - Le voci duplicate restituite da Classeviva per la stessa lezione su più ore consecutive (stessa materia/docente/argomento) vengono accorpate in un'unica riga con il range di ore
+
+---
+
 ## [1.10.1] — 2026-09-11
 
 ### Migliorato

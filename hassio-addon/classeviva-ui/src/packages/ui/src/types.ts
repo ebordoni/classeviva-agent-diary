@@ -8,11 +8,11 @@ export interface User {
 export interface Lezione {
   evtId: number;
   evtDate: string;
+  evtHPos: number;
   subjectDesc: string;
   authorName: string;
   lessonType: string;
   lessonArg: string;
-  evtText: string;
 }
 
 export interface LezioniResponse {

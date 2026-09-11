@@ -1,3 +1,9 @@
+## 1.6.2 — 2026-09-11
+
+- Fix: pagina Lezioni ora ordinata dal giorno più recente al meno recente (prima era in ordine crescente)
+- Fix: le lezioni all'interno di un giorno sono ordinate per ora effettiva (`evtHPos`) invece che per ordine di arrivo dall'API
+- Le lezioni consecutive identiche (stessa materia, docente e argomento su più ore) restituite duplicate da Classeviva vengono ora accorpate in un'unica riga con il range di ore (es. "1ª-3ª")
+
 ## 1.6.1 — 2026-09-11
 
 - Dashboard: rimossi i box "Media voti", "Voti totali" e "Assenze totali" (spostati in pagina Voti)

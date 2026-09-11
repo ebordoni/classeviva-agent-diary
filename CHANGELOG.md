@@ -7,6 +7,16 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.10.1] — 2026-09-11
+
+### Migliorato
+
+- **Addon `classeviva-ui` v1.6.1**: riorganizzata la Dashboard
+  - Rimossi i box "Media voti", "Voti totali" e "Assenze totali" (spostati in cima alla pagina Voti)
+  - Nuovi contatori: "Compiti da eseguire" (solo scadenze future), "Bacheca da leggere", "Assenze da giustificare"
+
+---
+
 ## [1.10.0] — 2026-09-11
 
 ### Migliorato

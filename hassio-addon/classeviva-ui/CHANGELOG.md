@@ -1,3 +1,9 @@
+## 1.6.1 — 2026-09-11
+
+- Dashboard: rimossi i box "Media voti", "Voti totali" e "Assenze totali" (spostati in pagina Voti)
+- Dashboard: nuovi contatori "Compiti da eseguire" (solo scadenze future, non conta i compiti passati), "Bacheca da leggere" e "Assenze da giustificare"
+- Pagina Voti: aggiunto riepilogo generale (media e totale voti) in cima alla pagina
+
 ## 1.6.0 — 2026-09-11
 
 - Il cambio utente (figlio/account) è stato spostato dalla sidebar a una barra superiore sempre visibile, su tutte le pagine e sia su desktop che su mobile

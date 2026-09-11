@@ -3,6 +3,7 @@ import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
 import { votiApi } from "../api.ts";
 import {
+  calcolaMedia,
   COLOR_TESTUALE,
   VALORE_NUMERICO,
   VOTI_TESTUALI,
@@ -17,6 +18,13 @@ function gradeColorNumerico(v: number): string {
   if (v >= 6) return "text-blue-700 bg-blue-50";
   if (v >= 5) return "text-yellow-700 bg-yellow-50";
   return "text-red-700 bg-red-50";
+}
+
+function gradeColor(v: number): string {
+  if (v >= 8) return "text-green-700";
+  if (v >= 6) return "text-blue-700";
+  if (v >= 5) return "text-yellow-700";
+  return "text-red-700";
 }
 
 export default function Voti() {
@@ -64,6 +72,19 @@ export default function Voti() {
     return { valore: mean, label };
   }
 
+  const grades = data?.grades ?? [];
+  const mediaRaw = calcolaMedia(grades);
+  const mediaGenerale = mediaRaw !== null ? mediaRaw.toFixed(2) : "—";
+  const mediaLabel: VotoTestuale | null =
+    mediaRaw !== null
+      ? VOTI_TESTUALI.reduce((prev, curr) =>
+          Math.abs(VALORE_NUMERICO[curr] - mediaRaw) <
+          Math.abs(VALORE_NUMERICO[prev] - mediaRaw)
+            ? curr
+            : prev,
+        )
+      : null;
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -73,6 +94,24 @@ export default function Voti() {
             📦 cache
           </span>
         )}
+      </div>
+
+      {/* Riepilogo generale */}
+      <div className="grid grid-cols-2 gap-3 mb-8">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-4">
+          <p
+            className={`text-3xl font-bold ${gradeColor(parseFloat(mediaGenerale))}`}
+          >
+            {mediaLabel
+              ? mediaLabel.charAt(0) + mediaLabel.slice(1).toLowerCase()
+              : mediaGenerale}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">Media generale</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-4">
+          <p className="text-3xl font-bold text-gray-800">{grades.length}</p>
+          <p className="text-xs text-gray-500 mt-1">Voti totali</p>
+        </div>
       </div>
 
       {isLoading && <Spinner />}

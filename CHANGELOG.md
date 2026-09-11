@@ -7,6 +7,15 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.10.7] — 2026-09-11
+
+### Corretto
+
+- **Addon `classeviva-ui` v1.6.7**: causa reale per cui l'account attivo non veniva mai evidenziato nell'`AccountSwitcher` — `/api/auth/me`, `/api/auth/login` e `/api/accounts/switch/:studentId` restituivano l'ID numerico interno di Classeviva (`whoami.id`) come `ident` invece dello `studentId` di login salvato in `accounts.json`; il confronto lato frontend non trovava mai corrispondenza
+- Rimosso il pallino indicatore sotto l'avatar attivo (ridondante col colore pieno + anello bianco)
+
+---
+
 ## [1.10.6] — 2026-09-11
 
 ### Corretto

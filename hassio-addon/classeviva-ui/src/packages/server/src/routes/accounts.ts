@@ -52,7 +52,7 @@ router.post("/switch/:studentId", async (req: Request, res: Response) => {
 
   res.json({
     success: true,
-    user: { nome: client.nomeCompleto, ident: client.datiUtente!.id },
+    user: { nome: client.nomeCompleto, ident: studentId },
   });
 });
 

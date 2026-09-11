@@ -1,3 +1,8 @@
+## 1.6.7 — 2026-09-11
+
+- Fix vero e proprio dell'account attivo mai evidenziato nell'`AccountSwitcher`: `/api/auth/me`, `/api/auth/login` e `/api/accounts/switch/:studentId` restituivano come `ident` l'ID numerico interno di Classeviva (`whoami.id`) invece dello `studentId` di login usato in `accounts.json` — il confronto lato frontend non trovava mai corrispondenza, quindi nessun avatar risultava mai selezionato
+- Rimosso il pallino indicatore sotto l'avatar attivo (ridondante: colore pieno + anello bianco bastano)
+
 ## 1.6.6 — 2026-09-11
 
 - Fix: nell'`AccountSwitcher` l'indicatore di account attivo (anello + puntino) era troppo sottile per essere notato. L'account non attivo ora è desaturato in scala di grigi (`grayscale`), mentre l'attivo mantiene il colore pieno con anello bianco e un pallino pieno sotto l'avatar: il contrasto colore-vs-grigio rende lo stato selezionato inequivocabile anche a colpo d'occhio

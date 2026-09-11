@@ -56,40 +56,25 @@ export default function AccountSwitcher({
             disabled={switching}
             title={a.nome ?? a.studentId}
             aria-pressed={isActive}
-            className="flex flex-col items-center gap-1 shrink-0 disabled:opacity-60"
+            className={[
+              "flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold text-white shrink-0 transition-all disabled:opacity-60",
+              colorFor(a.studentId),
+              isActive
+                ? "ring-2 ring-white ring-offset-2 ring-offset-gray-900 scale-110"
+                : "grayscale opacity-60 hover:grayscale-0 hover:opacity-100",
+            ].join(" ")}
           >
-            <span
-              className={[
-                "flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold text-white transition-all",
-                colorFor(a.studentId),
-                isActive
-                  ? "ring-2 ring-white ring-offset-2 ring-offset-gray-900 scale-110"
-                  : "grayscale opacity-60 hover:grayscale-0 hover:opacity-100",
-              ].join(" ")}
-            >
-              {initials(a)}
-            </span>
-            <span
-              className={[
-                "text-[10px] font-semibold leading-none transition-colors",
-                isActive ? "text-white" : "text-transparent",
-              ].join(" ")}
-            >
-              ●
-            </span>
+            {initials(a)}
           </button>
         );
       })}
-      <div className="flex flex-col items-center gap-1 shrink-0">
-        <button
-          onClick={onAddAccount}
-          title="Aggiungi account"
-          className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-dashed border-gray-300 text-gray-400 hover:border-indigo-400 hover:text-indigo-500 transition-colors"
-        >
-          <Plus size={16} />
-        </button>
-        <span className="text-[10px] leading-none text-transparent">●</span>
-      </div>
+      <button
+        onClick={onAddAccount}
+        title="Aggiungi account"
+        className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-dashed border-gray-300 text-gray-400 hover:border-indigo-400 hover:text-indigo-500 transition-colors shrink-0"
+      >
+        <Plus size={16} />
+      </button>
     </div>
   );
 }

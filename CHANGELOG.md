@@ -7,6 +7,18 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.11.0] — 2026-09-15
+
+### Aggiunto
+
+- **Addon `classeviva-ui` v1.7.0**: nuova pagina **Avvisi** che mostra le note/avvisi generali dell'agenda (evtCode `AGNT`), con voce dedicata in sidebar e contatore in Dashboard (avvisi nei prossimi 30 giorni). Riusa l'endpoint `/api/agenda` (agendav2) già esistente
+
+### Corretto
+
+- Il tipo `EventoAgenda` lato UI non corrispondeva alla risposta reale del server (campo `evtText` inesistente, mancavano `notes`, `isFullDay`, `classDesc`, `subjectId`, `homeworkId`)
+
+---
+
 ## [1.10.7] — 2026-09-11
 
 ### Corretto

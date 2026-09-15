@@ -69,12 +69,16 @@ export interface AssenzeResponse {
 
 export interface EventoAgenda {
   evtId: number;
+  evtCode: string;
   evtDatetimeBegin: string;
   evtDatetimeEnd: string;
-  evtText: string;
-  subjectDesc: string;
+  isFullDay: boolean;
+  notes: string;
   authorName: string;
-  evtCode: string;
+  classDesc: string;
+  subjectId: number | null;
+  subjectDesc: string | null;
+  homeworkId: number | null;
 }
 
 export interface AgendaResponse {

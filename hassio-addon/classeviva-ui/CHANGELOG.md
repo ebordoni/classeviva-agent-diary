@@ -1,3 +1,9 @@
+## 1.7.0 — 2026-09-15
+
+- Nuova pagina **Avvisi**: mostra le note/avvisi generali dell'agenda (evtCode `AGNT`), riusando l'endpoint `/api/agenda` già esistente (agendav2). Aggiunta voce in sidebar
+- Nuovo contatore "Avvisi" in Dashboard (avvisi nei prossimi 30 giorni)
+- Fix: il tipo `EventoAgenda` lato UI non corrispondeva alla risposta reale del server (campo `evtText` inesistente, mancavano `notes`, `isFullDay`, `classDesc`, `subjectId`, `homeworkId`) — corretto, insieme al riferimento nella pagina Agenda generica (non ancora collegata al routing)
+
 ## 1.6.7 — 2026-09-11
 
 - Fix vero e proprio dell'account attivo mai evidenziato nell'`AccountSwitcher`: `/api/auth/me`, `/api/auth/login` e `/api/accounts/switch/:studentId` restituivano come `ident` l'ID numerico interno di Classeviva (`whoami.id`) invece dello `studentId` di login usato in `accounts.json` — il confronto lato frontend non trovava mai corrispondenza, quindi nessun avatar risultava mai selezionato

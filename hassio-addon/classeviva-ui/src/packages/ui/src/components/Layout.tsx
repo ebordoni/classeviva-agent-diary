@@ -7,6 +7,7 @@ import {
   ChevronRight,
   LayoutDashboard,
   LogOut,
+  Megaphone,
   Menu,
   RefreshCw,
   Star,
@@ -30,6 +31,7 @@ const navItems: NavItem[] = [
   { to: "/voti", icon: <Star size={18} />, label: "Voti" },
   { to: "/assenze", icon: <Users size={18} />, label: "Assenze" },
   { to: "/compiti", icon: <Brain size={18} />, label: "Compiti AI" },
+  { to: "/avvisi", icon: <Megaphone size={18} />, label: "Avvisi" },
   { to: "/bacheca", icon: <Bell size={18} />, label: "Bacheca" },
 ];
 

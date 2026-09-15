@@ -4,25 +4,25 @@ import { it } from "date-fns/locale";
 import { useState } from "react";
 import { agendaApi } from "../api.ts";
 
+// Codice evento Classeviva per gli avvisi/note generali in agenda (agendav2).
+// NOTA: non documentato ufficialmente, dedotto dai dati osservati — se non
+// corrisponde a quanto mostrato come "Avvisi" nell'app ufficiale, va aggiornato qui.
+const AVVISO_EVTCODE = "AGNT";
+
 function toDateInput(d: Date) {
   return d.toISOString().split("T")[0]!;
 }
 
 function defaultRange() {
   const oggi = new Date();
-  const tra30 = new Date();
-  tra30.setDate(oggi.getDate() + 30);
-  return { inizio: toDateInput(oggi), fine: toDateInput(tra30) };
+  const indietro7 = new Date(oggi);
+  indietro7.setDate(oggi.getDate() - 7);
+  const avanti30 = new Date(oggi);
+  avanti30.setDate(oggi.getDate() + 30);
+  return { inizio: toDateInput(indietro7), fine: toDateInput(avanti30) };
 }
 
-function evtIcon(code: string): string {
-  if (code === "AGHW") return "📝";
-  if (code === "AGNT") return "📋";
-  if (code === "AGRE") return "📌";
-  return "📅";
-}
-
-export default function Agenda() {
+export default function Avvisi() {
   const [range, setRange] = useState(defaultRange);
 
   const { data, isLoading, error } = useQuery({
@@ -30,18 +30,14 @@ export default function Agenda() {
     queryFn: () => agendaApi.get({ inizio: range.inizio, fine: range.fine }),
   });
 
-  const byDate = new Map<string, NonNullable<typeof data>["agenda"]>();
-  for (const e of data?.agenda ?? []) {
-    const date = e.evtDatetimeBegin.split("T")[0]!;
-    if (!byDate.has(date)) byDate.set(date, []);
-    byDate.get(date)!.push(e);
-  }
-  const dates = [...byDate.keys()].sort();
+  const avvisi = (data?.agenda ?? [])
+    .filter((e) => e.evtCode === AVVISO_EVTCODE)
+    .sort((a, b) => b.evtDatetimeBegin.localeCompare(a.evtDatetimeBegin));
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Agenda</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Avvisi</h1>
         {data?.fromCache && (
           <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
             📦 cache
@@ -75,44 +71,35 @@ export default function Agenda() {
       {isLoading && <Spinner />}
       {error && <ErrorMsg message={(error as Error).message} />}
 
-      {!isLoading && dates.length === 0 && (
+      {!isLoading && avvisi.length === 0 && (
         <p className="text-gray-500 text-sm">
-          Nessun evento nel periodo selezionato.
+          Nessun avviso nel periodo selezionato.
         </p>
       )}
 
-      {dates.map((date) => (
-        <div key={date} className="mb-4">
-          <h2 className="text-sm font-semibold text-indigo-600 mb-2 uppercase tracking-wide">
-            {format(parseISO(date), "EEEE d MMMM yyyy", { locale: it })}
-          </h2>
-          <div className="space-y-2">
-            {(byDate.get(date) ?? []).map((e) => (
-              <div
-                key={e.evtId}
-                className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3 flex gap-3 items-start"
-              >
-                <span className="text-lg leading-none mt-0.5">
-                  {evtIcon(e.evtCode)}
-                </span>
-                <div>
-                  {e.subjectDesc && (
-                    <p className="text-xs font-semibold text-indigo-600 mb-0.5">
-                      {e.subjectDesc}
-                    </p>
-                  )}
-                  <p className="text-sm text-gray-800">{e.notes}</p>
-                  {e.authorName && (
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {e.authorName}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
+      <div className="space-y-3">
+        {avvisi.map((a) => (
+          <div
+            key={a.evtId}
+            className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-3 flex gap-3 items-start"
+          >
+            <span className="text-lg leading-none mt-0.5">📢</span>
+            <div>
+              <p className="text-xs font-semibold text-indigo-600 mb-0.5">
+                {format(parseISO(a.evtDatetimeBegin), "EEEE d MMMM yyyy", {
+                  locale: it,
+                })}
+                {a.subjectDesc ? ` — ${a.subjectDesc}` : ""}
+                {a.classDesc ? ` — ${a.classDesc}` : ""}
+              </p>
+              <p className="text-sm text-gray-800">{a.notes || "—"}</p>
+              {a.authorName && (
+                <p className="text-xs text-gray-400 mt-0.5">{a.authorName}</p>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

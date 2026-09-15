@@ -1,7 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
-import { assenzeApi, bachecaApi, compitiApi } from "../api.ts";
+import { agendaApi, assenzeApi, bachecaApi, compitiApi } from "../api.ts";
+
+// Stesso codice usato in Avvisi.tsx per riconoscere le note/avvisi in agenda.
+const AVVISO_EVTCODE = "AGNT";
 
 export default function Dashboard() {
   const { data: assenzeData } = useQuery({
@@ -12,6 +15,11 @@ export default function Dashboard() {
   const { data: bachecaData } = useQuery({
     queryKey: ["bacheca"],
     queryFn: bachecaApi.get,
+  });
+
+  const { data: agendaData } = useQuery({
+    queryKey: ["agenda-dashboard"],
+    queryFn: () => agendaApi.get(),
   });
 
   const { data: compitiData } = useQuery({
@@ -26,6 +34,10 @@ export default function Dashboard() {
 
   const bachecaDaLeggere = (bachecaData?.items ?? []).filter(
     (i) => !i.readStatus,
+  ).length;
+
+  const avvisiInArrivo = (agendaData?.agenda ?? []).filter(
+    (e) => e.evtCode === AVVISO_EVTCODE,
   ).length;
 
   const oggi = new Date().toISOString().split("T")[0]!;
@@ -43,7 +55,7 @@ export default function Dashboard() {
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
         <div
           className={`bg-white rounded-xl border shadow-sm px-4 py-4 ${compitiDaEseguire > 0 ? "border-indigo-200" : "border-gray-100"}`}
         >
@@ -53,6 +65,16 @@ export default function Dashboard() {
             {compitiDaEseguire}
           </p>
           <p className="text-xs text-gray-500 mt-1">Compiti da eseguire</p>
+        </div>
+        <div
+          className={`bg-white rounded-xl border shadow-sm px-4 py-4 ${avvisiInArrivo > 0 ? "border-amber-200" : "border-gray-100"}`}
+        >
+          <p
+            className={`text-3xl font-bold ${avvisiInArrivo > 0 ? "text-amber-600" : "text-gray-800"}`}
+          >
+            {avvisiInArrivo}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">Avvisi</p>
         </div>
         <div
           className={`bg-white rounded-xl border shadow-sm px-4 py-4 ${bachecaDaLeggere > 0 ? "border-sky-200" : "border-gray-100"}`}

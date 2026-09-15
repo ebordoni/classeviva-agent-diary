@@ -10,6 +10,7 @@ import type { AccountInfo } from "./api.ts";
 import { authApi } from "./api.ts";
 import Layout from "./components/Layout.tsx";
 import Assenze from "./pages/Assenze.tsx";
+import Avvisi from "./pages/Avvisi.tsx";
 import Bacheca from "./pages/Bacheca.tsx";
 import Compiti from "./pages/Compiti.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
@@ -68,6 +69,7 @@ function AppRoutes() {
                 <Route path="/voti" element={<Voti />} />
                 <Route path="/assenze" element={<Assenze />} />
                 <Route path="/compiti" element={<Compiti />} />
+                <Route path="/avvisi" element={<Avvisi />} />
                 <Route path="/bacheca" element={<Bacheca />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

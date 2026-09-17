@@ -7,6 +7,12 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.11.4] — 2026-09-17
+
+### Aggiunto
+
+- **Add-on sperimentale `classeviva-whatsapp-publisher` v0.1.0**: publisher testuale isolato per Canali WhatsApp con pairing via Ingress, coda SQLite persistente, deduplicazione, firma HMAC, retry e limiti di invio. L'integrazione con il bot Telegram resta disabilitata in attesa di test reali.
+
 ## [1.11.3] — 2026-09-17
 
 ### Corretto

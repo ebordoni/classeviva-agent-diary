@@ -1,0 +1,30 @@
+name: "Classeviva WhatsApp Publisher"
+description: "Sperimentale: pubblica messaggi testuali su un Canale WhatsApp tramite un client non ufficiale."
+version: "0.1.0"
+slug: "classeviva_whatsapp_publisher"
+init: false
+arch:
+  - aarch64
+  - armv7
+  - amd64
+
+ingress: true
+ingress_port: 8080
+panel_icon: mdi:whatsapp
+panel_title: "WhatsApp Publisher"
+
+options:
+  enabled: false
+  channel_jid: ""
+  shared_secret: ""
+  max_posts_per_day: 10
+  min_interval_minutes: 5
+  max_attempts: 3
+
+schema:
+  enabled: bool
+  channel_jid: str?
+  shared_secret: password?
+  max_posts_per_day: int(1,100)
+  min_interval_minutes: int(1,1440)
+  max_attempts: int(1,10)

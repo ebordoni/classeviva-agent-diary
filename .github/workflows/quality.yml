@@ -18,6 +18,8 @@ jobs:
       - run: npm run verify:addon-sources
       - run: npm run check
       - run: npm test
+      - run: npm ci --prefix hassio-addon/classeviva-whatsapp-publisher/src
+      - run: npm test --prefix hassio-addon/classeviva-whatsapp-publisher/src
 
   build-addons:
     runs-on: ubuntu-latest
@@ -25,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        addon: [classeviva-bot, classeviva-ui]
+        addon: [classeviva-bot, classeviva-ui, classeviva-whatsapp-publisher]
     steps:
       - uses: actions/checkout@v5
       - uses: docker/setup-buildx-action@v4

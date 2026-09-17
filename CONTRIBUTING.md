@@ -23,6 +23,7 @@ npm test
 | `packages/bot` | Bot Telegram. |
 | `hassio-addon/classeviva-bot` | Manifest, immagine e copia eseguibile del bot per Home Assistant. |
 | `hassio-addon/classeviva-ui` | Add-on Home Assistant con server Express e frontend React/Vite. |
+| `hassio-addon/classeviva-whatsapp-publisher` | Publisher sperimentale e isolato per Canali WhatsApp. |
 | `scripts/verify-addon-sources.mjs` | Controllo delle copie dei sorgenti condivisi. |
 
 ## Sorgenti sincronizzati
@@ -50,7 +51,7 @@ npm run check
 npm test
 ```
 
-La CI esegue gli stessi controlli e poi costruisce le immagini Docker di `classeviva-bot` e `classeviva-ui`. Se modifichi Dockerfile, `run.sh` o i sorgenti della UI, verifica anche la build dell'add-on interessato con Docker quando disponibile.
+La CI esegue gli stessi controlli e poi costruisce le immagini Docker di `classeviva-bot`, `classeviva-ui` e `classeviva-whatsapp-publisher`. Se modifichi Dockerfile, `run.sh` o i sorgenti della UI, verifica anche la build dell'add-on interessato con Docker quando disponibile.
 
 ## Versioni, changelog e commit
 

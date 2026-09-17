@@ -1,6 +1,6 @@
-name: "Classeviva WhatsApp Publisher"
-description: "Sperimentale: pubblica messaggi testuali su un Canale WhatsApp tramite un client non ufficiale."
-version: "0.1.0"
+name: "Classeviva WhatsApp Bot"
+description: "Bot sperimentale: pubblica messaggi testuali su un Canale WhatsApp tramite un client non ufficiale."
+version: "0.1.1"
 slug: "classeviva_whatsapp_publisher"
 init: false
 arch:
@@ -11,7 +11,7 @@ arch:
 ingress: true
 ingress_port: 8080
 panel_icon: mdi:whatsapp
-panel_title: "WhatsApp Publisher"
+panel_title: "WhatsApp Bot"
 
 options:
   enabled: false

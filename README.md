@@ -147,7 +147,7 @@ Sono disponibili tre add-on, tutti compatibili con `amd64`, `aarch64` e
 | --- | --- |
 | **Classeviva Bot** | Interazione via Telegram e digest giornaliero opzionale. |
 | **Classeviva UI** | Dashboard web multi-account tramite Ingress Home Assistant o porta `8099`. |
-| **WhatsApp Publisher** | Add-on sperimentale, separato dal bot, per post testuali su Canali WhatsApp. |
+| **Classeviva WhatsApp Bot** | Bot sperimentale, separato dal bot Telegram, per post testuali su Canali WhatsApp. |
 
 1. In Home Assistant apri **Impostazioni → Add-on → Add-on Store**.
 2. Dal menu ⋮ scegli **Repository** e aggiungi `https://github.com/ebordoni/classeviva-agent-diary`.
@@ -178,7 +178,7 @@ avvisi e bacheca; l'add-on è raggiungibile dal pannello laterale tramite
 Ingress oppure direttamente sulla porta configurata `8099`.
 
 > Consulta [packages/bot/README.md](./packages/bot/README.md) per i dettagli dei comandi Telegram e delle variabili disponibili.
-> Per il Publisher sperimentale consulta [la guida dedicata](./hassio-addon/classeviva-whatsapp-publisher/README.md): non è collegato automaticamente al bot e usa un client WhatsApp non ufficiale.
+> Per il Bot WhatsApp sperimentale consulta [la guida dedicata](./hassio-addon/classeviva-whatsapp-publisher/README.md): non è collegato automaticamente al bot Telegram e usa un client WhatsApp non ufficiale.
 
 ### Installazione
 

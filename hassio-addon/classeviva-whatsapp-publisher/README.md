@@ -1,4 +1,4 @@
-# Classeviva WhatsApp Publisher
+# Classeviva WhatsApp Bot
 
 > **Sperimentale.** Add-on Home Assistant che riceve messaggi testuali firmati, li accoda e prova a pubblicarli su un Canale WhatsApp tramite Baileys.
 
@@ -13,12 +13,12 @@ Questo add-on è separato dal bot Telegram: un errore, una disconnessione o un a
 
 ## Installazione e configurazione
 
-1. Aggiungi questo repository allo Store add-on di Home Assistant e installa **Classeviva WhatsApp Publisher**.
+1. Aggiungi questo repository allo Store add-on di Home Assistant e installa **Classeviva WhatsApp Bot**.
 2. Lascia `enabled: false` finché non hai completato il pairing e il test del Canale.
 3. Imposta un segreto casuale di almeno 32 caratteri in `shared_secret`.
 4. Inserisci il JID del Canale in `channel_jid`, nel formato `123456789012345@newsletter`.
 5. Imposta limiti prudenti, ad esempio 10 post/giorno e 5 minuti tra due invii.
-6. Abilita l'add-on, avvialo e apri il pannello **WhatsApp Publisher**: il QR viene mostrato soltanto lì, tramite Ingress autenticato Home Assistant.
+6. Abilita l'add-on, avvialo e apri il pannello **WhatsApp Bot**: il QR viene mostrato soltanto lì, tramite Ingress autenticato Home Assistant.
 7. Sul numero dedicato apri WhatsApp, vai in **Dispositivi collegati** e scansiona il QR.
 
 L'add-on memorizza coda e sessione solo nel proprio volume `/data`; un riavvio non richiede un nuovo pairing, salvo disconnessione o logout dal telefono.

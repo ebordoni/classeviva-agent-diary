@@ -1,3 +1,7 @@
+## 1.8.9 — 2026-09-17
+
+- Nuova icona: identifica il servizio come bot Telegram scolastico.
+
 ## 1.8.8 — 2026-09-17
 
 - Aggiornato il runtime dell'add-on a Node.js 22 LTS: Node.js 20 è fuori supporto e non riceve più aggiornamenti di sicurezza. La build continua a supportare anche ARMv7.

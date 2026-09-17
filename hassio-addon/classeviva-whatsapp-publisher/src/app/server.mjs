@@ -47,7 +47,7 @@ async function pairingPage(client, enabled) {
   const content = qrImage
     ? `<p>Apri WhatsApp sul numero dedicato, quindi Dispositivi collegati e scansiona questo codice.</p><img src="${qrImage}" alt="Codice QR di pairing WhatsApp">`
     : "<p>Il QR compare qui solo quando il pairing è richiesto.</p>";
-  return `<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>WhatsApp Publisher</title><style>body{font-family:system-ui;margin:2rem;max-width:40rem}img{max-width:100%;height:auto}</style><h1>WhatsApp Publisher</h1><p>Stato: <strong>${escapeHtml(status)}</strong></p><p>Pubblicazione automatica: <strong>${enabled ? "abilitata" : "disabilitata"}</strong></p>${content}</html>`;
+  return `<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>WhatsApp Bot</title><style>body{font-family:system-ui;margin:2rem;max-width:40rem}img{max-width:100%;height:auto}</style><h1>WhatsApp Bot</h1><p>Stato: <strong>${escapeHtml(status)}</strong></p><p>Pubblicazione automatica: <strong>${enabled ? "abilitata" : "disabilitata"}</strong></p>${content}</html>`;
 }
 
 export function createPublisherServer({ config, store, publisher, client }) {

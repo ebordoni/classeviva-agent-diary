@@ -1,3 +1,7 @@
+## 1.7.4 — 2026-09-17
+
+- Nuova icona: identifica l'add-on come dashboard grafica del registro.
+
 ## 1.7.3 — 2026-09-17
 
 - Fix: dopo l'estrazione AI dei compiti, la Dashboard aggiorna contatore ed elenco alla successiva navigazione senza richiedere il refresh manuale della pagina.

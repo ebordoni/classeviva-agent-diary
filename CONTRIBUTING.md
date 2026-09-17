@@ -23,7 +23,7 @@ npm test
 | `packages/bot` | Bot Telegram. |
 | `hassio-addon/classeviva-bot` | Manifest, immagine e copia eseguibile del bot per Home Assistant. |
 | `hassio-addon/classeviva-ui` | Add-on Home Assistant con server Express e frontend React/Vite. |
-| `hassio-addon/classeviva-whatsapp-publisher` | Publisher sperimentale e isolato per Canali WhatsApp. |
+| `hassio-addon/classeviva-whatsapp-publisher` | Bot WhatsApp sperimentale e isolato per Canali WhatsApp. |
 | `scripts/verify-addon-sources.mjs` | Controllo delle copie dei sorgenti condivisi. |
 
 ## Sorgenti sincronizzati

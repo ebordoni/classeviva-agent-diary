@@ -7,6 +7,13 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.11.5] — 2026-09-17
+
+### Modificato
+
+- Nuove icone coerenti per gli add-on: bot Telegram, dashboard Web UI e bot WhatsApp.
+- **Addon `classeviva-bot` v1.8.9**, **`classeviva-ui` v1.7.4** e **`classeviva-whatsapp-publisher` v0.1.1**: il Publisher è ora visualizzato come **Classeviva WhatsApp Bot**; lo slug tecnico resta invariato.
+
 ## [1.11.4] — 2026-09-17
 
 ### Aggiunto

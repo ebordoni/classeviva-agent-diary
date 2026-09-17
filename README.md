@@ -6,6 +6,11 @@
 [![Node.js](https://img.shields.io/badge/Node.js-22+-green.svg)](https://nodejs.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
+Client API, CLI, bot Telegram e Web UI per Home Assistant per consultare il
+registro elettronico Classeviva. Richiede **Node.js 22 o superiore**.
+
+Per contribuire al progetto, consulta [CONTRIBUTING.md](./CONTRIBUTING.md).
+
 ## 📦 Packages
 
 Progetto monorepo con tre package:
@@ -135,14 +140,43 @@ AI_API_KEY=sk-...
 
 ### Deploy su Home Assistant
 
-Il bot è disponibile come **addon per Home Assistant** nella cartella [`hassio-addon/`](./hassio-addon/).
-Aggiungere il repository `https://github.com/ebordoni/classeviva-agent-diary` nell'Add-on Store di HA.
+Sono disponibili due add-on, entrambi compatibili con `amd64`, `aarch64` e
+`armv7`:
 
-> Consulta [packages/bot/README.md](./packages/bot/README.md) per la documentazione completa.
+| Add-on | Uso |
+| --- | --- |
+| **Classeviva Bot** | Interazione via Telegram e digest giornaliero opzionale. |
+| **Classeviva UI** | Dashboard web multi-account tramite Ingress Home Assistant o porta `8099`. |
 
-### Web UI per Home Assistant
+1. In Home Assistant apri **Impostazioni → Add-on → Add-on Store**.
+2. Dal menu ⋮ scegli **Repository** e aggiungi `https://github.com/ebordoni/classeviva-agent-diary`.
+3. Installa l'add-on desiderato, compila la sezione **Configurazione** e avvialo.
 
-Nello stesso repository è disponibile l'add-on **Classeviva UI**: un'interfaccia web con supporto multi-account per dashboard, lezioni, voti, assenze, compiti, avvisi e bacheca. Dopo aver aggiunto il repository all'Add-on Store, configura gli account e l'eventuale provider AI nelle opzioni dell'add-on; Home Assistant la espone anche tramite Ingress.
+Per il **Bot** sono necessari `telegram_token` (creato con
+[@BotFather](https://t.me/BotFather)) e, solo per l'estrazione dei compiti,
+`ai_api_key`. `allowed_chat_ids` accetta una lista di ID Telegram separata da
+virgole e permette di limitare chi usa il bot; `daily_digest_time` usa il
+formato `HH:MM` e, se lasciato vuoto, disabilita il digest.
+
+Per la **UI** configura almeno un account oppure accedi dalla schermata di
+login. La configurazione può contenere più account:
+
+```yaml
+accounts:
+  - student_id: S1234567
+    password: una-password
+ai_provider: openai
+ai_model: ""
+ai_api_key: ""
+session_secret: un-segreto-lungo-e-casuale
+```
+
+`session_secret` è raccomandato su installazioni esposte oltre la rete locale.
+La UI supporta dashboard, lezioni, voti, assenze, compiti estratti con AI,
+avvisi e bacheca; l'add-on è raggiungibile dal pannello laterale tramite
+Ingress oppure direttamente sulla porta configurata `8099`.
+
+> Consulta [packages/bot/README.md](./packages/bot/README.md) per i dettagli dei comandi Telegram e delle variabili disponibili.
 
 ### Installazione
 
@@ -295,10 +329,16 @@ new ClassevivaClient(studentId: string, password?: string)
 
 ## 🛠️ Sviluppo
 
+### Requisiti
+
+- Node.js **22+** (LTS consigliata)
+- npm (incluso con Node.js)
+- Docker, solo per costruire localmente le immagini degli add-on
+
 ```bash
 git clone https://github.com/ebordoni/classeviva-agent-diary.git
 cd classeviva-agent-diary
-npm install
+npm ci
 
 # Build di tutti i package
 npm run build
@@ -314,6 +354,9 @@ npm run dev:core
 npm run cv -- lezioni
 ```
 
+`npm ci` usa il lockfile versionato e riproduce le installazioni della CI. Usa
+`npm install` solo quando modifichi intenzionalmente le dipendenze e il lockfile.
+
 ### Verifica
 
 ```bash
@@ -326,6 +369,23 @@ npm test
 # Verifica che le copie sorgente degli add-on siano allineate
 npm run verify:addon-sources
 ```
+
+### CI e sincronizzazione degli add-on
+
+Ogni push su `main` e ogni pull request eseguono `npm ci`, il controllo di sincronizzazione, il
+type-check, i test e la build Docker dei due add-on. La CI usa Node.js 22.
+
+I sorgenti condivisi non vanno modificati direttamente nelle copie degli
+add-on: `packages/core/src/` viene copiato nei due add-on e
+`packages/bot/src/` nell'add-on Bot. Il workflow **Sync HA Addon Sources**
+esegue questa operazione dopo un push su `main`; se trova differenze crea un
+commit di `github-actions[bot]` con messaggio
+`chore(addon): sync sources from packages [skip ci]`. Quel commit è previsto e
+non indica una modifica esterna inattesa.
+
+Le sorgenti specifiche della Web UI (`hassio-addon/classeviva-ui/src/packages/server`
+e `.../ui`) restano invece mantenute nell'add-on. Prima di aprire una pull
+request esegui tutti e tre i comandi della sezione **Verifica**.
 
 ---
 
@@ -365,6 +425,12 @@ Questo bot è progettato per uso personale su infrastruttura propria (es. Home A
 | **Token di sessione**   | Mantenuto solo in RAM. Non viene mai persistito su disco. Va perso al riavvio del bot.                                                                               |
 | **Student ID**          | Salvato nel file cache locale (`cache.json`) per evitare di reinserirlo a ogni login. È uno username, non un segreto critico.                                        |
 | **Dati del registro**   | Cachati localmente sul tuo server per ridurre le chiamate API. Non vengono mai trasmessi a terzi.                                                                    |
+
+La **Web UI** è diversa dal bot: per rendere disponibile il cambio account,
+salva le credenziali configurate o inserite al login nel volume privato
+dell'add-on (`/data/accounts.json`). Bot e UI condividono inoltre la cache del
+registro in `/share/classeviva_cache.json`. Proteggi l'accesso al tuo Home
+Assistant e tratta i backup di questi volumi come dati sensibili.
 
 ### Garanzie
 

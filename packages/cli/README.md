@@ -3,7 +3,7 @@
 > CLI tool per interagire con Classeviva da terminale
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-22+-green.svg)](https://nodejs.org/)
 
 ## ✨ Features
 
@@ -19,6 +19,8 @@
 
 ## 📦 Installazione
 
+Richiede **Node.js 22 o superiore**.
+
 ### Globale (raccomandato)
 
 ```bash
@@ -30,9 +32,11 @@ Ora puoi usare `classeviva` o `cv` da qualsiasi directory.
 ### Locale (sviluppo)
 
 ```bash
+# Dalla root del monorepo
+npm ci
+npm run build:cli
+
 cd packages/cli
-npm install
-npm run build
 npm link  # Crea link globale
 ```
 

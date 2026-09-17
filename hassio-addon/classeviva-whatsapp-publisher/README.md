@@ -33,6 +33,10 @@ Il pannello Ingress mostra anche l’**endpoint interno per il Bot Telegram**. C
 
 L’indirizzo resta sulla rete interna di Home Assistant: non esporlo a Internet e non sostituirlo con l’URL Ingress. Il collegamento pubblica soltanto i compiti effettivamente trovati dal digest giornaliero; Telegram continua a ricevere il proprio digest anche se WhatsApp non è disponibile.
 
+### Test del Canale
+
+Dal pannello Ingress usa **Invia messaggio di test** per verificare subito il Canale, anche quando non ci sono compiti. Il messaggio è esplicitamente identificato come prova, attraversa la normale coda di invio ed è deduplicato: se lo premi più volte nella stessa giornata non crea ulteriori post.
+
 ## API interna
 
 L'endpoint `POST /api/jobs` è pensato per una futura integrazione del bot. Non esporlo a Internet. Accetta un corpo JSON di massimo 4 KiB:

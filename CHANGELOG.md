@@ -7,6 +7,12 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.11.9] — 2026-09-17
+
+### Aggiunto
+
+- **Addon `classeviva-whatsapp-publisher` v0.1.4**: pulsante Ingress per accodare un messaggio di test deduplicato, utile anche quando il digest non trova compiti.
+
 ## [1.11.8] — 2026-09-17
 
 ### Corretto

@@ -1,3 +1,7 @@
+## 0.1.4 — 2026-09-17
+
+- Nuovo pulsante Ingress **Invia messaggio di test**: consente di validare subito il Canale senza compiti disponibili, passando da coda, limiti e retry normali. Il test è deduplicato una volta al giorno.
+
 ## 0.1.3 — 2026-09-17
 
 - Il pannello Ingress mostra l’endpoint interno da copiare nel Bot Telegram per configurare il digest WhatsApp senza esporre porte sulla rete locale o Internet.

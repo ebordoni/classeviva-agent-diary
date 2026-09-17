@@ -47,6 +47,14 @@ function internalPublisherEndpoint() {
   return `http://${hostname().replaceAll("_", "-")}:8080/api/jobs`;
 }
 
+function manualTestJob() {
+  const date = new Date().toISOString().slice(0, 10);
+  return {
+    id: `ingress-test:${date}`,
+    text: "🔧 Messaggio di test di Classeviva WhatsApp Bot. Se lo leggi nel Canale, la pubblicazione funziona correttamente.",
+  };
+}
+
 async function pairingPage(client, publisher, config) {
   const { status, pairingRequired, qr } = client.getStatus();
   const qrImage = pairingRequired ? await QRCode.toDataURL(qr, { margin: 2, width: 320 }) : undefined;
@@ -55,7 +63,26 @@ async function pairingPage(client, publisher, config) {
     : "<p>Il QR compare qui solo quando il pairing è richiesto.</p>";
   const channel = publisher.channelJid ?? "non ancora risolto";
   const configuredUrl = escapeHtml(config.channelUrl ?? "");
-  return `<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>WhatsApp Bot</title><style>body{font-family:system-ui;margin:2rem;max-width:40rem}img{max-width:100%;height:auto}input,button{font:inherit;padding:.55rem;margin:.25rem 0;width:100%;box-sizing:border-box}button{cursor:pointer}#result{min-height:1.4rem}</style><h1>WhatsApp Bot</h1><p>Stato: <strong>${escapeHtml(status)}</strong></p><p>Pubblicazione automatica: <strong>${config.enabled ? "abilitata" : "disabilitata"}</strong></p><p>JID attivo: <code>${escapeHtml(channel)}</code></p><p>Endpoint interno per il Bot Telegram: <code>${escapeHtml(internalPublisherEndpoint())}</code></p>${content}<hr><h2>Verifica link Canale</h2><p>Incolla il link pubblico del Canale. La verifica non salva né modifica la configurazione.</p><form id="channel-form"><input id="channel-url" type="url" required placeholder="https://whatsapp.com/channel/..." value="${configuredUrl}"><button>Ricava JID</button></form><p id="result" aria-live="polite"></p><script>const form=document.getElementById('channel-form');const input=document.getElementById('channel-url');const result=document.getElementById('result');form.addEventListener('submit',async(event)=>{event.preventDefault();result.textContent='Verifica in corso…';try{const response=await fetch('api/channel/resolve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channelUrl:input.value})});const data=await response.json();result.textContent=response.ok?'JID: '+data.channelJid:data.error}catch{result.textContent='Verifica non riuscita'}});</script></html>`;
+  const canSendTest = config.enabled && client.isReady && publisher.channelJid;
+  return `<!doctype html>
+<html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WhatsApp Bot</title>
+<style>body{font-family:system-ui;margin:2rem;max-width:40rem}img{max-width:100%;height:auto}input,button{font:inherit;padding:.55rem;margin:.25rem 0;width:100%;box-sizing:border-box}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.6}#result{min-height:1.4rem}</style>
+<h1>WhatsApp Bot</h1><p>Stato: <strong>${escapeHtml(status)}</strong></p>
+<p>Pubblicazione automatica: <strong>${config.enabled ? "abilitata" : "disabilitata"}</strong></p>
+<p>JID attivo: <code>${escapeHtml(channel)}</code></p>
+<p>Endpoint interno per il Bot Telegram: <code>${escapeHtml(internalPublisherEndpoint())}</code></p>
+${content}<hr><h2>Test di pubblicazione</h2>
+<p>Accoda un messaggio identificato come test. È disponibile una sola volta al giorno e usa gli stessi limiti, coda e retry degli invii reali.</p>
+<button id="test-message" ${canSendTest ? "" : "disabled"}>Invia messaggio di test</button><p id="test-result" aria-live="polite"></p>
+<hr><h2>Verifica link Canale</h2><p>Incolla il link pubblico del Canale. La verifica non salva né modifica la configurazione.</p>
+<form id="channel-form"><input id="channel-url" type="url" required placeholder="https://whatsapp.com/channel/..." value="${configuredUrl}"><button>Ricava JID</button></form><p id="result" aria-live="polite"></p>
+<script>
+const form=document.getElementById('channel-form');const input=document.getElementById('channel-url');const result=document.getElementById('result');
+form.addEventListener('submit',async(event)=>{event.preventDefault();result.textContent='Verifica in corso…';try{const response=await fetch('api/channel/resolve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({channelUrl:input.value})});const data=await response.json();result.textContent=response.ok?'JID: '+data.channelJid:data.error}catch{result.textContent='Verifica non riuscita'}});
+const testButton=document.getElementById('test-message');const testResult=document.getElementById('test-result');
+testButton?.addEventListener('click',async()=>{testButton.disabled=true;testResult.textContent='Accodamento in corso…';try{const response=await fetch('api/test-message',{method:'POST'});const data=await response.json();testResult.textContent=response.ok?(data.duplicate?'Il messaggio di test di oggi è già stato accodato.':'Messaggio di test accodato: controlla il Canale.'):data.error}catch{testResult.textContent='Accodamento non riuscito'}finally{testButton.disabled=false}});
+</script></html>`;
 }
 
 export function createPublisherServer({ config, store, publisher, client }) {
@@ -98,6 +125,30 @@ export function createPublisherServer({ config, store, publisher, client }) {
         const status = error instanceof SyntaxError ? 400 : 422;
         sendJson(response, status, { error: "Link del Canale non valido o non risolvibile" });
       }
+      return;
+    }
+
+    if (request.method === "POST" && pathname.endsWith("/api/test-message")) {
+      if (!config.enabled) {
+        sendJson(response, 503, { error: "Pubblicazione disabilitata" });
+        return;
+      }
+      if (!client.isReady || !publisher.channelJid) {
+        sendJson(response, 409, { error: "Collega prima WhatsApp e risolvi il Canale" });
+        return;
+      }
+      const job = manualTestJob();
+      const result = store.enqueue(job);
+      if (result.conflict) {
+        sendJson(response, 409, { error: "Test già presente con contenuto differente" });
+        return;
+      }
+      void publisher.drain();
+      sendJson(response, result.created ? 202 : 200, {
+        id: job.id,
+        status: result.job.status,
+        duplicate: !result.created,
+      });
       return;
     }
 

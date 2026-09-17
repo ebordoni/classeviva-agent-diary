@@ -17,7 +17,7 @@ test("l'endpoint accoda solo job con firma valida", async (t) => {
       return { created: true, conflict: false, job: { status: "pending" } };
     },
   };
-  const publisher = { drain: async () => {} };
+  const publisher = { channelJid: "120363012345678901@newsletter", drain: async () => {} };
   const client = {
     isReady: true,
     getStatus: () => ({ status: "connected", pairingRequired: false }),
@@ -59,6 +59,13 @@ test("l'endpoint accoda solo job con firma valida", async (t) => {
   const status = await fetch(`http://127.0.0.1:${port}/api/status`);
   assert.equal(status.status, 200);
   assert.match((await status.json()).publisherEndpoint, /^http:\/\/.+:8080\/api\/jobs$/);
+
+  const manualTest = await fetch(`http://127.0.0.1:${port}/api/test-message`, {
+    method: "POST",
+  });
+  assert.equal(manualTest.status, 202);
+  assert.match((await manualTest.json()).id, /^ingress-test:\d{4}-\d{2}-\d{2}$/);
+  assert.match(jobs.at(-1).text, /Messaggio di test/);
 
   const resolved = await fetch(`http://127.0.0.1:${port}/api/channel/resolve`, {
     method: "POST",

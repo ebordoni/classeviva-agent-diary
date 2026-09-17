@@ -1,3 +1,7 @@
+## 1.9.1 — 2026-09-17
+
+- Corretto il fuso orario del digest: nuova opzione `time_zone` (predefinita `Europe/Rome`) e calcolo della data locale, inclusa la cache dei compiti.
+
 ## 1.9.0 — 2026-09-17
 
 - Il digest giornaliero può pubblicare anche i compiti trovati su un Canale WhatsApp tramite l’add-on separato, con firma HMAC e deduplicazione.

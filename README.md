@@ -164,6 +164,9 @@ il **WhatsApp Bot**, copia dal suo Ingress l’endpoint interno in
 `whatsapp_shared_secret` e abilita `whatsapp_digest_enabled`. La funzione è
 disattivata di default.
 
+L’opzione `time_zone` usa un identificativo IANA (predefinito `Europe/Rome`) e
+determina sia l’orario del digest sia la data dei compiti analizzati.
+
 Per la **UI** configura almeno un account oppure accedi dalla schermata di
 login. La configurazione può contenere più account:
 

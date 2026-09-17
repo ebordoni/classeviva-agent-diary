@@ -7,6 +7,12 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.11.8] — 2026-09-17
+
+### Corretto
+
+- **Addon `classeviva-bot` v1.9.1**: digest e cache dei compiti rispettano il fuso orario configurato (`time_zone`, predefinito `Europe/Rome`) anziché l’UTC del container.
+
 ## [1.11.7] — 2026-09-17
 
 ### Aggiunto

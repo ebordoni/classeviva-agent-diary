@@ -88,6 +88,7 @@ npm run dev
 | `AI_MODEL`           |         No          | Modello AI (default del provider se omesso)               |
 | `AI_FALLBACK_PROVIDERS` |      No          | Provider di riserva se il primario fallisce (es. `google,groq`), usano l'API key dal proprio env |
 | `CACHE_DB_PATH`      |         No          | Percorso file JSON per la cache (default: `./cache.json`) |
+| `TZ` | No | Fuso orario IANA del processo (ad esempio `Europe/Rome`); nell’add-on è configurato con l’opzione `time_zone`. |
 | `WHATSAPP_DIGEST_ENABLED` | No | Se `true`, accoda su WhatsApp solo i compiti trovati dal digest giornaliero. |
 | `WHATSAPP_PUBLISHER_URL` | Se WhatsApp attivo | Endpoint interno `/api/jobs` mostrato dal pannello Ingress del WhatsApp Bot. |
 | `WHATSAPP_SHARED_SECRET` | Se WhatsApp attivo | Stesso segreto HMAC (almeno 32 caratteri) configurato nel WhatsApp Bot. |

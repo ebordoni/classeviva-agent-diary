@@ -253,14 +253,17 @@ export async function getCompiti(
   fine: string,
   ai: AIService,
 ): Promise<{ data: CompitiEstrattiResponse; fromCache: boolean }> {
-  const oggi = new Date().toISOString().split("T")[0];
+  const now = new Date();
+  const oggi = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
   // Genera la lista di date nel range [inizio, fine]
   const dates: string[] = [];
   const cur = new Date(inizio + "T00:00:00");
   const end = new Date(fine + "T00:00:00");
   while (cur <= end) {
-    dates.push(cur.toISOString().split("T")[0]);
+    dates.push(
+      `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, "0")}-${String(cur.getDate()).padStart(2, "0")}`,
+    );
     cur.setDate(cur.getDate() + 1);
   }
 

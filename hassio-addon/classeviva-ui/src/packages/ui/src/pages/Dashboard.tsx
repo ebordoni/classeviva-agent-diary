@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
-import { agendaApi, assenzeApi, bachecaApi, compitiApi } from "../api.ts";
 import { AVVISO_EVTCODE, defaultAvvisiRange } from "../agendaUtils.ts";
+import { agendaApi, assenzeApi, bachecaApi, compitiApi } from "../api.ts";
 
 export default function Dashboard() {
   const { data: assenzeData } = useQuery({

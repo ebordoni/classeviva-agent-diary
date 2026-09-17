@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
 import { useState } from "react";
-import { agendaApi } from "../api.ts";
 import { AVVISO_EVTCODE, defaultAvvisiRange } from "../agendaUtils.ts";
+import { agendaApi } from "../api.ts";
 
 export default function Avvisi() {
   const [range, setRange] = useState(defaultAvvisiRange);

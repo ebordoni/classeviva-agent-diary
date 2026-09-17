@@ -1,3 +1,7 @@
+## 1.7.3 — 2026-09-17
+
+- Fix: dopo l'estrazione AI dei compiti, la Dashboard aggiorna contatore ed elenco alla successiva navigazione senza richiedere il refresh manuale della pagina.
+
 ## 1.7.2 — 2026-09-17
 
 - Aggiornato il runtime dell'add-on a Node.js 22 LTS: Node.js 20 è fuori supporto e non riceve più aggiornamenti di sicurezza. La build continua a supportare anche ARMv7.

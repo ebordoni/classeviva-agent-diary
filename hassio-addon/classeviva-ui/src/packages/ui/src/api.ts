@@ -109,6 +109,9 @@ export const compitiApi = {
     apiFetch<CompitiResponse>(`api/compiti?giorni=${giorni}`),
 };
 
+export const compitiCachedQueryKey = (giorni: number) =>
+  ["compiti-cached", giorni] as const;
+
 export const noteApi = {
   get: () => apiFetch<NoteResponse>("api/note"),
   leggi: (eventCode: string, evtId: number) =>

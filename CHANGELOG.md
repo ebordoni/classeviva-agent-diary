@@ -7,6 +7,12 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.11.3] — 2026-09-17
+
+### Corretto
+
+- **Addon `classeviva-ui` v1.7.3**: l'estrazione AI dei compiti invalida la cache React Query; Dashboard aggiornata senza refresh manuale.
+
 ## [1.11.2] — 2026-09-17
 
 ### Modificato

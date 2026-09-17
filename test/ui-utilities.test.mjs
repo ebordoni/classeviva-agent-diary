@@ -17,6 +17,13 @@ const gradeUtils = await importTypeScriptModule(
 const agendaUtils = await importTypeScriptModule(
   new URL("../hassio-addon/classeviva-ui/src/packages/ui/src/agendaUtils.ts", import.meta.url),
 );
+const previousWindow = globalThis.window;
+globalThis.window = { location: { pathname: "/" } };
+const api = await importTypeScriptModule(
+  new URL("../hassio-addon/classeviva-ui/src/packages/ui/src/api.ts", import.meta.url),
+);
+if (previousWindow === undefined) delete globalThis.window;
+else globalThis.window = previousWindow;
 
 function voto(parziale = {}) {
   return {
@@ -54,4 +61,9 @@ test("il range predefinito degli avvisi è un intervallo ISO valido", () => {
   assert.match(inizio, /^\d{4}-\d{2}-\d{2}$/);
   assert.match(fine, /^\d{4}-\d{2}-\d{2}$/);
   assert.ok(inizio <= fine);
+});
+
+test("la cache dei compiti è distinta per intervallo", () => {
+  assert.deepEqual(api.compitiCachedQueryKey(7), ["compiti-cached", 7]);
+  assert.deepEqual(api.compitiCachedQueryKey(30), ["compiti-cached", 30]);
 });

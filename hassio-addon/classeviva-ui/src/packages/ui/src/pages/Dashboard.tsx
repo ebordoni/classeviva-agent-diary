@@ -2,7 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
 import { AVVISO_EVTCODE, defaultAvvisiRange } from "../agendaUtils.ts";
-import { agendaApi, assenzeApi, bachecaApi, compitiApi } from "../api.ts";
+import {
+  agendaApi,
+  assenzeApi,
+  bachecaApi,
+  compitiApi,
+  compitiCachedQueryKey,
+} from "../api.ts";
 
 export default function Dashboard() {
   const { data: assenzeData } = useQuery({
@@ -22,7 +28,7 @@ export default function Dashboard() {
   });
 
   const { data: compitiData } = useQuery({
-    queryKey: ["compiti-cached"],
+    queryKey: compitiCachedQueryKey(7),
     queryFn: () => compitiApi.getCached(7),
     retry: false,
     staleTime: 5 * 60 * 1000,

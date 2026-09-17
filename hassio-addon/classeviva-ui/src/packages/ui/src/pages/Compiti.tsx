@@ -1,8 +1,8 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format, isPast, isToday, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
 import { useState } from "react";
-import { compitiApi } from "../api.ts";
+import { compitiApi, compitiCachedQueryKey } from "../api.ts";
 import type { CompitiResponse } from "../types.ts";
 
 const PROVIDERS = ["openai", "google", "anthropic", "groq", "xai"] as const;
@@ -12,13 +12,14 @@ function toDateInput(d: Date) {
 }
 
 export default function Compiti() {
+  const queryClient = useQueryClient();
   const [giorni, setGiorni] = useState(10);
   const [provider, setProvider] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [model, setModel] = useState("");
 
   const { data: cachedData } = useQuery({
-    queryKey: ["compiti-cached"],
+    queryKey: compitiCachedQueryKey(30),
     queryFn: () => compitiApi.getCached(30),
     retry: false,
     staleTime: 5 * 60 * 1000,
@@ -37,6 +38,8 @@ export default function Compiti() {
         ...(model ? { model } : {}),
       });
     },
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["compiti-cached"] }),
   });
 
   const result: CompitiResponse | undefined = mutation.data ?? cachedData;

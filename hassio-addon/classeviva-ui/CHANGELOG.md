@@ -1,3 +1,7 @@
+## 1.7.2 — 2026-09-17
+
+- Aggiornato il runtime dell'add-on a Node.js 22 LTS: Node.js 20 è fuori supporto e non riceve più aggiornamenti di sicurezza. La build continua a supportare anche ARMv7.
+
 ## 1.7.1 — 2026-09-17
 
 - Fix: il riconoscimento dei giudizi testuali ora privilegia il giudizio più specifico. In particolare, "gravemente insufficiente" non viene più classificato come il generico "insufficiente".

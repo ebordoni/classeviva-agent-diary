@@ -7,6 +7,12 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.11.2] — 2026-09-17
+
+### Modificato
+
+- **Addon `classeviva-bot` v1.8.8 e `classeviva-ui` v1.7.2**: runtime, immagini Docker, CI e vincoli package aggiornati a Node.js 22 LTS. Node.js 20 è EOL; Node 22 preserva il supporto ARMv7 degli add-on.
+
 ## [1.11.1] — 2026-09-17
 
 ### Corretto

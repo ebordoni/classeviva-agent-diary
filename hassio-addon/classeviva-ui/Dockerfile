@@ -1,10 +1,11 @@
 ARG BUILD_FROM
+FROM node:22-bookworm-slim AS node
 FROM ${BUILD_FROM}
 
+COPY --from=node /usr/local/ /usr/local/
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    bash jq curl ca-certificates \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y --no-install-recommends nodejs \
+    bash jq ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build

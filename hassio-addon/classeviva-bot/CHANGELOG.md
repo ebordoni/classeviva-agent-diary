@@ -1,3 +1,7 @@
+## 1.8.8 — 2026-09-17
+
+- Aggiornato il runtime dell'add-on a Node.js 22 LTS: Node.js 20 è fuori supporto e non riceve più aggiornamenti di sicurezza. La build continua a supportare anche ARMv7.
+
 ## 1.8.7 — 2026-09-10
 
 - Validazione post-estrazione: i compiti con date non valide o con scadenza precedente alla data della lezione vengono scartati invece di essere mostrati così come sono

@@ -3,7 +3,7 @@
 > Wrapper TypeScript per le API di [Classeviva](https://web.spaggiari.eu/) — Registro Elettronico Spaggiari
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-22+-green.svg)](https://nodejs.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
 ## 📦 Packages

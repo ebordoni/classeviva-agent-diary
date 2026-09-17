@@ -11,6 +11,9 @@
       ],
       "scripts": {
             "build": "npm run build -w packages/core && npm run build -w packages/cli && npm run build -w packages/bot",
+            "check": "tsc --noEmit -p packages/core/tsconfig.json && tsc --noEmit -p packages/cli/tsconfig.json && tsc --noEmit -p packages/bot/tsconfig.json",
+            "test": "npm run build:core && node --test test/*.test.mjs",
+            "verify:addon-sources": "node scripts/verify-addon-sources.mjs",
             "build:core": "npm run build -w packages/core",
             "build:cli": "npm run build -w packages/cli",
             "build:bot": "npm run build -w packages/bot",
@@ -32,12 +35,12 @@
       "license": "MIT",
       "repository": {
             "type": "git",
-            "url": "git+https://github.com/ebordoni/classeviva-diario.git"
+            "url": "git+https://github.com/ebordoni/classeviva-agent-diary.git"
       },
       "bugs": {
-            "url": "https://github.com/ebordoni/classeviva-diario/issues"
+            "url": "https://github.com/ebordoni/classeviva-agent-diary/issues"
       },
-      "homepage": "https://github.com/ebordoni/classeviva-diario#readme",
+      "homepage": "https://github.com/ebordoni/classeviva-agent-diary#readme",
       "engines": {
             "node": ">=18.0.0"
       }

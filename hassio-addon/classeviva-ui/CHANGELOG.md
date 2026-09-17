@@ -1,3 +1,7 @@
+## 1.7.1 — 2026-09-17
+
+- Fix: il riconoscimento dei giudizi testuali ora privilegia il giudizio più specifico. In particolare, "gravemente insufficiente" non viene più classificato come il generico "insufficiente".
+
 ## 1.7.0 — 2026-09-15
 
 - Nuova pagina **Avvisi**: mostra le note/avvisi generali dell'agenda (evtCode `AGNT`), riusando l'endpoint `/api/agenda` già esistente (agendav2). Aggiunta voce in sidebar

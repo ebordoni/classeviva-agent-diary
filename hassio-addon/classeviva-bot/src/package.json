@@ -31,12 +31,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ebordoni/classeviva-diario.git"
+    "url": "git+https://github.com/ebordoni/classeviva-agent-diary.git"
   },
   "bugs": {
-    "url": "https://github.com/ebordoni/classeviva-diario/issues"
+    "url": "https://github.com/ebordoni/classeviva-agent-diary/issues"
   },
-  "homepage": "https://github.com/ebordoni/classeviva-diario#readme",
+  "homepage": "https://github.com/ebordoni/classeviva-agent-diary#readme",
   "engines": {
     "node": ">=18.0.0"
   }

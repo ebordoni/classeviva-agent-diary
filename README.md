@@ -14,7 +14,6 @@ Progetto monorepo con tre package:
 | ------------------------------------- | -------------------------------------------------------------------- |
 | [`@classeviva/core`](./packages/core) | Libreria TypeScript — client API, tipi, integrazione AI              |
 | [`@classeviva/cli`](./packages/cli)   | CLI da terminale con output tabulare o JSON                          |
-| [`@classeviva/tui`](./packages/tui)   | TUI interattiva basata su [Ink](https://github.com/vadimdemedes/ink) |
 | [`@classeviva/bot`](./packages/bot)   | Bot Telegram — consulta il registro direttamente da Telegram         |
 
 ---
@@ -102,24 +101,6 @@ AI_API_KEY=sk-...
 
 ---
 
-## 🖥️ Quick Start — TUI
-
-Interfaccia interattiva a terminale con menu navigabile.
-
-```bash
-# Esecuzione diretta (sviluppo)
-cd packages/tui
-npm run dev
-
-# Oppure dopo la build
-npm run build
-classeviva-tui   # oppure: cvtui
-```
-
-Supporta le stesse variabili d'ambiente del CLI per pre-popolare le credenziali.
-
----
-
 ## 🤖 Quick Start — Bot Telegram
 
 Consulta voti, lezioni, compiti e altro direttamente da Telegram, con estrazione compiti tramite AI.
@@ -158,6 +139,10 @@ Il bot è disponibile come **addon per Home Assistant** nella cartella [`hassio-
 Aggiungere il repository `https://github.com/ebordoni/classeviva-agent-diary` nell'Add-on Store di HA.
 
 > Consulta [packages/bot/README.md](./packages/bot/README.md) per la documentazione completa.
+
+### Web UI per Home Assistant
+
+Nello stesso repository è disponibile l'add-on **Classeviva UI**: un'interfaccia web con supporto multi-account per dashboard, lezioni, voti, assenze, compiti, avvisi e bacheca. Dopo aver aggiunto il repository all'Add-on Store, configura gli account e l'eventuale provider AI nelle opzioni dell'add-on; Home Assistant la espone anche tramite Ingress.
 
 ### Installazione
 
@@ -311,8 +296,8 @@ new ClassevivaClient(studentId: string, password?: string)
 ## 🛠️ Sviluppo
 
 ```bash
-git clone https://github.com/ebordoni/classeviva-diario.git
-cd classeviva-diario
+git clone https://github.com/ebordoni/classeviva-agent-diary.git
+cd classeviva-agent-diary
 npm install
 
 # Build di tutti i package
@@ -321,13 +306,25 @@ npm run build
 # Build selettivi
 npm run build:core
 npm run build:cli
-npm run build:tui
 
 # Sviluppo con watch
 npm run dev:core
 
 # Usa il CLI in locale senza installarlo globalmente
 npm run cv -- lezioni
+```
+
+### Verifica
+
+```bash
+# Type-check dei package principali
+npm run check
+
+# Test senza credenziali né chiamate esterne
+npm test
+
+# Verifica che le copie sorgente degli add-on siano allineate
+npm run verify:addon-sources
 ```
 
 ---
@@ -338,8 +335,8 @@ npm run cv -- lezioni
 packages/
   core/        — Libreria TypeScript (@classeviva/core)
   cli/         — CLI tool (@classeviva/cli)
-  tui/         — TUI interattiva (@classeviva/tui)
-examples-ts/   — Esempi di utilizzo della libreria
+  bot/         — Bot Telegram (@classeviva/bot)
+hassio-addon/  — Add-on Home Assistant: bot e Web UI
 ```
 
 ---

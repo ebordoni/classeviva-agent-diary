@@ -40,7 +40,11 @@ export function estraiVotoTestuale(
 ): VotoTestuale | null {
   if (!note) return null;
   const upper = note.toUpperCase();
-  return VOTI_TESTUALI.find((v) => upper.includes(v)) ?? null;
+  return (
+    [...VOTI_TESTUALI]
+      .sort((a, b) => b.length - a.length)
+      .find((v) => upper.includes(v)) ?? null
+  );
 }
 
 export function isVotoSkill(v: Voto): boolean {

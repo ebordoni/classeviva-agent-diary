@@ -16,7 +16,7 @@
 | `/compiti [giorni]` | Estrai compiti con AI (default: 10 giorni, richiede `AI_API_KEY`) |
 | `/help`             | Mostra i comandi disponibili                                      |
 
-I dati vengono cachati su SQLite per ridurre le chiamate all'API di Classeviva e all'AI (TTL: lezioni/agenda 6h, voti/assenze/compiti 12h, materie 24h). Quando una risposta arriva dalla cache viene indicato con 📦.
+I dati vengono cachati in un file JSON locale per ridurre le chiamate all'API di Classeviva e all'AI (TTL: lezioni/agenda 6h, voti/assenze/compiti 12h, materie 24h). Quando una risposta arriva dalla cache viene indicato con 📦.
 
 ---
 
@@ -56,8 +56,8 @@ AI_PROVIDER=openai
 AI_MODEL=gpt-4o-mini
 AI_API_KEY=sk-...
 
-# Percorso cache SQLite (default: ./cache.db)
-CACHE_DB_PATH=./cache.db
+# Percorso cache JSON (default: ./cache.json)
+CACHE_DB_PATH=./cache.json
 ```
 
 ### 3. Avvia

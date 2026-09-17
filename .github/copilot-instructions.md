@@ -7,7 +7,7 @@ Rispondi sempre in italiano.
 ## Struttura del progetto
 
 - Monorepo TypeScript con npm workspaces
-- I package principali sono in `packages/` (core, bot, cli, tui)
+- I package principali sono in `packages/` (core, bot, cli)
 - L'addon Bot per Home Assistant è in `hassio-addon/classeviva-bot/`
   - I sorgenti Node.js dell'addon bot sono in `hassio-addon/classeviva-bot/src/`
   - I package dell'addon bot sono in `hassio-addon/classeviva-bot/src/packages/` (solo core e bot)
@@ -32,6 +32,12 @@ Quando modifichi `packages/bot/src/` sincronizza solo nell'addon bot:
 
 ```
 hassio-addon/classeviva-bot/src/packages/bot/src/
+```
+
+Prima di consegnare modifiche ai sorgenti condivisi, esegui:
+
+```bash
+npm run verify:addon-sources
 ```
 
 ### Versionamento e changelog

@@ -60,11 +60,18 @@ jobs:
           cp packages/core/tsconfig.json "$ADDON_SRC/packages/core/"
           cp -r packages/core/src/. "$ADDON_SRC/packages/core/src/"
 
+          # Il core della UI ha manifest e configurazione propri, ma il codice
+          # sorgente deve rimanere allineato alla libreria principale.
+          UI_CORE_SRC="hassio-addon/classeviva-ui/src/packages/core/src"
+          rm -rf "$UI_CORE_SRC"
+          mkdir -p "$UI_CORE_SRC"
+          cp -r packages/core/src/. "$UI_CORE_SRC/"
+
       - name: Commit and push if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add hassio-addon/classeviva-bot/src/
+          git add hassio-addon/classeviva-bot/src/ hassio-addon/classeviva-ui/src/packages/core/src/
           if git diff --cached --quiet; then
             echo "Nessuna modifica da committare."
           else

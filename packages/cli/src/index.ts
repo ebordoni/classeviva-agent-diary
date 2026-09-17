@@ -67,7 +67,7 @@ Configurazione:
   Le credenziali vengono salvate in: ~/.classeviva/config.json
   Oppure usa variabili d'ambiente: CLASSEVIVA_STUDENT_ID, CLASSEVIVA_PASSWORD
 
-Per maggiori informazioni: https://github.com/ebordoni/classeviva-diario
+Per maggiori informazioni: https://github.com/ebordoni/classeviva-agent-diary
 `,
 );
 

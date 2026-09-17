@@ -7,6 +7,17 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.11.1] — 2026-09-17
+
+### Corretto
+
+- **Addon `classeviva-ui` v1.7.1**: il riconoscimento dei giudizi testuali ora privilegia "gravemente insufficiente" rispetto al giudizio generico "insufficiente".
+
+### Sviluppo
+
+- Aggiunti test senza dipendenze esterne, type-check ripetibile, verifica dell'allineamento dei sorgenti add-on e workflow CI per test e build delle immagini Docker.
+- Allineata la documentazione alla struttura corrente: nessuna TUI distribuita e cache del bot in file JSON.
+
 ## [1.11.0] — 2026-09-15
 
 ### Aggiunto

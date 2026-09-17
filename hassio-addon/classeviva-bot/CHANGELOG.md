@@ -1,3 +1,8 @@
+## 1.10.0 — 2026-09-17
+
+- Il digest giornaliero ora considera le estrazioni degli ultimi 31 giorni (configurabile con `daily_digest_days`) e invia solo i compiti con scadenza odierna, futura o non indicata.
+- Compiti scaduti esclusi da Telegram e WhatsApp; messaggio vuoto reso esplicito come “Nessun compito in scadenza da oggi”.
+
 ## 1.9.1 — 2026-09-17
 
 - Corretto il fuso orario del digest: nuova opzione `time_zone` (predefinita `Europe/Rome`) e calcolo della data locale, inclusa la cache dei compiti.

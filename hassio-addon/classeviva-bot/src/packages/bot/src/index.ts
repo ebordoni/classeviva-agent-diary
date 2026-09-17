@@ -18,6 +18,7 @@ const allowedChatIds = process.env.ALLOWED_CHAT_IDS
   : [];
 
 const digestTime = process.env.DAILY_DIGEST_TIME?.trim() || undefined;
+const digestDays = parseInt(process.env.DAILY_DIGEST_DAYS ?? "31", 10);
 const whatsappPublisher = WhatsAppPublisher.fromEnvironment();
 
 const bot = buildBot(
@@ -37,6 +38,7 @@ if (digestTime) {
     process.env.AI_API_KEY,
     process.env.AI_PROVIDER,
     whatsappPublisher,
+    digestDays,
   );
   console.log(`📅 Digest giornaliero programmato alle ${digestTime}`);
 }

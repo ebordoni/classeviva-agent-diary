@@ -166,6 +166,8 @@ disattivata di default.
 
 L’opzione `time_zone` usa un identificativo IANA (predefinito `Europe/Rome`) e
 determina sia l’orario del digest sia la data dei compiti analizzati.
+`daily_digest_days` (predefinito `31`) determina quante lezioni recenti sono
+considerate; il digest invia poi solo i compiti in scadenza da oggi in avanti.
 
 Per la **UI** configura almeno un account oppure accedi dalla schermata di
 login. La configurazione può contenere più account:

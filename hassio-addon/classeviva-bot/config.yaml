@@ -1,6 +1,6 @@
 name: "Classeviva Bot"
 description: "Telegram bot per Classeviva — consulta voti, lezioni, compiti direttamente da Telegram."
-version: "1.9.1"
+version: "1.10.0"
 slug: "classeviva_bot"
 init: false
 
@@ -24,6 +24,7 @@ options:
   ai_api_key: ""
   allowed_chat_ids: ""
   daily_digest_time: ""
+  daily_digest_days: 31
   time_zone: "Europe/Rome"
   whatsapp_digest_enabled: false
   whatsapp_publisher_url: ""
@@ -36,6 +37,7 @@ schema:
   ai_api_key: str?
   allowed_chat_ids: str?
   daily_digest_time: str?
+  daily_digest_days: int(1,90)
   time_zone: str
   whatsapp_digest_enabled: bool
   whatsapp_publisher_url: str?

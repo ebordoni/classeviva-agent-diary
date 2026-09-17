@@ -1,4 +1,5 @@
 import { AIService, ClassevivaClient } from "@classeviva/core";
+import type { CompitiEstrattiResponse } from "@classeviva/core";
 import type { Telegraf } from "telegraf";
 import {
   getCompiti,
@@ -13,20 +14,52 @@ import {
 } from "./whatsappPublisher.js";
 
 function todayStr(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  return dateStr(new Date());
+}
+
+function dateStr(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function digestRange(days: number): { inizio: string; fine: string; days: number } {
+  const normalizedDays = Number.isFinite(days)
+    ? Math.min(Math.max(Math.trunc(days), 1), 90)
+    : 31;
+  const fine = new Date();
+  const inizio = new Date(fine);
+  inizio.setDate(inizio.getDate() - (normalizedDays - 1));
+  return { inizio: dateStr(inizio), fine: dateStr(fine), days: normalizedDays };
+}
+
+/** Mantiene i compiti non scaduti e quelli senza una scadenza determinata. */
+export function filterDigestHomework(
+  data: CompitiEstrattiResponse,
+  today: string,
+): CompitiEstrattiResponse {
+  const compiti = data.compiti.filter(
+    (compito) => !compito.scadenza || compito.scadenza >= today,
+  );
+  return {
+    ...data,
+    compiti,
+    metadata: { ...data.metadata, totale_compiti: compiti.length },
+  };
 }
 
 async function sendDailyDigest(
   bot: Telegraf,
   ai: AIService,
   whatsappPublisher?: WhatsAppPublisher,
+  digestDays = 31,
 ): Promise<void> {
   const chatIds = await getDigestSubscriptions();
   if (chatIds.length === 0) return;
 
   const oggi = todayStr();
-  console.log(`[scheduler] Invio digest giornaliero a ${chatIds.length} chat`);
+  const range = digestRange(digestDays);
+  console.log(
+    `[scheduler] Invio digest giornaliero a ${chatIds.length} chat (ultimi ${range.days} giorni)`,
+  );
 
   for (const chatId of chatIds) {
     const creds = await getCredentials(chatId);
@@ -39,23 +72,24 @@ async function sendDailyDigest(
     try {
       const client = new ClassevivaClient(creds.studentId, creds.password);
       await client.accedi();
-      const { data } = await getCompiti(client, oggi, oggi, ai);
+      const { data } = await getCompiti(client, range.inizio, range.fine, ai);
+      const compiti = filterDigestHomework(data, oggi);
 
-      if (data.compiti.length === 0) {
+      if (compiti.compiti.length === 0) {
         await bot.telegram.sendMessage(
           chatId,
-          "📅 <b>Digest giornaliero</b>\n\nNessun compito trovato per oggi. 🎉",
+          "📅 <b>Digest giornaliero</b>\n\nNessun compito in scadenza da oggi. 🎉",
           { parse_mode: "HTML" },
         );
       } else {
-        const corpo = formatCompiti(data);
+        const corpo = formatCompiti(compiti);
         await bot.telegram.sendMessage(
           chatId,
           `📅 <b>Digest giornaliero</b>\n\n${corpo}`,
           { parse_mode: "HTML" },
         );
 
-        const whatsappText = formatCompitiWhatsApp(data);
+        const whatsappText = formatCompitiWhatsApp(compiti);
         if (whatsappPublisher && whatsappText) {
           try {
             const parts = createWhatsAppDigestParts({
@@ -93,6 +127,7 @@ export function startScheduler(
   aiApiKey?: string,
   aiProvider?: string,
   whatsappPublisher?: WhatsAppPublisher,
+  digestDays = 31,
 ): void {
   const parts = time.split(":");
   const hour = parseInt(parts[0], 10);
@@ -131,7 +166,7 @@ export function startScheduler(
     );
 
     setTimeout(async () => {
-      await sendDailyDigest(bot, ai, whatsappPublisher);
+      await sendDailyDigest(bot, ai, whatsappPublisher, digestDays);
       scheduleNext();
     }, delay).unref();
   }

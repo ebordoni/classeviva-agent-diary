@@ -4,6 +4,23 @@ import test from "node:test";
 
 const publisher = await import("../packages/bot/dist/whatsappPublisher.js");
 const format = await import("../packages/bot/dist/format.js");
+const scheduler = await import("../packages/bot/dist/scheduler.js");
+
+test("il digest conserva solo compiti ancora aperti", () => {
+  const source = {
+    compiti: [
+      { materia: "Storia", testo: "Scaduto", data_lezione: "2026-09-10", scadenza: "2026-09-16", note: null },
+      { materia: "Italiano", testo: "Per oggi", data_lezione: "2026-09-16", scadenza: "2026-09-17", note: null },
+      { materia: "Scienze", testo: "Per domani", data_lezione: "2026-09-16", scadenza: "2026-09-18", note: null },
+      { materia: "Arte", testo: "Senza data", data_lezione: "2026-09-16", scadenza: "", note: null },
+    ],
+    metadata: { totale_compiti: 4, totale_lezioni: 31, modello_utilizzato: "test", timestamp: "" },
+  };
+  const filtered = scheduler.filterDigestHomework(source, "2026-09-17");
+  assert.deepEqual(filtered.compiti.map((compito) => compito.materia), ["Italiano", "Scienze", "Arte"]);
+  assert.equal(filtered.metadata.totale_compiti, 3);
+  assert.equal(source.metadata.totale_compiti, 4);
+});
 
 test("il digest WhatsApp è testo semplice e omette risultati vuoti o falliti", () => {
   assert.equal(

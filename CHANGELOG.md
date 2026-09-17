@@ -7,6 +7,12 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.12.0] — 2026-09-17
+
+### Modificato
+
+- **Addon `classeviva-bot` v1.10.0**: il digest giornaliero non dipende più dalle sole lezioni registrate oggi. Usa le estrazioni recenti (`daily_digest_days`, default 31) e notifica soltanto compiti non scaduti, allineandosi alla UI e al Canale WhatsApp.
+
 ## [1.11.9] — 2026-09-17
 
 ### Aggiunto

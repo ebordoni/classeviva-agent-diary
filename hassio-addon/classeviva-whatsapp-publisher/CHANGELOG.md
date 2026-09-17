@@ -1,3 +1,7 @@
+## 0.1.3 — 2026-09-17
+
+- Il pannello Ingress mostra l’endpoint interno da copiare nel Bot Telegram per configurare il digest WhatsApp senza esporre porte sulla rete locale o Internet.
+
 ## 0.1.2 — 2026-09-17
 
 - Configurazione semplificata: il bot accetta il link pubblico del Canale (`channel_url`) e ricava il JID dopo il pairing.

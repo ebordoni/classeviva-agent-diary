@@ -1,6 +1,7 @@
 import { config as loadEnv } from "dotenv";
 import { buildBot } from "./bot.js";
 import { startScheduler } from "./scheduler.js";
+import { WhatsAppPublisher } from "./whatsappPublisher.js";
 
 loadEnv();
 
@@ -17,6 +18,7 @@ const allowedChatIds = process.env.ALLOWED_CHAT_IDS
   : [];
 
 const digestTime = process.env.DAILY_DIGEST_TIME?.trim() || undefined;
+const whatsappPublisher = WhatsAppPublisher.fromEnvironment();
 
 const bot = buildBot(
   token,
@@ -34,8 +36,13 @@ if (digestTime) {
     digestTime,
     process.env.AI_API_KEY,
     process.env.AI_PROVIDER,
+    whatsappPublisher,
   );
   console.log(`📅 Digest giornaliero programmato alle ${digestTime}`);
+}
+
+if (whatsappPublisher) {
+  console.log("📣 Pubblicazione WhatsApp del digest abilitata.");
 }
 
 console.log("🤖 Classeviva Bot avviato.");

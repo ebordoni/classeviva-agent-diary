@@ -56,6 +56,10 @@ test("l'endpoint accoda solo job con firma valida", async (t) => {
   });
   assert.equal(unauthorized.status, 401);
 
+  const status = await fetch(`http://127.0.0.1:${port}/api/status`);
+  assert.equal(status.status, 200);
+  assert.match((await status.json()).publisherEndpoint, /^http:\/\/.+:8080\/api\/jobs$/);
+
   const resolved = await fetch(`http://127.0.0.1:${port}/api/channel/resolve`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

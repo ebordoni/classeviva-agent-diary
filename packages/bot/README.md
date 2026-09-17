@@ -58,6 +58,11 @@ AI_API_KEY=sk-...
 
 # Percorso cache JSON (default: ./cache.json)
 CACHE_DB_PATH=./cache.json
+
+# Pubblicazione opzionale del digest su un Canale WhatsApp
+WHATSAPP_DIGEST_ENABLED=false
+WHATSAPP_PUBLISHER_URL=http://<hostname-interno-publisher>:8080/api/jobs
+WHATSAPP_SHARED_SECRET=almeno-32-caratteri-casuali
 ```
 
 ### 3. Avvia
@@ -83,3 +88,10 @@ npm run dev
 | `AI_MODEL`           |         No          | Modello AI (default del provider se omesso)               |
 | `AI_FALLBACK_PROVIDERS` |      No          | Provider di riserva se il primario fallisce (es. `google,groq`), usano l'API key dal proprio env |
 | `CACHE_DB_PATH`      |         No          | Percorso file JSON per la cache (default: `./cache.json`) |
+| `WHATSAPP_DIGEST_ENABLED` | No | Se `true`, accoda su WhatsApp solo i compiti trovati dal digest giornaliero. |
+| `WHATSAPP_PUBLISHER_URL` | Se WhatsApp attivo | Endpoint interno `/api/jobs` mostrato dal pannello Ingress del WhatsApp Bot. |
+| `WHATSAPP_SHARED_SECRET` | Se WhatsApp attivo | Stesso segreto HMAC (almeno 32 caratteri) configurato nel WhatsApp Bot. |
+
+L’integrazione WhatsApp è disattivata per impostazione predefinita. Un errore
+del publisher viene registrato ma non interrompe il digest Telegram. I messaggi
+senza compiti e gli errori dell’estrazione AI non vengono pubblicati.

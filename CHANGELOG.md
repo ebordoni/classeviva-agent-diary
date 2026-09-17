@@ -7,6 +7,13 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.11.7] — 2026-09-17
+
+### Aggiunto
+
+- **Addon `classeviva-bot` v1.9.0**: inoltro opzionale e firmato HMAC del digest dei compiti al **Classeviva WhatsApp Bot**. Gli invii sono deduplicati, non pubblicano digest vuoti e non influenzano Telegram in caso di errore.
+- **Addon `classeviva-whatsapp-publisher` v0.1.3**: Ingress mostra l’endpoint interno corretto per collegare i due add-on.
+
 ## [1.11.6] — 2026-09-17
 
 ### Aggiunto

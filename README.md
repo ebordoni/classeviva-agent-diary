@@ -157,7 +157,12 @@ Per il **Bot** sono necessari `telegram_token` (creato con
 [@BotFather](https://t.me/BotFather)) e, solo per l'estrazione dei compiti,
 `ai_api_key`. `allowed_chat_ids` accetta una lista di ID Telegram separata da
 virgole e permette di limitare chi usa il bot; `daily_digest_time` usa il
-formato `HH:MM` e, se lasciato vuoto, disabilita il digest.
+formato `HH:MM` e, se lasciato vuoto, disabilita il digest. Per inoltrare i
+compiti trovati dal digest anche al Canale WhatsApp, configura e collega prima
+il **WhatsApp Bot**, copia dal suo Ingress l’endpoint interno in
+`whatsapp_publisher_url`, imposta lo stesso segreto in
+`whatsapp_shared_secret` e abilita `whatsapp_digest_enabled`. La funzione è
+disattivata di default.
 
 Per la **UI** configura almeno un account oppure accedi dalla schermata di
 login. La configurazione può contenere più account:
@@ -178,7 +183,7 @@ avvisi e bacheca; l'add-on è raggiungibile dal pannello laterale tramite
 Ingress oppure direttamente sulla porta configurata `8099`.
 
 > Consulta [packages/bot/README.md](./packages/bot/README.md) per i dettagli dei comandi Telegram e delle variabili disponibili.
-> Per il Bot WhatsApp sperimentale consulta [la guida dedicata](./hassio-addon/classeviva-whatsapp-publisher/README.md): non è collegato automaticamente al bot Telegram e usa un client WhatsApp non ufficiale.
+> Per il Bot WhatsApp sperimentale consulta [la guida dedicata](./hassio-addon/classeviva-whatsapp-publisher/README.md): usa un client WhatsApp non ufficiale e pubblica solo dopo un opt-in esplicito nel Bot Telegram.
 
 ### Installazione
 

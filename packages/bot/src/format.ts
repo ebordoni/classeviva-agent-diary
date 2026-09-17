@@ -197,3 +197,24 @@ export function formatCompiti(resp: CompitiEstrattiResponse): string {
   }
   return lines.join("\n");
 }
+
+/** Testo semplice per un Canale WhatsApp: non usa il markup HTML di Telegram. */
+export function formatCompitiWhatsApp(resp: CompitiEstrattiResponse): string | undefined {
+  if (resp.metadata.errore || resp.compiti.length === 0) return undefined;
+
+  const byData = new Map<string, typeof resp.compiti>();
+  for (const compito of resp.compiti) {
+    const key = compito.scadenza || "—";
+    if (!byData.has(key)) byData.set(key, []);
+    byData.get(key)!.push(compito);
+  }
+
+  const lines = [`📚 Compiti trovati (${resp.metadata.totale_compiti})`];
+  for (const [data, compiti] of [...byData.entries()].sort()) {
+    lines.push("", `🗓 ${formatDateIT(data)}`);
+    for (const compito of compiti) {
+      lines.push(`• ${compito.materia}: ${compito.testo}`);
+    }
+  }
+  return lines.join("\n");
+}

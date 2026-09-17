@@ -1,3 +1,8 @@
+## 1.9.0 — 2026-09-17
+
+- Il digest giornaliero può pubblicare anche i compiti trovati su un Canale WhatsApp tramite l’add-on separato, con firma HMAC e deduplicazione.
+- La funzione è disabilitata di default; i fallimenti di WhatsApp non interrompono l’invio su Telegram.
+
 ## 1.8.9 — 2026-09-17
 
 - Nuova icona: identifica il servizio come bot Telegram scolastico.

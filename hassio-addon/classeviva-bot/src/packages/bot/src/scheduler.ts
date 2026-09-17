@@ -6,13 +6,21 @@ import {
   getDigestSubscriptions,
   unsubscribeDigest,
 } from "./cache.js";
-import { formatCompiti } from "./format.js";
+import { formatCompiti, formatCompitiWhatsApp } from "./format.js";
+import {
+  createWhatsAppDigestParts,
+  WhatsAppPublisher,
+} from "./whatsappPublisher.js";
 
 function todayStr(): string {
   return new Date().toISOString().split("T")[0];
 }
 
-async function sendDailyDigest(bot: Telegraf, ai: AIService): Promise<void> {
+async function sendDailyDigest(
+  bot: Telegraf,
+  ai: AIService,
+  whatsappPublisher?: WhatsAppPublisher,
+): Promise<void> {
   const chatIds = await getDigestSubscriptions();
   if (chatIds.length === 0) return;
 
@@ -45,6 +53,26 @@ async function sendDailyDigest(bot: Telegraf, ai: AIService): Promise<void> {
           `📅 <b>Digest giornaliero</b>\n\n${corpo}`,
           { parse_mode: "HTML" },
         );
+
+        const whatsappText = formatCompitiWhatsApp(data);
+        if (whatsappPublisher && whatsappText) {
+          try {
+            const parts = createWhatsAppDigestParts({
+              studentId: creds.studentId,
+              date: oggi,
+              text: whatsappText,
+            });
+            for (const part of parts) await whatsappPublisher.publish(part);
+            console.log(
+              `[scheduler] Digest WhatsApp accodato per studentId=${creds.studentId} (${parts.length} messaggio/i)`,
+            );
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            console.error(
+              `[scheduler] Invio WhatsApp fallito per studentId=${creds.studentId}: ${msg}`,
+            );
+          }
+        }
       }
     } catch (err: any) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -63,6 +91,7 @@ export function startScheduler(
   time: string,
   aiApiKey?: string,
   aiProvider?: string,
+  whatsappPublisher?: WhatsAppPublisher,
 ): void {
   const parts = time.split(":");
   const hour = parseInt(parts[0], 10);
@@ -101,7 +130,7 @@ export function startScheduler(
     );
 
     setTimeout(async () => {
-      await sendDailyDigest(bot, ai);
+      await sendDailyDigest(bot, ai, whatsappPublisher);
       scheduleNext();
     }, delay).unref();
   }

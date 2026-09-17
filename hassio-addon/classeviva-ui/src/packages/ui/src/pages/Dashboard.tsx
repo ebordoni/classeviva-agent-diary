@@ -2,9 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
 import { agendaApi, assenzeApi, bachecaApi, compitiApi } from "../api.ts";
-
-// Stesso codice usato in Avvisi.tsx per riconoscere le note/avvisi in agenda.
-const AVVISO_EVTCODE = "AGNT";
+import { AVVISO_EVTCODE, defaultAvvisiRange } from "../agendaUtils.ts";
 
 export default function Dashboard() {
   const { data: assenzeData } = useQuery({
@@ -17,9 +15,10 @@ export default function Dashboard() {
     queryFn: bachecaApi.get,
   });
 
+  const avvisiRange = defaultAvvisiRange();
   const { data: agendaData } = useQuery({
-    queryKey: ["agenda-dashboard"],
-    queryFn: () => agendaApi.get(),
+    queryKey: ["agenda", avvisiRange.inizio, avvisiRange.fine],
+    queryFn: () => agendaApi.get(avvisiRange),
   });
 
   const { data: compitiData } = useQuery({

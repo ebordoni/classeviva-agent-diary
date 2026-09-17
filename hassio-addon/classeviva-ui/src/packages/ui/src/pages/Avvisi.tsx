@@ -3,27 +3,10 @@ import { format, parseISO } from "date-fns";
 import { it } from "date-fns/locale";
 import { useState } from "react";
 import { agendaApi } from "../api.ts";
-
-// Codice evento Classeviva per gli avvisi/note generali in agenda (agendav2).
-// NOTA: non documentato ufficialmente, dedotto dai dati osservati — se non
-// corrisponde a quanto mostrato come "Avvisi" nell'app ufficiale, va aggiornato qui.
-const AVVISO_EVTCODE = "AGNT";
-
-function toDateInput(d: Date) {
-  return d.toISOString().split("T")[0]!;
-}
-
-function defaultRange() {
-  const oggi = new Date();
-  const indietro7 = new Date(oggi);
-  indietro7.setDate(oggi.getDate() - 7);
-  const avanti30 = new Date(oggi);
-  avanti30.setDate(oggi.getDate() + 30);
-  return { inizio: toDateInput(indietro7), fine: toDateInput(avanti30) };
-}
+import { AVVISO_EVTCODE, defaultAvvisiRange } from "../agendaUtils.ts";
 
 export default function Avvisi() {
-  const [range, setRange] = useState(defaultRange);
+  const [range, setRange] = useState(defaultAvvisiRange);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["agenda", range.inizio, range.fine],

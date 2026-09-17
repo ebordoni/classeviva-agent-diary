@@ -1,6 +1,6 @@
 name: "Classeviva WhatsApp Bot"
 description: "Bot sperimentale: pubblica messaggi testuali su un Canale WhatsApp tramite un client non ufficiale."
-version: "0.1.1"
+version: "0.1.2"
 slug: "classeviva_whatsapp_publisher"
 init: false
 arch:
@@ -16,6 +16,7 @@ panel_title: "WhatsApp Bot"
 options:
   enabled: false
   channel_jid: ""
+  channel_url: ""
   shared_secret: ""
   max_posts_per_day: 10
   min_interval_minutes: 5
@@ -24,6 +25,7 @@ options:
 schema:
   enabled: bool
   channel_jid: str?
+  channel_url: str?
   shared_secret: password?
   max_posts_per_day: int(1,100)
   min_interval_minutes: int(1,1440)

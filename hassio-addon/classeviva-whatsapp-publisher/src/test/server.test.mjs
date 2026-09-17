@@ -18,7 +18,14 @@ test("l'endpoint accoda solo job con firma valida", async (t) => {
     },
   };
   const publisher = { drain: async () => {} };
-  const client = { getStatus: () => ({ status: "connected", pairingRequired: false }) };
+  const client = {
+    isReady: true,
+    getStatus: () => ({ status: "connected", pairingRequired: false }),
+    resolveNewsletterJid: async (inviteCode) => {
+      assert.equal(inviteCode, "0029VbExample");
+      return "120363012345678901@newsletter";
+    },
+  };
   const server = createPublisherServer({
     config: { enabled: true, sharedSecret: secret },
     store,
@@ -48,4 +55,12 @@ test("l'endpoint accoda solo job con firma valida", async (t) => {
     body,
   });
   assert.equal(unauthorized.status, 401);
+
+  const resolved = await fetch(`http://127.0.0.1:${port}/api/channel/resolve`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ channelUrl: "https://whatsapp.com/channel/0029VbExample" }),
+  });
+  assert.equal(resolved.status, 200);
+  assert.deepEqual(await resolved.json(), { channelJid: "120363012345678901@newsletter" });
 });

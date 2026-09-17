@@ -2,6 +2,7 @@ import makeWASocket, {
   DisconnectReason,
   useMultiFileAuthState,
 } from "@whiskeysockets/baileys";
+import { normalizeNewsletterJid } from "./newsletter.mjs";
 
 function disconnectCode(lastDisconnect) {
   return lastDisconnect?.error?.output?.statusCode ?? lastDisconnect?.error?.statusCode;
@@ -59,6 +60,13 @@ export class BaileysClient {
   async sendText(channelJid, text) {
     if (!this.isReady || !this.socket) throw new Error("WhatsApp non connesso");
     await this.socket.sendMessage(channelJid, { text });
+  }
+
+  async resolveNewsletterJid(inviteCode) {
+    if (!this.isReady || !this.socket) throw new Error("WhatsApp non connesso");
+    const metadata = await this.socket.newsletterMetadata("invite", inviteCode);
+    if (!metadata?.id) throw new Error("Canale WhatsApp non trovato");
+    return normalizeNewsletterJid(metadata.id);
   }
 
   stop() {

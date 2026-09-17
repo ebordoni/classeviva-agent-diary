@@ -16,12 +16,16 @@ Questo add-on è separato dal bot Telegram: un errore, una disconnessione o un a
 1. Aggiungi questo repository allo Store add-on di Home Assistant e installa **Classeviva WhatsApp Bot**.
 2. Lascia `enabled: false` finché non hai completato il pairing e il test del Canale.
 3. Imposta un segreto casuale di almeno 32 caratteri in `shared_secret`.
-4. Inserisci il JID del Canale in `channel_jid`, nel formato `123456789012345@newsletter`.
+4. Inserisci il link pubblico del Canale in `channel_url`, nel formato `https://whatsapp.com/channel/...`. È il metodo consigliato: il bot ricava il JID automaticamente dopo il pairing. In alternativa puoi usare `channel_jid` con un valore come `123456789012345@newsletter`; configura solo uno dei due campi.
 5. Imposta limiti prudenti, ad esempio 10 post/giorno e 5 minuti tra due invii.
 6. Abilita l'add-on, avvialo e apri il pannello **WhatsApp Bot**: il QR viene mostrato soltanto lì, tramite Ingress autenticato Home Assistant.
 7. Sul numero dedicato apri WhatsApp, vai in **Dispositivi collegati** e scansiona il QR.
 
 L'add-on memorizza coda e sessione solo nel proprio volume `/data`; un riavvio non richiede un nuovo pairing, salvo disconnessione o logout dal telefono.
+
+### Ricavare e verificare il JID
+
+Nel pannello Ingress **WhatsApp Bot**, dopo il pairing, incolla il link del Canale nella sezione **Verifica link Canale**. Il bot mostra il JID risolto senza salvare o modificare le opzioni. Se hai impostato `channel_url`, la stessa risoluzione viene eseguita automaticamente a ogni connessione e il JID attivo è visibile nel pannello.
 
 ## API interna
 

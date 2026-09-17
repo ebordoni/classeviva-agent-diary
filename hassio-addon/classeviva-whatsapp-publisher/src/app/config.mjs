@@ -1,3 +1,5 @@
+import { inviteCodeFromChannelUrl, normalizeNewsletterJid } from "./newsletter.mjs";
+
 const DEFAULTS = {
   maxPostsPerDay: 10,
   minIntervalMinutes: 5,
@@ -20,11 +22,16 @@ function parsePositiveInteger(value, name, fallback, max) {
 
 export function loadConfig(env = process.env) {
   const enabled = parseBoolean(env.PUBLISHER_ENABLED);
-  const channelJid = (env.PUBLISHER_CHANNEL_JID ?? "").trim();
+  const rawChannelJid = (env.PUBLISHER_CHANNEL_JID ?? "").trim();
+  const channelUrl = (env.PUBLISHER_CHANNEL_URL ?? "").trim();
+  const channelJid = rawChannelJid ? normalizeNewsletterJid(rawChannelJid) : undefined;
+  const channelInviteCode = channelUrl ? inviteCodeFromChannelUrl(channelUrl) : undefined;
   const sharedSecret = env.PUBLISHER_SHARED_SECRET ?? "";
   const config = {
     enabled,
     channelJid,
+    channelUrl,
+    channelInviteCode,
     sharedSecret,
     maxPostsPerDay: parsePositiveInteger(
       env.PUBLISHER_MAX_POSTS_PER_DAY,
@@ -52,8 +59,11 @@ export function loadConfig(env = process.env) {
     port: parsePositiveInteger(env.PORT, "PORT", DEFAULTS.port, 65535),
   };
 
-  if (enabled && !/^\d+@newsletter$/.test(channelJid)) {
-    throw new Error("PUBLISHER_CHANNEL_JID deve terminare con @newsletter");
+  if (enabled && !channelJid && !channelInviteCode) {
+    throw new Error("Configura PUBLISHER_CHANNEL_JID oppure PUBLISHER_CHANNEL_URL");
+  }
+  if (channelJid && channelInviteCode) {
+    throw new Error("Configura solo uno tra PUBLISHER_CHANNEL_JID e PUBLISHER_CHANNEL_URL");
   }
   if (enabled && sharedSecret.length < 32) {
     throw new Error("PUBLISHER_SHARED_SECRET deve contenere almeno 32 caratteri");

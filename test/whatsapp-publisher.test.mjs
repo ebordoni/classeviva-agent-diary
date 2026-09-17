@@ -9,6 +9,7 @@ const publisherRoot = path.resolve("hassio-addon/classeviva-whatsapp-publisher/s
 const importPublisherModule = (name) => import(pathToFileURL(path.join(publisherRoot, name)).href);
 const { createSignature, verifySignedRequest } = await importPublisherModule("auth.mjs");
 const { loadConfig } = await importPublisherModule("config.mjs");
+const { inviteCodeFromChannelUrl, normalizeNewsletterJid } = await importPublisherModule("newsletter.mjs");
 const { Publisher } = await importPublisherModule("publisher.mjs");
 const { JobStore } = await importPublisherModule("store.mjs");
 
@@ -31,7 +32,7 @@ test("la configurazione resta inattiva senza impostazioni WhatsApp", () => {
 test("la configurazione attiva richiede canale e segreto robusto", () => {
   assert.throws(
     () => loadConfig({ PUBLISHER_ENABLED: "true", PUBLISHER_SHARED_SECRET: "a".repeat(32) }),
-    /CHANNEL_JID/,
+    /CHANNEL_JID oppure PUBLISHER_CHANNEL_URL/,
   );
   assert.throws(
     () => loadConfig({
@@ -41,6 +42,20 @@ test("la configurazione attiva richiede canale e segreto robusto", () => {
     }),
     /almeno 32 caratteri/,
   );
+});
+
+test("il link pubblico del Canale viene convertito nel suo codice d'invito", () => {
+  assert.equal(inviteCodeFromChannelUrl("https://whatsapp.com/channel/0029VbExample"), "0029VbExample");
+  assert.equal(normalizeNewsletterJid("120363012345678901"), "120363012345678901@newsletter");
+  assert.throws(() => inviteCodeFromChannelUrl("https://example.com/channel/0029VbExample"), /formato/);
+
+  const config = loadConfig({
+    PUBLISHER_ENABLED: "true",
+    PUBLISHER_CHANNEL_URL: "https://whatsapp.com/channel/0029VbExample",
+    PUBLISHER_SHARED_SECRET: "s".repeat(32),
+  });
+  assert.equal(config.channelJid, undefined);
+  assert.equal(config.channelInviteCode, "0029VbExample");
 });
 
 test("la firma HMAC accetta solo il corpo e il timestamp originali", () => {

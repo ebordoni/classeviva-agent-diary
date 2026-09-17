@@ -7,6 +7,12 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.11.6] — 2026-09-17
+
+### Aggiunto
+
+- **Addon `classeviva-whatsapp-publisher` v0.1.2**: configurazione tramite link pubblico del Canale e pannello Ingress per risolvere e visualizzare il JID, senza usare il terminale.
+
 ## [1.11.5] — 2026-09-17
 
 ### Modificato

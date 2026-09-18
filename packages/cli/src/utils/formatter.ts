@@ -240,6 +240,9 @@ export function formatCompitiTable(
         `   ${chalk.gray("Materia:")}  ${chalk.cyan(compito.materia)}`,
       );
     }
+    if (compito.docente) {
+      console.log(`   ${chalk.gray("Docente:")}  ${compito.docente}`);
+    }
     console.log(`   ${chalk.gray("Assegnato:")} ${compito.data_lezione}`);
     console.log(
       `   ${chalk.gray("Scadenza:")}  ${scadenzaColor(compito.scadenza)(compito.scadenza)}`,

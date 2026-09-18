@@ -7,6 +7,14 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.12.1] — 2026-09-18
+
+### Aggiunto
+
+- **Addon `classeviva-bot` v1.10.1** e **`classeviva-ui` v1.7.5**: i compiti estratti associano il docente della lezione sorgente in modo deterministico. La UI, Telegram e WhatsApp lo mostrano accanto alla materia quando la corrispondenza è univoca; i messaggi dei bot iniziano ora con la data di invio.
+
+---
+
 ## [1.12.0] — 2026-09-17
 
 ### Modificato

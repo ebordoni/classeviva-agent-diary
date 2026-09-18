@@ -5,6 +5,24 @@ import test from "node:test";
 const publisher = await import("../packages/bot/dist/whatsappPublisher.js");
 const format = await import("../packages/bot/dist/format.js");
 const scheduler = await import("../packages/bot/dist/scheduler.js");
+const core = await import("../packages/core/dist/index.js");
+
+test("il docente è associato solo alla lezione corrispondente", () => {
+  const compiti = [
+    { materia: "Italiano", testo: "Leggere", data_lezione: "2026-09-17", scadenza: "2026-09-18", note: null },
+    { materia: "Storia", testo: "Ripassare", data_lezione: "2026-09-17", scadenza: "2026-09-18", note: null },
+  ];
+  const lezioni = [
+    { evtDate: "2026-09-17", subjectDesc: " italiano ", authorName: "Prof.ssa Rossi" },
+    { evtDate: "2026-09-17", subjectDesc: "Storia", authorName: "Prof. Bianchi" },
+    { evtDate: "2026-09-17", subjectDesc: "Storia", authorName: "Prof.ssa Verdi" },
+  ];
+
+  const enriched = core.associaDocentiAiCompiti(compiti, lezioni);
+  assert.equal(enriched[0].docente, "Prof.ssa Rossi");
+  assert.equal(enriched[1].docente, undefined);
+  assert.equal(compiti[0].docente, undefined);
+});
 
 test("il digest conserva solo compiti ancora aperti", () => {
   const source = {
@@ -31,12 +49,18 @@ test("il digest WhatsApp è testo semplice e omette risultati vuoti o falliti", 
     undefined,
   );
 
-  const text = format.formatCompitiWhatsApp({
-    compiti: [{ materia: "Matematica", testo: "Esercizi 1-5", data_lezione: "2026-09-17", scadenza: "2026-09-18", note: null }],
+  const compiti = {
+    compiti: [{ materia: "Matematica", docente: "Prof. Neri", testo: "Esercizi 1-5", data_lezione: "2026-09-17", scadenza: "2026-09-18", note: null }],
     metadata: { totale_compiti: 1, totale_lezioni: 1, modello_utilizzato: "test", timestamp: "" },
-  });
-  assert.match(text, /Matematica: Esercizi 1-5/);
+  };
+  const text = format.formatCompitiWhatsApp(compiti);
+  assert.match(text, /^📅 Compiti — /);
+  assert.match(text, /Matematica · Prof\. Neri: Esercizi 1-5/);
   assert.doesNotMatch(text, /<b>|<i>/);
+
+  const telegram = format.formatCompiti(compiti);
+  assert.match(telegram, /^📅 <b>Compiti — /);
+  assert.match(telegram, /<b>Matematica<\/b> · <i>Prof\. Neri<\/i>/);
 });
 
 test("le parti del digest rispettano il limite e hanno ID ripetibili", () => {

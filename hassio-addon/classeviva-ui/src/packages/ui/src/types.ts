@@ -106,6 +106,7 @@ export interface MaterieResponse {
 export interface CompitoEstratto {
   testo: string;
   materia: string;
+  docente?: string;
   data_lezione: string;
   scadenza: string;
   note?: string;

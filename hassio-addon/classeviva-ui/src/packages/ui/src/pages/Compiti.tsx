@@ -200,6 +200,11 @@ export default function Compiti() {
                     >
                       <p className="text-xs font-semibold text-indigo-600 mb-0.5">
                         {c.materia}
+                        {c.docente && (
+                          <span className="font-normal text-gray-500">
+                            {" "}· {c.docente}
+                          </span>
+                        )}
                       </p>
                       <p className="text-sm text-gray-800">{c.testo}</p>
                       {c.note && (

@@ -123,7 +123,10 @@ export default function Dashboard() {
                   {format(parseISO(c.data_lezione), "d MMM", { locale: it })}
                 </span>
                 <div>
-                  <p className="text-xs text-gray-400 mb-0.5">{c.materia}</p>
+                  <p className="text-xs text-gray-400 mb-0.5">
+                    {c.materia}
+                    {c.docente && ` · ${c.docente}`}
+                  </p>
                   <p className="text-sm text-gray-800">{c.testo}</p>
                   {c.note && (
                     <p className="text-xs text-gray-500 mt-0.5">{c.note}</p>

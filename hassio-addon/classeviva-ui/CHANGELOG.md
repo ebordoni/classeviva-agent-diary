@@ -1,3 +1,7 @@
+## 1.7.5 — 2026-09-18
+
+- Nei compiti estratti, il docente della lezione sorgente è mostrato accanto alla materia quando l'associazione è univoca.
+
 ## 1.7.4 — 2026-09-17
 
 - Nuova icona: identifica l'add-on come dashboard grafica del registro.

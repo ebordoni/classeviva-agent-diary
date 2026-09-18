@@ -1,4 +1,4 @@
-export { AIService } from "./client/AIService.js";
+export { AIService, associaDocentiAiCompiti } from "./client/AIService.js";
 export { ClassevivaClient } from "./client/ClassevivaClient.js";
 export { ListaUtenti, type UtenteConfig } from "./client/ListaUtenti.js";
 export { OllamaService } from "./client/OllamaService.js";

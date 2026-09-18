@@ -18,6 +18,15 @@
 
 I dati vengono cachati in un file JSON locale per ridurre le chiamate all'API di Classeviva e all'AI (TTL: lezioni/agenda 6h, voti/assenze/compiti 12h, materie 24h). Quando una risposta arriva dalla cache viene indicato con 📦.
 
+Nei compiti estratti il docente viene associato direttamente alla lezione
+originaria (data e materia), senza delegarlo all'AI. I messaggi Telegram e i
+digest WhatsApp iniziano con la data di invio e mostrano il docente accanto alla
+materia quando l'associazione è univoca.
+
+Dopo l'aggiornamento, una prima esecuzione di `/compiti` completa anche i
+risultati già in cache interrogando solo le lezioni sorgenti: non avvia una
+nuova estrazione AI.
+
 ---
 
 ## Privacy e sicurezza

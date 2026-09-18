@@ -38,6 +38,10 @@ function formatDateIT(dateStr: string): string {
   return `${GIORNI_IT[d.getDay()]} ${d.getDate()} ${MESI_IT[d.getMonth()]}`;
 }
 
+function dataLocale(now = new Date()): string {
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+}
+
 export function formatLezioni(resp: LezioniResponse): string {
   if (!resp.lessons.length) return "Nessuna lezione trovata.";
 
@@ -169,8 +173,7 @@ export function formatCompiti(resp: CompitiEstrattiResponse): string {
   if (!resp.compiti.length)
     return "Nessun compito trovato nelle lezioni analizzate.";
 
-  const now = new Date();
-  const oggi = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const oggi = dataLocale();
   const SEP = "──────────────────";
 
   const byData = new Map<string, typeof resp.compiti>();
@@ -181,6 +184,7 @@ export function formatCompiti(resp: CompitiEstrattiResponse): string {
   }
 
   const lines: string[] = [
+    `📅 <b>Compiti — ${e(formatDateIT(oggi))}</b>`,
     `📚 <b>Compiti trovati (${resp.metadata.totale_compiti})</b>`,
   ];
 
@@ -191,7 +195,9 @@ export function formatCompiti(resp: CompitiEstrattiResponse): string {
     lines.push(SEP);
     for (let i = 0; i < compiti.length; i++) {
       const c = compiti[i];
-      lines.push(`<b>${e(c.materia)}</b>`);
+      lines.push(
+        `<b>${e(c.materia)}</b>${c.docente ? ` · <i>${e(c.docente)}</i>` : ""}`,
+      );
       lines.push(e(c.testo));
       if (i < compiti.length - 1) lines.push("");
     }
@@ -210,11 +216,16 @@ export function formatCompitiWhatsApp(resp: CompitiEstrattiResponse): string | u
     byData.get(key)!.push(compito);
   }
 
-  const lines = [`📚 Compiti trovati (${resp.metadata.totale_compiti})`];
+  const lines = [
+    `📅 Compiti — ${formatDateIT(dataLocale())}`,
+    `📚 Compiti trovati (${resp.metadata.totale_compiti})`,
+  ];
   for (const [data, compiti] of [...byData.entries()].sort()) {
     lines.push("", `🗓 ${formatDateIT(data)}`);
     for (const compito of compiti) {
-      lines.push(`• ${compito.materia}: ${compito.testo}`);
+      lines.push(
+        `• ${compito.materia}${compito.docente ? ` · ${compito.docente}` : ""}: ${compito.testo}`,
+      );
     }
   }
   return lines.join("\n");

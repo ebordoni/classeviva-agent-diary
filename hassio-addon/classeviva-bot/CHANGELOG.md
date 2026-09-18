@@ -1,3 +1,8 @@
+## 1.10.1 — 2026-09-18
+
+- Ogni compito estratto conserva il docente della lezione sorgente quando data e materia coincidono in modo univoco.
+- I messaggi Telegram e WhatsApp mostrano il docente accanto alla materia e iniziano con la data di invio.
+
 ## 1.10.0 — 2026-09-17
 
 - Il digest giornaliero ora considera le estrazioni degli ultimi 31 giorni (configurabile con `daily_digest_days`) e invia solo i compiti con scadenza odierna, futura o non indicata.

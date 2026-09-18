@@ -19,6 +19,7 @@ import { z } from "zod";
 import type {
   AIProvider,
   AIServiceOptions,
+  CompitoEstratto,
   CompitiEstrattiResponse,
   Lezione,
   LezioniResponse,
@@ -66,6 +67,43 @@ interface LezionePerPrompt {
   data: string;
   giorno_settimana: string;
   argomento: string;
+}
+
+/**
+ * Collega ogni compito alla lezione originaria, senza chiedere al modello AI di
+ * ricostruire o inventare il docente. Il confronto tollera maiuscole e spazi
+ * diversi nel nome della materia, ma non assegna un docente se non c'è una
+ * corrispondenza certa per data e materia.
+ */
+export function associaDocentiAiCompiti(
+  compiti: CompitoEstratto[],
+  lezioni: Lezione[],
+): CompitoEstratto[] {
+  const normalizza = (valore: string) =>
+    valore.trim().replace(/\s+/g, " ").toLocaleLowerCase("it-IT");
+  const chiaveLezione = (data: string, materia: string) =>
+    `${data}\u0000${normalizza(materia)}`;
+  const docentiPerLezione = new Map<string, Set<string>>();
+
+  for (const lezione of lezioni) {
+    const docente = lezione.authorName?.trim();
+    if (!docente) continue;
+    const chiave = chiaveLezione(lezione.evtDate, lezione.subjectDesc);
+    const docenti = docentiPerLezione.get(chiave) ?? new Set<string>();
+    docenti.add(docente);
+    docentiPerLezione.set(chiave, docenti);
+  }
+
+  return compiti.map((compito) => {
+    if (compito.docente?.trim()) return compito;
+    const docenti = docentiPerLezione.get(
+      chiaveLezione(compito.data_lezione, compito.materia),
+    );
+    // Se due docenti hanno la stessa materia nello stesso giorno, non è
+    // possibile attribuire il compito in modo affidabile: non mostriamo nulla.
+    if (!docenti || docenti.size !== 1) return compito;
+    return { ...compito, docente: [...docenti][0] };
+  });
 }
 
 /** Verifica che una stringa sia una data YYYY-MM-DD reale (non "2025-02-30" ecc.). */
@@ -216,11 +254,16 @@ ${lezioniJSON}`;
           return true;
         });
 
+        const compitiConDocente = associaDocentiAiCompiti(
+          compitiValidati,
+          lezioniResponse.lessons,
+        );
+
         return {
-          compiti: compitiValidati,
+          compiti: compitiConDocente,
           metadata: {
             totale_lezioni: lezioniResponse.lessons.length,
-            totale_compiti: compitiValidati.length,
+            totale_compiti: compitiConDocente.length,
             modello_utilizzato: `${candidato.provider}/${candidato.model}`,
             timestamp: new Date().toISOString(),
           },

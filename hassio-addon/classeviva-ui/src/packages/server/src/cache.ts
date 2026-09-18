@@ -7,7 +7,11 @@ import type {
   MaterieResponse,
   VotiResponse,
 } from "@classeviva/core";
-import { AIService, ClassevivaClient } from "@classeviva/core";
+import {
+  AIService,
+  associaDocentiAiCompiti,
+  ClassevivaClient,
+} from "@classeviva/core";
 import Keyv from "keyv";
 import { FileStore } from "./fileStore.js";
 
@@ -134,6 +138,48 @@ export async function getCompiti(
     ),
   );
 
+  // Le entry create prima dell'aggiunta del docente sono compatibili, ma non
+  // possono mostrarlo. Al primo utilizzo le completiamo dalle lezioni originali
+  // senza consumare una nuova chiamata AI. Un eventuale errore non invalida la
+  // cache già disponibile.
+  const cachedDaAggiornare = cached.filter(
+    (entry) =>
+      entry.value &&
+      !entry.value.metadata.errore &&
+      !entry.value.metadata.docenti_associati,
+  );
+  if (cachedDaAggiornare.length > 0) {
+    try {
+      const lezioniCache = await client.lezioniDaA(
+        cachedDaAggiornare[0]!.date,
+        cachedDaAggiornare[cachedDaAggiornare.length - 1]!.date,
+      );
+      await Promise.all(
+        cachedDaAggiornare.map(async (entry) => {
+          const precedente = entry.value!;
+          const aggiornato: CompitiEstrattiResponse = {
+            ...precedente,
+            compiti: associaDocentiAiCompiti(
+              precedente.compiti,
+              lezioniCache.lessons,
+            ),
+            metadata: { ...precedente.metadata, docenti_associati: true },
+          };
+          entry.value = aggiornato;
+          await store.set(
+            key("compiti_giorno", client.datiUtente!.id, entry.date),
+            aggiornato,
+            entry.date < oggi ? 30 * 24 * 60 * 60 * 1000 : 4 * 60 * 60 * 1000,
+          );
+        }),
+      );
+    } catch (err) {
+      console.warn(
+        `[cache] Impossibile associare i docenti alla cache esistente: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
   const hitDates = cached.filter((c) => c.value !== undefined);
   const missDates = cached
     .filter((c) => c.value === undefined)
@@ -151,7 +197,11 @@ export async function getCompiti(
     const aiResult = hasLessons ? await ai.estraiCompiti(lezioni) : null;
 
     const compitiByDate = new Map<string, CompitoEstratto[]>();
-    for (const c of aiResult?.compiti ?? []) {
+    const compitiConDocente = associaDocentiAiCompiti(
+      aiResult?.compiti ?? [],
+      lezioni.lessons,
+    );
+    for (const c of compitiConDocente) {
       const d = c.data_lezione || missInizio!;
       if (!compitiByDate.has(d)) compitiByDate.set(d, []);
       compitiByDate.get(d)!.push(c);
@@ -177,6 +227,7 @@ export async function getCompiti(
           totale_compiti: dayCompiti.length,
           modello_utilizzato: aiResult?.metadata.modello_utilizzato ?? "",
           timestamp: new Date().toISOString(),
+          docenti_associati: true,
           ...(aiResult?.metadata.errore && { errore: aiResult.metadata.errore }),
         },
       };

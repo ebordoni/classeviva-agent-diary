@@ -68,6 +68,12 @@ classeviva lezioni --help
 ### Comando `compiti` (AI)
 
 Estrae automaticamente i compiti dal testo delle lezioni usando AI.
+Ogni compito conserva anche il docente della lezione che lo ha assegnato, quando
+la corrispondenza tra data e materia è univoca; i messaggi dei bot riportano
+inoltre la data di invio all'inizio del digest.
+Per arricchire i compiti estratti prima di questo aggiornamento, esegui una
+volta l'estrazione: viene consultata la lezione sorgente, senza una nuova
+richiesta al provider AI.
 
 ```bash
 classeviva compiti                              # Ultimi 10 giorni, per data (default)

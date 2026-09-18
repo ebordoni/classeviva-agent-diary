@@ -409,6 +409,8 @@ export interface AIServiceOptions {
 export interface CompitoEstratto {
   testo: string;
   materia: string;
+  /** Docente della lezione da cui è stato estratto il compito, se disponibile. */
+  docente?: string;
   data_lezione: string;
   scadenza: string;
   note: string | null;
@@ -421,6 +423,8 @@ export interface CompitiEstrattiResponse {
     totale_compiti: number;
     modello_utilizzato: string;
     timestamp: string;
+    /** Indica che il docente è stato associato anche alle entry di cache storiche. */
+    docenti_associati?: boolean;
     /** Presente se l'estrazione AI è fallita: i compiti restituiti sono vuoti/parziali */
     errore?: string;
   };

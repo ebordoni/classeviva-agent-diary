@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "ClasseViva — prova login mobile",
+  "version": "0.1.0",
+  "description": "Invia su richiesta il token del callback mobile al test locale sul PC. Nessuna credenziale salvata.",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["http://127.0.0.1/*"],
+  "action": {
+    "default_title": "Prova il token mobile su questo PC",
+    "default_popup": "popup.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src http://127.0.0.1:18765"
+  }
+}

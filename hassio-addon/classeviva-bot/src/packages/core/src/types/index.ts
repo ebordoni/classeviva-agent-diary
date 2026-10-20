@@ -11,6 +11,17 @@ export interface ClassevivaConfig {
   timeout?: number;
 }
 
+/** Credenziali sensibili: esportazione esplicita, nessuna persistenza nel core. */
+export interface SessioneSpid {
+  version: 1;
+  ident: string;
+  paToken: string;
+  accessToken: string;
+  refreshToken: string;
+  /** Scadenza del token di accesso, millisecondi Unix, restituita dal server. */
+  expiresAt: number;
+}
+
 // ============================================================================
 // AUTH — risposta di AuthApi4.php?a=aLoginPwd
 // ============================================================================
@@ -64,6 +75,10 @@ export interface WhoAmI {
   email: string | null;
   schoolpass: string;
 }
+
+/** Le API mobile non forniscono tutti i metadati del whoami web. */
+export type IdentitaUtente = Pick<WhoAmI, "id" | "account_type" | "nome" | "cognome"> &
+  Partial<Omit<WhoAmI, "id" | "account_type" | "nome" | "cognome">>;
 
 // ============================================================================
 // CARD — GET /rest/w1/students/{studentId}/card

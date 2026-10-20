@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosInstance } from "axios";
+import axios, { AxiosError, AxiosInstance, type AxiosResponse } from "axios";
 import type {
   AgendaResponse,
   AssenzeResponse,
@@ -11,15 +11,19 @@ import type {
   DidatticaResponse,
   ElementiDidatticaResponse,
   FunctionsResponse,
+  IdentitaUtente,
   LezioniResponse,
   LibrettoWebConf,
   MaterieResponse,
   NoteResponse,
   PeriodiResponse,
+  SessioneSpid,
   VotiResponse,
   WhoAmI,
 } from "../types/index.js";
 import {
+  AccessoSpidRichiesto,
+  FunzionalitaNonDisponibile,
   NonAccesso,
   PasswordNonValida,
   sollevaErroreHTTP,
@@ -33,16 +37,18 @@ import {
   toRestDate,
   validaDate,
 } from "../utils/helpers.js";
+import { SpidSession, studentIdFromIdent } from "./SpidSession.js";
 
 export class ClassevivaClient {
   private userId: string;
   private password?: string;
   private auth4Data?: Auth4Response;
-  private whoAmIData?: WhoAmI;
+  private whoAmIData?: IdentitaUtente;
   private numericStudentId?: string;
   private sessionCookie?: string;
   private axiosInstance: AxiosInstance;
   private loginTimestamp?: number;
+  #spid?: SpidSession;
 
   constructor(userId: string, password?: string, config?: ClassevivaConfig) {
     this.userId = userId;
@@ -89,6 +95,45 @@ export class ClassevivaClient {
     );
   }
 
+  /** Scambia il PA ottenuto dal login ufficiale. Non apre SPID/CIE né salva token. */
+  static async accediConSpid(paToken: string, config?: ClassevivaConfig): Promise<ClassevivaClient> {
+    const session = await SpidSession.login(paToken, config);
+    return this.fromSpid(session, config);
+  }
+
+  /** Ripristina e verifica una sessione; il chiamante gestisce l'eventuale persistenza. */
+  static async daSessioneSpid(session: SessioneSpid, config?: ClassevivaConfig): Promise<ClassevivaClient> {
+    return this.fromSpid(SpidSession.restore(session, config), config);
+  }
+
+  private static async fromSpid(session: SpidSession, config?: ClassevivaConfig): Promise<ClassevivaClient> {
+    const client = new ClassevivaClient(session.ident, undefined, config);
+    client.#spid = session;
+    client.numericStudentId = studentIdFromIdent(session.ident);
+    const { card } = await client.card();
+    if (!card || card.ident !== session.ident || typeof card.firstName !== "string" ||
+        typeof card.lastName !== "string") {
+      throw new NonAccesso("Profilo della sessione SPID/CIE non corrispondente.");
+    }
+    client.whoAmIData = { id: client.numericStudentId, account_type: session.ident[0].toUpperCase(),
+      nome: card.firstName, cognome: card.lastName, sede_codice: card.schCode,
+      data_nascita: card.birthDate, codice_fisc: card.fiscalCode };
+    return client;
+  }
+
+  /** Contiene credenziali sensibili. Restituisce una copia, solo su richiesta esplicita. */
+  esportaSessioneSpid(): SessioneSpid | undefined { return this.#spid?.export(); }
+
+  private read<T>(webPath: string, mobilePath?: string): Promise<AxiosResponse<T>> {
+    if (!this.#spid) return this.axiosInstance.get<T>(webPath);
+    if (!mobilePath) throw new FunzionalitaNonDisponibile();
+    return this.#spid.get<T>(mobilePath);
+  }
+
+  private requireWeb(): void {
+    if (this.#spid) throw new FunzionalitaNonDisponibile();
+  }
+
   // ============================================================================
   // AUTH
   // Login tramite AuthApi4.php (endpoint del vecchio portale PHP),
@@ -96,6 +141,11 @@ export class ClassevivaClient {
   // ============================================================================
 
   async accedi(password?: string): Promise<void> {
+    if (this.#spid) {
+      if (password !== undefined) throw new PasswordNonValida("La sessione SPID/CIE non usa una password.");
+      await this.#spid.renew();
+      return;
+    }
     const pwd = password ?? this.password;
     if (!pwd) throw new PasswordNonValida();
 
@@ -177,11 +227,13 @@ export class ClassevivaClient {
   }
 
   get connesso(): boolean {
+    if (this.#spid) return this.#spid.connected;
     if (!this.sessionCookie || !this.loginTimestamp) return false;
     return (Date.now() - this.loginTimestamp) / 1000 < TEMPO_CONNESSIONE;
   }
 
   private verificaConnessione(): void {
+    if (this.#spid && !this.#spid.connected) throw new AccessoSpidRichiesto();
     if (!this.connesso) throw new NonAccesso();
   }
 
@@ -193,7 +245,7 @@ export class ClassevivaClient {
   // DATI UTENTE
   // ============================================================================
 
-  get datiUtente(): WhoAmI | undefined {
+  get datiUtente(): IdentitaUtente | undefined {
     return this.whoAmIData;
   }
 
@@ -219,7 +271,8 @@ export class ClassevivaClient {
 
   async card(): Promise<CardResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<CardResponse>(
+    const r = await this.read<CardResponse>(
+      `/students/${this.sid}/card`,
       `/students/${this.sid}/card`,
     );
     return r.data;
@@ -227,7 +280,7 @@ export class ClassevivaClient {
 
   async functions(): Promise<FunctionsResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<FunctionsResponse>(
+    const r = await this.read<FunctionsResponse>(
       `/students/${this.sid}/_functions`,
     );
     return r.data;
@@ -239,7 +292,8 @@ export class ClassevivaClient {
 
   async periodi(): Promise<PeriodiResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<PeriodiResponse>(
+    const r = await this.read<PeriodiResponse>(
+      `/students/${this.sid}/periods`,
       `/students/${this.sid}/periods`,
     );
     return r.data;
@@ -251,7 +305,8 @@ export class ClassevivaClient {
 
   async materie(): Promise<MaterieResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<MaterieResponse>(
+    const r = await this.read<MaterieResponse>(
+      `/students/${this.sid}/subjects`,
       `/students/${this.sid}/subjects`,
     );
     return r.data;
@@ -263,7 +318,7 @@ export class ClassevivaClient {
 
   async voti(): Promise<VotiResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<VotiResponse>(
+    const r = await this.read<VotiResponse>(
       `/students/${this.sid}/grades26`,
     );
     return r.data;
@@ -275,7 +330,8 @@ export class ClassevivaClient {
 
   async assenze(): Promise<AssenzeResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<AssenzeResponse>(
+    const r = await this.read<AssenzeResponse>(
+      `/students/${this.sid}/absences/details/`,
       `/students/${this.sid}/absences/details/`,
     );
     return r.data;
@@ -300,7 +356,7 @@ export class ClassevivaClient {
 
   async librettoWebConf(): Promise<LibrettoWebConf> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<LibrettoWebConf>(
+    const r = await this.read<LibrettoWebConf>(
       `/students/${this.sid}/absences/librettowebconf`,
     );
     return r.data;
@@ -313,7 +369,8 @@ export class ClassevivaClient {
   async lezioniDaA(inizio: string, fine: string): Promise<LezioniResponse> {
     this.verificaConnessione();
     validaDate(inizio, fine);
-    const r = await this.axiosInstance.get<LezioniResponse>(
+    const r = await this.read<LezioniResponse>(
+      `/students/${this.sid}/lessons/${toRestDate(inizio)}/${toRestDate(fine)}`,
       `/students/${this.sid}/lessons/${toRestDate(inizio)}/${toRestDate(fine)}`,
     );
     return r.data;
@@ -345,7 +402,7 @@ export class ClassevivaClient {
   async agendaDaA(inizio: string, fine: string): Promise<AgendaResponse> {
     this.verificaConnessione();
     validaDate(inizio, fine);
-    const r = await this.axiosInstance.get<AgendaResponse>(
+    const r = await this.read<AgendaResponse>(
       `/students/${this.sid}/agendav2/all/${toRestDate(inizio)}/${toRestDate(fine)}`,
     );
     return r.data;
@@ -371,7 +428,7 @@ export class ClassevivaClient {
 
   async compiti(): Promise<CompitiResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<CompitiResponse>(
+    const r = await this.read<CompitiResponse>(
       `/students/${this.sid}/homeworks/index`,
     );
     return r.data;
@@ -383,13 +440,14 @@ export class ClassevivaClient {
 
   async note(): Promise<NoteResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<NoteResponse>(
+    const r = await this.read<NoteResponse>(
       `/students/${this.sid}/notes/all/`,
     );
     return r.data;
   }
 
   async leggiNota(eventCode: string, evtId: number): Promise<void> {
+    this.requireWeb();
     this.verificaConnessione();
     await this.axiosInstance.post(
       `/students/${this.sid}/notes/${eventCode}/${evtId}/read`,
@@ -398,13 +456,14 @@ export class ClassevivaClient {
 
   async bacheca(): Promise<BachecaResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<BachecaResponse>(
+    const r = await this.read<BachecaResponse>(
       `/students/${this.sid}/noticeboard`,
     );
     return r.data;
   }
 
   async bachecaLeggi(eventCode: string, pubId: number): Promise<ContenutoItem> {
+    this.requireWeb();
     this.verificaConnessione();
     const r = await this.axiosInstance.post<{ item: ContenutoItem }>(
       `/students/${this.sid}/noticeboard/${eventCode}/${pubId}/read/`,
@@ -414,7 +473,7 @@ export class ClassevivaClient {
 
   async didattica(): Promise<DidatticaResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<DidatticaResponse>(
+    const r = await this.read<DidatticaResponse>(
       `/students/${this.sid}/didactics`,
     );
     return r.data;
@@ -424,7 +483,7 @@ export class ClassevivaClient {
     folderId: number,
   ): Promise<ElementiDidatticaResponse> {
     this.verificaConnessione();
-    const r = await this.axiosInstance.get<ElementiDidatticaResponse>(
+    const r = await this.read<ElementiDidatticaResponse>(
       `/students/${this.sid}/didactics/${folderId}`,
     );
     return r.data;

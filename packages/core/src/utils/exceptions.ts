@@ -32,6 +32,22 @@ export class PasswordNonValida extends ClassevivaError {
   }
 }
 
+export class AccessoSpidRichiesto extends NonAccesso {
+  constructor() {
+    super("Sessione SPID/CIE non valida. Completa nuovamente l'accesso SPID/CIE.");
+    this.name = "AccessoSpidRichiesto";
+    Object.setPrototypeOf(this, AccessoSpidRichiesto.prototype);
+  }
+}
+
+export class FunzionalitaNonDisponibile extends ClassevivaError {
+  constructor() {
+    super("Questa funzione non è ancora disponibile con SPID/CIE.");
+    this.name = "FunzionalitaNonDisponibile";
+    Object.setPrototypeOf(this, FunzionalitaNonDisponibile.prototype);
+  }
+}
+
 export class FormatoNonValido extends ClassevivaError {
   constructor(message: string) {
     super(message);

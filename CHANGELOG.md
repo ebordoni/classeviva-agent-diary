@@ -7,6 +7,21 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [Unreleased]
+
+### Aggiunto
+
+- **Core 0.3.0 — prima fase SPID/CIE:** creazione e ripristino esplicito della sessione mobile, rinnovo automatico condiviso tra richieste concorrenti, nuovo tentativo dopo HTTP 401 e richiesta di login dopo rifiuto del rinnovo. Supportate lezioni per intervallo, materie, periodi, profilo e assenze, mantenendo l'estrazione dei compiti dalle lezioni.
+- Esportazione esplicita della sessione per la futura integrazione degli add-on; il core non salva credenziali su disco. Gli errori mobile non espongono token o dettagli Axios. Le funzioni mobile non ancora verificate sono segnalate come non disponibili.
+- `datiUtente` restituisce `IdentitaUtente`: ID, tipo account, nome e cognome restano disponibili; gli ulteriori metadati web sono opzionali per i profili mobile.
+
+### Sviluppo
+
+- Prova locale sperimentale per analizzare il callback SPID/CIE mobile, lo scambio del token e il rinnovo. Le credenziali sono mantenute soltanto in memoria e gli esiti non riportano token o dati del registro. Il login degli add-on resta invariato.
+- Estensione Chrome di prova per trasferire su richiesta il token dalla pagina mobile già aperta al ricevitore locale, con accesso temporaneo alla scheda e codice di collegamento monouso.
+- Diagnostica mobile aggiornata al formato `pa`/`rf` osservato nell'app Android, con scambio immediato dopo il trasferimento e rifiuto locale dei token iniziali già scaduti.
+- Verificati login CIE mobile, lettura delle lezioni e rinnovo; il rinnovo omette il vecchio header di accesso. Documentati i limiti di compatibilità con gli endpoint web e la prova del collegamento tramite ticket.
+
 ## [1.12.1] — 2026-09-18
 
 ### Aggiunto

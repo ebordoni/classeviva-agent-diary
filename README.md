@@ -388,6 +388,56 @@ npm test
 npm run verify:addon-sources
 ```
 
+### Diagnostica sperimentale SPID/CIE mobile
+
+Il core **0.3.0** supporta ora sessioni SPID/CIE mobile, rinnovo automatico e
+letture di lezioni, materie, periodi, profilo e assenze. L'interfaccia di
+collegamento negli add-on sarà aggiunta nella fase successiva. L'API del core
+e le funzioni ancora escluse sono descritte nella
+[guida SPID/CIE](./docs/spid-cie.md#fase-1-api-del-core).
+
+Il login SPID/CIE non è ancora integrato negli add-on. Per verificare lo scambio
+del token restituito dal flusso mobile ufficiale è disponibile una prova locale:
+
+```bash
+node scripts/probe-mobile-auth.mjs
+```
+
+Apri `http://127.0.0.1:18765` sullo stesso PC. Il metodo preferito per la
+prova è la piccola [estensione locale](./tools/mobile-auth-bridge/README.md):
+legge il token dalla pagina finale già aperta del
+[login mobile Spaggiari](https://web.spaggiari.eu/home/app/default/login_spid.php?mob=on),
+solo premendo il pulsante e dopo il collegamento con un codice monouso.
+Non legge cookie o credenziali CIE e non conserva token nell'estensione.
+La guida elenca i permessi e i passaggi di installazione manuale.
+Il ricevitore avvia lo scambio API appena arriva il token: quello iniziale
+osservato durante la prova dura soltanto un minuto. Le richieste diagnostiche
+usano i campi `pa` e `rf` individuati nell'app Android 5.12.9. Nella prova
+del 20 ottobre 2026 sono riusciti il login CIE, la lettura delle lezioni e il
+rinnovo dopo la scadenza del token iniziale. Gli endpoint web `w1` restano
+inaccessibili con il solo token mobile: vedi [risultati e integrazione prevista](./docs/spid-cie.md).
+
+Il modulo conserva anche l'alternativa tramite URL. Il collegamento di ritorno
+può scadere in due minuti; lo strumento verifica la scadenza prima di contattare
+Spaggiari. Il tentativo dal backend può essere rifiutato anche quando la pagina
+è aperta nel browser: il solo URL non equivale alla sessione del browser.
+
+Collegamenti e token sono credenziali temporanee: non allegarli a issue o
+chat e non versionarli. Lo strumento li gestisce in memoria, contatta solo
+gli endpoint ufficiali Spaggiari e mostra soltanto stati HTTP, struttura
+delle risposte ed esiti delle letture. Le credenziali restano in memoria
+fino alla chiusura del processo con `Ctrl+C`.
+
+È disponibile anche l'importazione di una pagina HTML già salvata. Questo
+metodo è meno affidabile: il browser può scaricare nuovamente un collegamento
+scaduto e salvare la schermata di login anziché il callback. L'eventuale file
+HTML deve restare fuori dal repository.
+
+Il pulsante **Prova rinnovo** esegue una chiamata separata quando la risposta
+contiene il refresh token riconosciuto. Il protocollo è ancora in verifica:
+una prova positiva non dimostra né la durata effettiva della sessione né la
+compatibilità con tutti gli endpoint web usati dagli add-on.
+
 ### CI e sincronizzazione degli add-on
 
 Ogni push su `main` e ogni pull request eseguono `npm ci`, il controllo di sincronizzazione, il

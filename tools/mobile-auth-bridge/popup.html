@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="it">
+  <meta charset="utf-8">
+  <title>Collega il test locale</title>
+  <link rel="stylesheet" href="popup.css">
+  <h1>Prova login mobile</h1>
+  <p>Apri la pagina Spaggiari con “loading… please wait”. Questo pulsante legge il suo token mobile e lo invia soltanto al test su questo PC.</p>
+  <label for="pairing">Codice dalla prova locale</label>
+  <input id="pairing" type="password" autocomplete="off" spellcheck="false">
+  <button id="send">Invia token al test locale</button>
+  <p>Nessun cookie o PIN letto. Nessuna credenziale salvata dall’estensione.</p>
+  <pre id="result" role="status">In attesa.</pre>
+  <script type="module" src="popup.mjs"></script>
+</html>

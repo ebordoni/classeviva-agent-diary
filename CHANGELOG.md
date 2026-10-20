@@ -17,6 +17,8 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ### Sviluppo
 
+- Modalità `--core` della prova locale: l'estensione e i pulsanti della pagina esercitano direttamente il client committato, con letture del diario e verifica del rinnovo, senza esportare credenziali.
+
 - Prova locale sperimentale per analizzare il callback SPID/CIE mobile, lo scambio del token e il rinnovo. Le credenziali sono mantenute soltanto in memoria e gli esiti non riportano token o dati del registro. Il login degli add-on resta invariato.
 - Estensione Chrome di prova per trasferire su richiesta il token dalla pagina mobile già aperta al ricevitore locale, con accesso temporaneo alla scheda e codice di collegamento monouso.
 - Diagnostica mobile aggiornata al formato `pa`/`rf` osservato nell'app Android, con scambio immediato dopo il trasferimento e rifiuto locale dei token iniziali già scaduti.

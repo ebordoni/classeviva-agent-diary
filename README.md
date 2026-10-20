@@ -400,8 +400,13 @@ Il login SPID/CIE non è ancora integrato negli add-on. Per verificare lo scambi
 del token restituito dal flusso mobile ufficiale è disponibile una prova locale:
 
 ```bash
-node scripts/probe-mobile-auth.mjs
+npm run build:core
+node scripts/probe-mobile-auth.mjs --core
 ```
+
+La pagina deve indicare **Modalità: core dell’applicativo**. In questa
+modalità login, letture e rinnovo usano `ClassevivaClient`; senza `--core`
+si eseguono le chiamate diagnostiche dirette alle API.
 
 Apri `http://127.0.0.1:18765` sullo stesso PC. Il metodo preferito per la
 prova è la piccola [estensione locale](./tools/mobile-auth-bridge/README.md):

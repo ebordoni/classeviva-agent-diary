@@ -1,5 +1,5 @@
 /** Local, memory-only diagnostic for the official mobile SPID/CIE callback.
- * Start: node scripts/probe-mobile-auth.mjs
+ * Start: node scripts/probe-mobile-auth.mjs [--core]
  * Paste the fresh official callback URL in the localhost form (or import its HTML).
  * No credentials or API response values are written to disk or console.
  */
@@ -277,10 +277,42 @@ export async function probeMobileCoverage(session, request = fetch, date = new D
   return { publicResult: { coverage }, session };
 }
 
-function page(csrf, bridgeCode) {
+async function coreReport(client) {
+  const today = new Date();
+  const start = new Date(today); start.setUTCDate(start.getUTCDate() - 6);
+  const startDate = start.toISOString().slice(0, 10);
+  const endDate = today.toISOString().slice(0, 10);
+  const [lessons, subjects, periods, absences] = await Promise.all([
+    client.lezioniDaA(startDate, endDate), client.materie(), client.periodi(), client.assenze(),
+  ]);
+  const session = client.esportaSessioneSpid();
+  return { publicResult: { engine: "@classeviva/core", paTokenMetadata: tokenMetadata(session.paToken),
+    refreshTokenMetadata: tokenMetadata(session.refreshToken),
+    core: { connected: client.connesso, identityBound: !!client.datiUtente?.id, startDate, endDate,
+      lessonsReadable: Array.isArray(lessons.lessons), lessonCount: lessons.lessons?.length ?? null,
+      subjectsReadable: Array.isArray(subjects.subjects), subjectCount: subjects.subjects?.length ?? null,
+      periodsReadable: Array.isArray(periods.periods), absencesReadable: Array.isArray(absences.events) } }, session };
+}
+
+export async function probeCoreLogin(paToken) {
+  const { ClassevivaClient } = await import("../packages/core/dist/client/ClassevivaClient.js");
+  return coreReport(await ClassevivaClient.accediConSpid(paToken));
+}
+
+export async function probeCoreRefresh(session) {
+  const { ClassevivaClient } = await import("../packages/core/dist/client/ClassevivaClient.js");
+  const client = await ClassevivaClient.daSessioneSpid(session);
+  await client.accedi();
+  const result = await coreReport(client);
+  result.publicResult.accessTokenReplaced = result.session.accessToken !== session.accessToken;
+  return result;
+}
+
+function page(csrf, bridgeCode, useCore) {
   return `<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>Prova accesso mobile ClasseViva</title><style>body{font:17px system-ui;max-width:760px;margin:48px auto;padding:0 24px;color:#182e46}button,input{font:inherit;margin:12px 0;padding:10px}pre{white-space:pre-wrap;background:#eef3f7;padding:16px}small{display:block}</style>
 <h1>Prova accesso mobile ClasseViva</h1>
+<p><strong>${useCore ? "Modalità: core dell’applicativo — accesso, letture e rinnovo tramite ClassevivaClient." : "Modalità: diagnostica diretta delle API."}</strong></p>
 <h2>Collegamento dalla pagina aperta</h2>
 <p>L’estensione di prova legge il token dalla pagina finale già aperta, senza ricaricarla. Invia il token solo a questo processo locale e solo premendo il suo pulsante.</p>
 <label for="bridge-code">Codice di collegamento monouso, valido 5 minuti</label><br>
@@ -307,7 +339,9 @@ setInterval(async()=>{if(busy)return;try{const r=await fetch('/result',{cache:'n
 </script></html>`;
 }
 
-export function createProbeServer({ port = 18765, request = fetch, now = Date.now, autoExchange = true } = {}) {
+export function createProbeServer({ port = 18765, request = fetch, now = Date.now, autoExchange = true, useCore = false } = {}) {
+  const login = useCore ? probeCoreLogin : probeLogin;
+  const refresh = useCore ? probeCoreRefresh : probeRefresh;
   const csrf = randomBytes(24).toString("hex");
   const host = `127.0.0.1:${port}`;
   const origin = `http://${host}`;
@@ -335,7 +369,7 @@ export function createProbeServer({ port = 18765, request = fetch, now = Date.no
     if (req.method === "GET" && req.url === "/") {
       bridgeCode = randomBytes(24).toString("hex");
       bridgeExpiresAt = now() + 5 * 60_000;
-      return send(200, page(csrf, bridgeCode), true);
+      return send(200, page(csrf, bridgeCode, useCore), true);
     }
     if (req.method === "GET" && req.url === "/result") return send(200, {
       ...lastResult, ...(lastResult.paTokenMetadata && pendingPaToken ? { paTokenMetadata: tokenMetadata(pendingPaToken, now()) } : {}),
@@ -367,7 +401,7 @@ export function createProbeServer({ port = 18765, request = fetch, now = Date.no
           paTokenMetadata: tokenMetadata(pendingPaToken), state: "Token ricevuto in memoria; scambio API da avviare separatamente.",
           refreshAvailable: false, retryAvailable: true };
         if (autoExchange) {
-          const result = await probeLogin(pendingPaToken, request);
+          const result = await login(pendingPaToken, request);
           session = result.session;
           lastResult = { source: "pagina aperta nel browser", tokenCaptured: true, ...result.publicResult,
             refreshAvailable: !!session?.refreshToken, retryAvailable: true };
@@ -392,21 +426,22 @@ export function createProbeServer({ port = 18765, request = fetch, now = Date.no
       if (req.url === "/probe") {
         session = null;
         if (body.callbackUrl) {
+          if (useCore) return send(400, { error: "In modalità core usa l’estensione dalla pagina finale aperta nel browser." });
           result = await probeCallback(body.callbackUrl, request);
         } else {
           let token;
           try { token = parsePaToken(body.html); } catch { return send(400, { error: "Token mobile non trovato: il file potrebbe contenere la schermata di login anziché il callback." }); }
-          result = await probeLogin(token, request);
+          result = await login(token, request);
         }
       } else if (req.url === "/retry") {
         if (!pendingPaToken) return send(400, { error: "Nessun token mobile nella memoria del processo." });
         // Diagnostic only: reload this trusted local module so protocol fixes can
         // be tested without exporting credentials or asking for another transfer.
         const protocol = await import(`${import.meta.url}?diagnostic=${Date.now()}`);
-        result = await protocol.probeLogin(pendingPaToken, request);
+        result = await protocol[useCore ? "probeCoreLogin" : "probeLogin"](pendingPaToken, request);
       } else {
         if (!session?.refreshToken) return send(400, { error: "Rinnovo non disponibile." });
-        result = await probeRefresh(session, request);
+        result = await refresh(session, request);
       }
       session = result.session;
       lastResult = { ...result.publicResult, refreshAvailable: !!session?.refreshToken, retryAvailable: !!pendingPaToken };
@@ -426,7 +461,15 @@ export function createProbeServer({ port = 18765, request = fetch, now = Date.no
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const server = createProbeServer();
-  server.listen(18765, "127.0.0.1", () => console.log("Prova locale pronta: http://127.0.0.1:18765"));
-  server.on("error", () => { console.error("Impossibile avviare la prova locale sulla porta 18765."); process.exitCode = 1; });
+  const useCore = process.argv.includes("--core");
+  let ready = true;
+  if (useCore) {
+    try { await import("../packages/core/dist/client/ClassevivaClient.js"); }
+    catch { ready = false; console.error("Core non disponibile: esegui prima npm run build:core."); process.exitCode = 1; }
+  }
+  if (ready) {
+    const server = createProbeServer({ useCore });
+    server.listen(18765, "127.0.0.1", () => console.log(`Prova locale pronta (${useCore ? "core" : "API dirette"}): http://127.0.0.1:18765`));
+    server.on("error", () => { console.error("Impossibile avviare la prova locale sulla porta 18765."); process.exitCode = 1; });
+  }
 }

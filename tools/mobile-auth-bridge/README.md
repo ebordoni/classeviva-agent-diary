@@ -24,6 +24,18 @@ L'installazione abilita temporaneamente la lettura del token della pagina
 attiva quando invochi l'estensione. Procedi solo dopo aver verificato questi
 permessi e il codice della cartella.
 
+Per provare il **core dell'applicativo** committato, dalla root esegui:
+
+```powershell
+npm run build:core
+node scripts/probe-mobile-auth.mjs --core
+```
+
+Chiudi prima un eventuale processo diagnostico precedente con `Ctrl+C`.
+La pagina mostrerà **Modalità: core dell’applicativo**. Senza `--core`, lo
+strumento usa invece le chiamate diagnostiche dirette alle API.
+L'estensione già installata funziona in entrambe le modalità.
+
 1. Avvia `node scripts/probe-mobile-auth.mjs` dalla root del repository.
 2. In Chrome apri `chrome://extensions`, attiva **Modalità sviluppatore**,
    scegli **Carica estensione non pacchettizzata** e seleziona questa cartella.
@@ -44,3 +56,16 @@ autenticazione in chat e non aggiungerli ai file del repository.
 
 Al termine puoi rimuovere l'estensione da `chrome://extensions`; arresta il
 processo locale con `Ctrl+C` per eliminare la sessione in memoria.
+
+## Esito della prova del core
+
+Completa un nuovo login CIE dal link mobile e trasferisci subito il PA con
+l'estensione. Il risultato deve riportare `engine: "@classeviva/core"` e
+`core.connected`, `core.identityBound`, `core.lessonsReadable`,
+`core.subjectsReadable`, `core.periodsReadable`, `core.absencesReadable`
+uguali a `true`. I conteggi non contengono i testi delle lezioni.
+Premi poi **Prova rinnovo**: lo strumento ripristina la sessione nel core,
+forza il rinnovo e ripete le letture. `accessTokenReplaced: true` conferma
+la sostituzione del token. Puoi ripetere la prova dopo più di un minuto
+senza eseguire un altro login CIE. La prova non comprende il login dalla
+UI Home Assistant né la conservazione della sessione dopo un riavvio.

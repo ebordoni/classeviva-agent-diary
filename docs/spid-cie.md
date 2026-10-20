@@ -122,6 +122,14 @@ derivano separatamente dalle prove reali.
 Implementata in `@classeviva/core` **0.3.0**. Non aggiunge ancora il pulsante
 di collegamento alla UI, la conservazione su disco o la riconnessione del bot.
 
+Per provarla dal browser con l'estensione già installata, eseguire
+`npm run build:core` e poi `node scripts/probe-mobile-auth.mjs --core`.
+La pagina locale deve indicare **Modalità: core dell’applicativo** e
+l'esito `engine: "@classeviva/core"`. La
+[guida dell'estensione](../tools/mobile-auth-bridge/README.md) descrive
+accesso CIE, trasferimento e prova del rinnovo. Questa modalità usa il
+client compilato dalla working copy, senza richiedere token nella console.
+
 ```ts
 import { ClassevivaClient } from "@classeviva/core";
 

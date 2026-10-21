@@ -36,6 +36,7 @@ function AppRoutes() {
     return () => window.removeEventListener("classeviva:login-required", expired);
   }, [navigate, queryClient]);
   const addAccount =
+    new URLSearchParams(location.search).get("addAccount") === "1" ||
     (location.state as { addAccount?: boolean } | null)?.addAccount === true;
   const { data, isLoading } = useQuery({
     queryKey: ["me"],

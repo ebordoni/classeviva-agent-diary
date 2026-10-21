@@ -31,6 +31,20 @@ Se la UI era già aperta durante l’installazione, ricaricala prima di abilitar
 l’estensione. Per aggiungere un profilo da un diario già aperto usa
 **Aggiungi account** nella barra superiore.
 
+### Collegare due figli o account
+
+Ogni login SPID/CIE collega il solo profilo selezionato su Spaggiari. Per
+aggiungere il secondo, dal diario premi **Aggiungi account**, avvia l’accesso
+SPID/CIE e seleziona l’altro figlio nella pagina Spaggiari. Puoi usare la stessa
+identità SPID/CIE se entrambi i profili sono associati ad essa.
+
+Il primo account rimane salvato: dopo il secondo collegamento passa da un
+profilo all’altro tramite gli avatar nella barra superiore, senza rifare il
+login finché le rispettive sessioni sono valide. Se selezioni nuovamente lo
+stesso profilo ne aggiorni il collegamento, senza creare un secondo account.
+Per collegare il nuovo profilo usa Chrome sul PC con l’estensione già abilitata;
+poi entrambi saranno disponibili anche da iPhone.
+
 ### Accesso
 
 La versione 2.1.1 con estensione 1.0.1 corregge l’interruzione sulla scelta

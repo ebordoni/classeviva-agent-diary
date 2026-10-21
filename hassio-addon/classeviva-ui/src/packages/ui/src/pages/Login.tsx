@@ -36,6 +36,10 @@ export default function Login({ accounts, forceNew = false }: { accounts: Accoun
     <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 w-full max-w-lg space-y-6">
       <div className="text-center"><span className="text-5xl">🏫</span><h1 className="text-2xl font-bold mt-3 text-gray-900">Classeviva</h1><p className="text-sm text-gray-500 mt-1">{forceNew ? "Collega un altro account" : "Accedi al registro"}</p></div>
       {(error || location.state?.error) && <p role="alert" className="bg-red-50 text-red-700 text-sm p-3 rounded-lg">{error || location.state.error}</p>}
+      {forceNew && <section className="rounded-lg bg-indigo-50 text-indigo-900 p-3 text-sm space-y-2">
+        <p>Per collegare un secondo figlio, premi «Accedi con SPID / CIE» e seleziona il suo profilo nella pagina Spaggiari. Puoi usare la stessa identità SPID/CIE se dà accesso a entrambi i figli.</p>
+        <p>Gli account già salvati restano disponibili. Dopo il collegamento potrai passare da un account all’altro dagli avatar in alto.</p>
+      </section>}
       {!forceNew && accounts.length > 0 && <section className="space-y-3">
         <h2 className="text-sm font-semibold text-gray-700">Account salvati</h2>
         {accounts.map(a => <div key={a.studentId} className="border rounded-lg p-3 flex gap-3 items-center">

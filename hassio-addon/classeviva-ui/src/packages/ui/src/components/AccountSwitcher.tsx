@@ -46,7 +46,7 @@ export default function AccountSwitcher({
   if (accounts.length === 0) return null;
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center justify-end gap-3 ml-auto max-w-full" role="group" aria-label="Account del registro">
       {accounts.map((a) => {
         const isActive = a.studentId === activeStudentId;
         return (
@@ -55,6 +55,7 @@ export default function AccountSwitcher({
             onClick={() => onSwitch(a.studentId)}
             disabled={switching}
             title={a.nome ?? a.studentId}
+            aria-label={`Apri account ${a.nome || a.studentId}`}
             aria-pressed={isActive}
             className={[
               "flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold text-white shrink-0 transition-all disabled:opacity-60",
@@ -70,10 +71,12 @@ export default function AccountSwitcher({
       })}
       <button
         onClick={onAddAccount}
+        disabled={switching}
         title="Aggiungi account"
-        className="flex items-center justify-center w-9 h-9 rounded-full border-2 border-dashed border-gray-300 text-gray-400 hover:border-indigo-400 hover:text-indigo-500 transition-colors shrink-0"
+        className="flex items-center justify-center gap-2 px-3 h-9 rounded-lg border border-gray-500 text-sm text-white hover:bg-gray-800 transition-colors shrink-0 disabled:opacity-60"
       >
-        <Plus size={16} />
+        <Plus size={16} aria-hidden="true" />
+        Aggiungi account
       </button>
     </div>
   );

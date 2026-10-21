@@ -7,6 +7,12 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [2.1.2] — 2026-10-21
+
+### Migliorato
+
+- **Add-on UI 2.1.2:** aggiunta di un secondo account più evidente con pulsante testuale e istruzioni SPID/CIE per scegliere l’altro figlio. La schermata di aggiunta sopravvive al ricaricamento della pagina.
+
 ## [2.1.1] — 2026-10-21
 
 ### Corretto

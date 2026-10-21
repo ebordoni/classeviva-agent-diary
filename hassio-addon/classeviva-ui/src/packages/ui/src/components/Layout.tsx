@@ -221,7 +221,7 @@ export default function Layout({
       {/* Area principale */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         {/* Top bar — sempre visibile, così il cambio utente non richiede aprire la sidebar */}
-        <header className="flex items-center gap-3 px-4 py-3 bg-gray-900 text-white shrink-0 shadow-md">
+        <header className="flex flex-wrap items-center gap-3 px-4 py-3 bg-gray-900 text-white shrink-0 shadow-md">
           {isMobile && (
             <button
               onClick={() => setSidebarOpen((v) => !v)}
@@ -241,7 +241,7 @@ export default function Layout({
             activeStudentId={activeStudentId}
             switching={switching}
             onSwitch={handleSwitch}
-            onAddAccount={() => navigate("/login", { state: { addAccount: true } })}
+            onAddAccount={() => navigate("/login?addAccount=1")}
           />
         </header>
 

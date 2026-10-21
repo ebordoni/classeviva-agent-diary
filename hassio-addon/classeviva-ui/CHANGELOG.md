@@ -1,3 +1,8 @@
+## 2.1.2 — 2026-10-21
+
+- Pulsante «Aggiungi account» visibile nella barra superiore anche su telefono, con istruzioni per collegare separatamente il profilo di un altro figlio tramite SPID/CIE.
+- La schermata di aggiunta rimane aperta anche dopo un ricaricamento della UI; gli account già collegati restano disponibili.
+
 ## 2.1.1 — 2026-10-21
 
 - Corretto il login quando Spaggiari mostra la scelta del profilo sullo stesso indirizzo del callback: il collegamento resta attivo e attende la selezione del figlio prima di acquisire il token.

@@ -1,6 +1,6 @@
 # Indagine SPID/CIE — 20 ottobre 2026
 
-## UI 1.8.0: collegamento a Home Assistant
+## UI 2.0.0: collegamento a Home Assistant
 
 La UI integra il percorso mobile descritto in questa indagine. Il primo
 collegamento richiede **Chrome sul PC**, Node.js 22 o superiore e l’estensione
@@ -8,7 +8,7 @@ locale già usata per le prove. Non occorre inserire la password del registro
 nella configurazione dell’add-on. Il bot e la CLI conservano il loro flusso
 attuale: questa fase collega soltanto la UI.
 
-1. Aggiorna l’add-on **Classeviva UI a 1.8.0** e il repository sul PC con
+1. Aggiorna l’add-on **Classeviva UI a 2.0.0** e il repository sul PC con
    `git pull`. Se Home Assistant mostra ancora 1.7.5, apri lo store degli add-on,
    usa **Controlla aggiornamenti** dal menu e riapri la scheda dell’add-on.
 2. Chiudi con `Ctrl+C` la vecchia prova `probe-mobile-auth.mjs`, se è ancora in

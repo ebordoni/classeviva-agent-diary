@@ -1,8 +1,13 @@
-## 1.8.0 � 2026-10-21
+## 2.0.0 — 2026-10-21
+
+- Rilascio major del collegamento SPID/CIE introdotto nella 1.8.0, con sessioni cifrate, ripristino dopo riavvio e rinnovo automatico.
+- Nessuna migrazione manuale per chi ha già collegato un account con la 1.8.0.
+
+## 1.8.0 — 2026-10-21
 
 - Collegamento SPID/CIE dalla UI tramite Chrome sul PC, estensione locale e conferma sul telefono.
 - Sessioni salvate nel volume privato con cifratura AES-256-GCM e rinnovo automatico, anche dopo un riavvio. Un rinnovo rifiutato richiede di ricollegare il profilo.
-- Supportate lezioni, materie, assenze e Compiti AI. Voti, avvisi e bacheca sono nascosti per gli account SPID/CIE perch� non ancora verificati con le API mobile.
+- Supportate lezioni, materie, assenze e Compiti AI. Voti, avvisi e bacheca sono nascosti per gli account SPID/CIE perché non ancora verificati con le API mobile.
 - Cambio profilo con pulizia dei dati nella UI e rimozione delle credenziali degli account salvati.
 - Accesso con password mantenuto per gli account che lo consentono.
 

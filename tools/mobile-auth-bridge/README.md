@@ -1,8 +1,8 @@
 # Prova del callback mobile nel browser
 
 Estensione Chrome Manifest V3 sperimentale, mantenuta insieme alla diagnostica
-`scripts/probe-mobile-auth.mjs`. Dalla UI 1.8.0 serve anche al collegamento
-SPID/CIE dell’add-on: consulta la [procedura Home Assistant](../../docs/spid-cie.md#ui-180-collegamento-a-home-assistant).
+`scripts/probe-mobile-auth.mjs`. Dalla UI 2.0.0 serve anche al collegamento
+SPID/CIE dell’add-on: consulta la [procedura Home Assistant](../../docs/spid-cie.md#ui-200-collegamento-a-home-assistant).
 
 ## Permessi e comportamento
 

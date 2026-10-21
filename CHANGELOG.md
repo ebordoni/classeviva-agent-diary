@@ -7,13 +7,19 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [1.13.0] � 2026-10-21
+## [2.0.0] — 2026-10-21
+
+### Modificato
+
+- **Add-on UI 2.0.0:** rilascio major dell’integrazione SPID/CIE introdotta nella UI 1.8.0. Sessioni e account già collegati restano compatibili; documentazione aggiornata alla nuova versione.
+
+## [1.13.0] — 2026-10-21
 
 ### Aggiunto
 
 - **Add-on UI 1.8.0:** collegamento SPID/CIE dal PC, sessioni cifrate nel volume privato, ripristino dopo riavvio, rinnovo automatico e richiesta di ricollegamento alla scadenza. Supportati diario, materie, assenze e Compiti AI; le funzioni mobile non ancora verificate sono nascoste.
 - **Core 0.4.0:** callback opzionale per salvare ogni rinnovo prima di consentire nuove letture, con gestione degli errori di salvataggio senza esporre credenziali.
-- Programma locale `scripts/link-home-assistant.mjs` per collegare il browser alla UI, anche tramite Ingress, con destinazione esplicita e codici monouso. Nessun token nelle URL o nell�estensione.
+- Programma locale `scripts/link-home-assistant.mjs` per collegare il browser alla UI, anche tramite Ingress, con destinazione esplicita e codici monouso. Nessun token nelle URL o nell’estensione.
 
 ### Fase iniziale SPID/CIE
 

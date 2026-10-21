@@ -1,3 +1,4 @@
+import { sendClientError } from "../http.js";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import { invalidateUser } from "../cache.js";
@@ -11,8 +12,7 @@ router.post("/invalida", requireAuth, async (req: Request, res: Response) => {
     await invalidateUser(client.datiUtente!.id);
     res.json({ success: true });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Errore";
-    res.status(500).json({ error: message });
+    await sendClientError(req, res, err);
   }
 });
 

@@ -1,3 +1,4 @@
+import { sendClientError } from "../http.js";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import { getAssenze } from "../cache.js";
@@ -11,8 +12,7 @@ router.get("/", requireAuth, async (req: Request, res: Response) => {
     const result = await getAssenze(client);
     res.json({ ...result.data, fromCache: result.fromCache });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Errore API";
-    res.status(500).json({ error: message });
+    await sendClientError(req, res, err);
   }
 });
 

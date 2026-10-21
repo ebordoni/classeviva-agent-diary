@@ -1,3 +1,4 @@
+import { sendClientError } from "../http.js";
 import type { Request, Response } from "express";
 import { Router } from "express";
 import { requireAuth } from "../middleware/auth.js";
@@ -10,8 +11,7 @@ router.get("/", requireAuth, async (req: Request, res: Response) => {
     const data = await client.didattica();
     res.json(data);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Errore API";
-    res.status(500).json({ error: message });
+    await sendClientError(req, res, err);
   }
 });
 
@@ -22,8 +22,7 @@ router.get("/:folderId", requireAuth, async (req: Request, res: Response) => {
     const data = await client.didatticaElemento(folderId);
     res.json(data);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Errore API";
-    res.status(500).json({ error: message });
+    await sendClientError(req, res, err);
   }
 });
 

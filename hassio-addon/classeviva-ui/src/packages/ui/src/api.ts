@@ -10,12 +10,15 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const url = BASE_PATH + path;
   const res = await fetch(url, {
     credentials: "same-origin",
-    headers: { "Content-Type": "application/json" },
     ...options,
+    headers: { "Content-Type": "application/json", ...options?.headers },
   });
 
   if (!res.ok) {
-    const body = (await res.json().catch(() => ({}))) as { error?: string };
+    const body = (await res.json().catch(() => ({}))) as { error?: string; code?: string };
+    if (res.status === 401 && !path.startsWith("api/auth/")) {
+      window.dispatchEvent(new CustomEvent("classeviva:login-required", { detail: body.error }));
+    }
     throw new Error(body.error ?? `Errore HTTP ${res.status}`);
   }
 
@@ -27,15 +30,26 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 export interface AccountInfo {
   studentId: string;
   nome?: string;
+  authType?: "password" | "spid";
+  needsLogin?: boolean;
 }
 
 export interface MeResponse {
   authenticated: boolean;
   accounts?: AccountInfo[];
-  user?: { nome: string; ident: string };
+  user?: { nome: string; ident: string; authType?: "password" | "spid" };
 }
 
 export const authApi = {
+  startSpid: () => apiFetch<{ nonce: string; expiresAt: number }>("api/auth/spid/start", {
+    method: "POST", headers: { "X-Classeviva-Request": "1" }, body: "{}",
+  }),
+  completeSpid: (nonce: string, paToken: string) => apiFetch<{ success: boolean }>("api/auth/spid/complete", {
+    method: "POST", headers: { "X-Classeviva-Request": "1" }, body: JSON.stringify({ nonce, paToken }),
+  }),
+  cancelSpid: () => apiFetch("api/auth/spid/cancel", {
+    method: "POST", headers: { "X-Classeviva-Request": "1" }, body: "{}",
+  }),
   me: () => apiFetch<MeResponse>("api/auth/me"),
   login: (studentId: string, password: string) =>
     apiFetch<{ success: boolean; user: { nome: string; ident: string } }>(

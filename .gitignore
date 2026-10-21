@@ -54,6 +54,8 @@ cache.json
 packages/bot/cache.json
 cache_ui.json
 hassio-addon/classeviva-ui/src/packages/server/data/accounts.json
+spid-session.key
+accounts.json
 
 # File temporanei
 *.tmp

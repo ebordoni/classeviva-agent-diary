@@ -11,6 +11,12 @@ registro elettronico Classeviva. Richiede **Node.js 22 o superiore**.
 
 Per contribuire al progetto, consulta [CONTRIBUTING.md](./CONTRIBUTING.md).
 
+La **UI Home Assistant 1.8.0** supporta il collegamento **SPID/CIE** tramite
+Chrome sul PC e conferma sul telefono, con sessione cifrata e rinnovo
+automatico. Sono disponibili lezioni, materie, assenze e Compiti AI.
+Segui la [procedura di collegamento](./docs/spid-cie.md#ui-180-collegamento-a-home-assistant).
+Il login SPID/CIE di bot e CLI non è ancora integrato.
+
 ## 📦 Packages
 
 Progetto monorepo con tre package:

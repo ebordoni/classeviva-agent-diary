@@ -1,6 +1,77 @@
 # Indagine SPID/CIE — 20 ottobre 2026
 
-## Flusso attuale degli add-on
+## UI 1.8.0: collegamento a Home Assistant
+
+La UI integra il percorso mobile descritto in questa indagine. Il primo
+collegamento richiede **Chrome sul PC**, Node.js 22 o superiore e l’estensione
+locale già usata per le prove. Non occorre inserire la password del registro
+nella configurazione dell’add-on. Il bot e la CLI conservano il loro flusso
+attuale: questa fase collega soltanto la UI.
+
+1. Aggiorna l’add-on **Classeviva UI a 1.8.0** e il repository sul PC con
+   `git pull`. Se Home Assistant mostra ancora 1.7.5, apri lo store degli add-on,
+   usa **Controlla aggiornamenti** dal menu e riapri la scheda dell’add-on.
+2. Chiudi con `Ctrl+C` la vecchia prova `probe-mobile-auth.mjs`, se è ancora in
+   esecuzione. Dalla root del repository avvia:
+
+   ```powershell
+   node scripts/link-home-assistant.mjs
+   ```
+
+   Non serve compilare il core o installare dipendenze per questo programma.
+   Lascia aperto il terminale fino alla conferma del collegamento.
+3. Se necessario, installa manualmente in Chrome l’estensione della cartella
+   [`tools/mobile-auth-bridge`](../tools/mobile-auth-bridge/README.md).
+   Se già installata per la prova precedente, puoi riutilizzarla.
+4. Apri la UI di Home Assistant **nello stesso Chrome sul PC**. Se sei già
+   nel diario, usa **Aggiungi account**, altrimenti premi **Collega con SPID / CIE**.
+5. Nella nuova scheda verifica che la **destinazione** sia il tuo Home Assistant,
+   poi premi **Conferma e apri Spaggiari**. Completa SPID/CIE e scegli scuola e
+   profilo. Per la prova precedente: IC Bovolone, codice VRIC872009.
+6. Nella pagina finale “loading… please wait”, apri l’estensione, incolla il
+   codice copiato dalla scheda di collegamento e premi **Invia token al test locale**.
+   Fallo subito: il PA osservato scade dopo un minuto.
+7. Attendi **Account collegato** e l’apertura del diario nella UI. Ora puoi
+   chiudere le schede di collegamento e fermare il programma con `Ctrl+C`.
+   L’uso quotidiano, anche da iPhone, e il rinnovo avvengono su Home Assistant.
+
+Lascia aperte la UI e la scheda locale durante il collegamento. Se il browser
+non permette l’apertura della scheda, mostra una pagina bloccata o interrompe
+la comunicazione tra finestre, ripeti dalla UI nel browser desktop; non occorre
+disabilitare protezioni di sicurezza. Se la porta 18765 è occupata, chiudi il
+vecchio programma locale prima di avviare quello nuovo. Non eseguirli insieme.
+
+**Dati disponibili:** lezioni, materie, assenze e Compiti AI. L’estrazione AI
+richiede ancora la configurazione del provider. Voti, avvisi e bacheca sono
+nascosti per gli account SPID/CIE finché non saranno verificati con dati reali.
+
+Le credenziali sono conservate in `/data/accounts.json` in forma cifrata
+AES-256-GCM, con chiave locale `/data/spid-session.key` e permessi riservati.
+Entrambi i file devono restare nel volume privato e insieme nei backup: chi
+possiede entrambi può recuperare la sessione. La cifratura protegge il file
+account isolato, non un’intera istanza Home Assistant compromessa.
+Rimuovere un account dalla schermata di accesso cancella le sue credenziali
+locali; **Logout** chiude soltanto la sessione della UI. Per un nuovo collegamento
+puoi prima rimuovere il vecchio profilo, se non è più utilizzabile.
+
+Il rinnovo è automatico al bisogno e salva gli eventuali token ruotati prima
+di nuove letture. Dopo un riavvio l’add-on ricostruisce il client dalle
+credenziali salvate. Un rifiuto definitivo del rinnovo cancella queste
+credenziali e richiede di ricollegare il profilo; un errore temporaneo conserva
+la sessione per riprovare. I 30 giorni sono la scadenza dichiarata dal token
+osservato, non una durata garantita o già provata per intero.
+
+Verifica software: test automatici con risposte simulate per cifratura,
+riavvio, rinnovo, revoca e isolamento dei profili; build Docker e prova browser
+in una cornice locale simile a Ingress. La verifica sull’istanza Home Assistant
+reale resta da eseguire. I risultati delle API reali seguono nella sezione sotto.
+
+Per gli sviluppatori, `ClassevivaConfig.onSpidSessionChanged` (core 0.4.0)
+riceve una copia sensibile della sessione dopo ogni rinnovo e viene atteso
+prima delle nuove letture. Il primo salvataggio resta esplicito dopo
+`accediConSpid()`, quando il profilo è stato verificato. Non inviare la copia a log.
+
+## Flusso degli add-on prima dell’integrazione
 
 Gli add-on usano ancora il percorso con nome utente e password di
 `packages/core/src/client/ClassevivaClient.ts`, tramite

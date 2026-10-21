@@ -1,3 +1,8 @@
 src/**/node_modules
 src/**/dist
 src/**/*.tsbuildinfo
+src/**/data
+src/**/.env*
+src/**/accounts.json
+src/**/spid-session.key
+src/package-lock.json

@@ -1,59 +1,37 @@
-import { ClassevivaClient } from "@classeviva/core";
-import type { Request, Response } from "express";
 import { Router } from "express";
-import { loadAccounts, removeAccount } from "../accounts.js";
-import { getClientByStudentId, setClientByStudentId } from "../session.js";
+import { loadAccounts, publicAccount, removeAccount } from "../accounts.js";
+import { accountClient, forgetClient } from "../clients.js";
+import { asyncRoute, sendClientError } from "../http.js";
+import { activate } from "./auth.js";
 
 const router = Router();
+router.get("/", asyncRoute(async (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  return res.json({ accounts: (await loadAccounts()).map(publicAccount) });
+}));
 
-// GET /api/accounts — lista account salvati (senza password)
-router.get("/", async (_req: Request, res: Response) => {
-  const accounts = await loadAccounts();
-  res.json({
-    accounts: accounts.map((a) => ({ studentId: a.studentId, nome: a.nome })),
-  });
-});
-
-// DELETE /api/accounts/:studentId — rimuovi account
-router.delete("/:studentId", async (req: Request, res: Response) => {
+router.delete("/:studentId", asyncRoute(async (req, res) => {
   const { studentId } = req.params;
   await removeAccount(studentId);
-  res.json({ success: true });
-});
+  forgetClient(studentId);
+  if (req.session.activeStudentId === studentId) {
+    req.session.activeStudentId = undefined;
+    req.session.authenticated = false;
+    req.session.manualLogout = true;
+  }
+  return res.json({ success: true });
+}));
 
-// POST /api/accounts/switch/:studentId — cambia account attivo
-router.post("/switch/:studentId", async (req: Request, res: Response) => {
+router.post("/switch/:studentId", asyncRoute(async (req, res) => {
   const { studentId } = req.params;
-  const accounts = await loadAccounts();
-  const account = accounts.find((a) => a.studentId === studentId);
-
-  if (!account) {
-    res.status(404).json({ error: "Account non trovato" });
-    return;
-  }
-
-  let client = getClientByStudentId(studentId);
-  if (!client || !client.connesso) {
-    try {
-      const newClient = new ClassevivaClient(studentId, account.password);
-      await newClient.accedi();
-      setClientByStudentId(studentId, newClient);
-      client = newClient;
-    } catch {
-      res
-        .status(401)
-        .json({ error: "Impossibile autenticarsi con questo account" });
-      return;
-    }
-  }
-
-  req.session.activeStudentId = studentId;
-  req.session.authenticated = true;
-
-  res.json({
-    success: true,
-    user: { nome: client.nomeCompleto, ident: studentId },
-  });
-});
+  const account = (await loadAccounts()).find(a => a.studentId === studentId);
+  if (!account) return res.status(404).json({ error: "Account non trovato." });
+  try {
+    const client = await accountClient(studentId);
+    await activate(req, studentId);
+    return res.json({ success: true, user: { nome: client.nomeCompleto, ident: studentId,
+      authType: account.authType === "spid" ? "spid" : "password" } });
+  } catch (error) { return sendClientError(req, res, error, studentId); }
+}));
 
 export default router;

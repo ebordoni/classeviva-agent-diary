@@ -1,10 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import {
   HashRouter,
   Navigate,
   Route,
   Routes,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 import type { AccountInfo } from "./api.ts";
 import { authApi } from "./api.ts";
@@ -16,10 +18,23 @@ import Compiti from "./pages/Compiti.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Lezioni from "./pages/Lezioni.tsx";
 import Login from "./pages/Login.tsx";
+import Materie from "./pages/Materie.tsx";
 import Voti from "./pages/Voti.tsx";
 
 function AppRoutes() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    const expired = (event: Event) => {
+      void queryClient.cancelQueries();
+      queryClient.removeQueries({ predicate: q => q.queryKey[0] !== "me" });
+      queryClient.setQueryData(["me"], (old: typeof data) => ({ ...old, authenticated: false, user: undefined }));
+      navigate("/login", { replace: true, state: { error: (event as CustomEvent).detail || "Accedi nuovamente al registro." } });
+    };
+    window.addEventListener("classeviva:login-required", expired);
+    return () => window.removeEventListener("classeviva:login-required", expired);
+  }, [navigate, queryClient]);
   const addAccount =
     (location.state as { addAccount?: boolean } | null)?.addAccount === true;
   const { data, isLoading } = useQuery({
@@ -41,6 +56,7 @@ function AppRoutes() {
   const userName = data?.user?.nome ?? "";
   const activeStudentId = data?.user?.ident ?? "";
   const accounts: AccountInfo[] = data?.accounts ?? [];
+  const mobileAuth = data?.user?.authType === "spid";
 
   return (
     <Routes>
@@ -62,15 +78,17 @@ function AppRoutes() {
               userName={userName}
               activeStudentId={activeStudentId}
               accounts={accounts}
+              mobileAuth={mobileAuth}
             >
               <Routes>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<Dashboard mobileAuth={mobileAuth} />} />
                 <Route path="/lezioni" element={<Lezioni />} />
-                <Route path="/voti" element={<Voti />} />
+                <Route path="/materie" element={<Materie />} />
+                <Route path="/voti" element={mobileAuth ? <Navigate to="/" replace /> : <Voti />} />
                 <Route path="/assenze" element={<Assenze />} />
                 <Route path="/compiti" element={<Compiti />} />
-                <Route path="/avvisi" element={<Avvisi />} />
-                <Route path="/bacheca" element={<Bacheca />} />
+                <Route path="/avvisi" element={mobileAuth ? <Navigate to="/" replace /> : <Avvisi />} />
+                <Route path="/bacheca" element={mobileAuth ? <Navigate to="/" replace /> : <Bacheca />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Layout>

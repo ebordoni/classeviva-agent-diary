@@ -7,7 +7,15 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
-## [Unreleased]
+## [1.13.0] � 2026-10-21
+
+### Aggiunto
+
+- **Add-on UI 1.8.0:** collegamento SPID/CIE dal PC, sessioni cifrate nel volume privato, ripristino dopo riavvio, rinnovo automatico e richiesta di ricollegamento alla scadenza. Supportati diario, materie, assenze e Compiti AI; le funzioni mobile non ancora verificate sono nascoste.
+- **Core 0.4.0:** callback opzionale per salvare ogni rinnovo prima di consentire nuove letture, con gestione degli errori di salvataggio senza esporre credenziali.
+- Programma locale `scripts/link-home-assistant.mjs` per collegare il browser alla UI, anche tramite Ingress, con destinazione esplicita e codici monouso. Nessun token nelle URL o nell�estensione.
+
+### Fase iniziale SPID/CIE
 
 ### Aggiunto
 
@@ -19,7 +27,7 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 - Modalità `--core` della prova locale: l'estensione e i pulsanti della pagina esercitano direttamente il client committato, con letture del diario e verifica del rinnovo, senza esportare credenziali.
 
-- Prova locale sperimentale per analizzare il callback SPID/CIE mobile, lo scambio del token e il rinnovo. Le credenziali sono mantenute soltanto in memoria e gli esiti non riportano token o dati del registro. Il login degli add-on resta invariato.
+- Prova locale sperimentale per analizzare il callback SPID/CIE mobile, lo scambio del token e il rinnovo. Le credenziali sono mantenute soltanto in memoria e gli esiti non riportano token o dati del registro. La prova diagnostica resta separata dal collegamento della UI.
 - Estensione Chrome di prova per trasferire su richiesta il token dalla pagina mobile già aperta al ricevitore locale, con accesso temporaneo alla scheda e codice di collegamento monouso.
 - Diagnostica mobile aggiornata al formato `pa`/`rf` osservato nell'app Android, con scambio immediato dopo il trasferimento e rifiuto locale dei token iniziali già scaduti.
 - Verificati login CIE mobile, lettura delle lezioni e rinnovo; il rinnovo omette il vecchio header di accesso. Documentati i limiti di compatibilità con gli endpoint web e la prova del collegamento tramite ticket.

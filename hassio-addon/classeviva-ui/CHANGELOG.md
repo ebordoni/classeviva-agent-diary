@@ -1,3 +1,11 @@
+## 1.8.0 — 2026-10-21
+
+- Collegamento SPID/CIE dalla UI tramite Chrome sul PC, estensione locale e conferma sul telefono.
+- Sessioni salvate nel volume privato con cifratura AES-256-GCM e rinnovo automatico, anche dopo un riavvio. Un rinnovo rifiutato richiede di ricollegare il profilo.
+- Supportate lezioni, materie, assenze e Compiti AI. Voti, avvisi e bacheca sono nascosti per gli account SPID/CIE perché non ancora verificati con le API mobile.
+- Cambio profilo con pulizia dei dati nella UI e rimozione delle credenziali degli account salvati.
+- Accesso con password mantenuto per gli account che lo consentono.
+
 ## 1.7.5 â€” 2026-09-18
 
 - Nei compiti estratti, il docente della lezione sorgente Ã¨ mostrato accanto alla materia quando l'associazione Ã¨ univoca.

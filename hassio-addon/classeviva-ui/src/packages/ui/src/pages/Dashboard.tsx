@@ -10,7 +10,7 @@ import {
   compitiCachedQueryKey,
 } from "../api.ts";
 
-export default function Dashboard() {
+export default function Dashboard({ mobileAuth = false }: { mobileAuth?: boolean }) {
   const { data: assenzeData } = useQuery({
     queryKey: ["assenze"],
     queryFn: assenzeApi.get,
@@ -19,12 +19,14 @@ export default function Dashboard() {
   const { data: bachecaData } = useQuery({
     queryKey: ["bacheca"],
     queryFn: bachecaApi.get,
+    enabled: !mobileAuth,
   });
 
   const avvisiRange = defaultAvvisiRange();
   const { data: agendaData } = useQuery({
     queryKey: ["agenda", avvisiRange.inizio, avvisiRange.fine],
     queryFn: () => agendaApi.get(avvisiRange),
+    enabled: !mobileAuth,
   });
 
   const { data: compitiData } = useQuery({
@@ -71,7 +73,7 @@ export default function Dashboard() {
           </p>
           <p className="text-xs text-gray-500 mt-1">Compiti da eseguire</p>
         </div>
-        <div
+        {!mobileAuth && <div
           className={`bg-white rounded-xl border shadow-sm px-4 py-4 ${avvisiInArrivo > 0 ? "border-amber-200" : "border-gray-100"}`}
         >
           <p
@@ -80,8 +82,8 @@ export default function Dashboard() {
             {avvisiInArrivo}
           </p>
           <p className="text-xs text-gray-500 mt-1">Avvisi</p>
-        </div>
-        <div
+        </div>}
+        {!mobileAuth && <div
           className={`bg-white rounded-xl border shadow-sm px-4 py-4 ${bachecaDaLeggere > 0 ? "border-sky-200" : "border-gray-100"}`}
         >
           <p
@@ -90,7 +92,7 @@ export default function Dashboard() {
             {bachecaDaLeggere}
           </p>
           <p className="text-xs text-gray-500 mt-1">Bacheca da leggere</p>
-        </div>
+        </div>}
         <div
           className={`bg-white rounded-xl border shadow-sm px-4 py-4 ${nonGiustificate > 0 ? "border-orange-200" : "border-gray-100"}`}
         >

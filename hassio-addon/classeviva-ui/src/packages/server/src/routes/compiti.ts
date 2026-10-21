@@ -1,3 +1,4 @@
+import { sendClientError } from "../http.js";
 import type { AIProvider } from "@classeviva/core";
 import { AIService, ultimiNGiorni } from "@classeviva/core";
 import type { Request, Response } from "express";
@@ -20,8 +21,7 @@ router.get("/", requireAuth, async (req: Request, res: Response) => {
     );
     res.json({ ...data, fromCache: true });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Errore";
-    res.status(500).json({ error: message });
+    await sendClientError(req, res, err);
   }
 });
 
@@ -70,8 +70,7 @@ router.post("/", requireAuth, async (req: Request, res: Response) => {
     const result = await getCompiti(client, dataInizio, dataFine, ai);
     res.json({ ...result.data, fromCache: result.fromCache });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Errore AI";
-    res.status(500).json({ error: message });
+    await sendClientError(req, res, err);
   }
 });
 

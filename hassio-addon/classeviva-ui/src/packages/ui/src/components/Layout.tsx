@@ -28,6 +28,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { to: "/", icon: <LayoutDashboard size={18} />, label: "Dashboard" },
   { to: "/lezioni", icon: <BookOpen size={18} />, label: "Lezioni" },
+  { to: "/materie", icon: <BookOpen size={18} />, label: "Materie" },
   { to: "/voti", icon: <Star size={18} />, label: "Voti" },
   { to: "/assenze", icon: <Users size={18} />, label: "Assenze" },
   { to: "/compiti", icon: <Brain size={18} />, label: "Compiti AI" },
@@ -40,6 +41,7 @@ interface LayoutProps {
   userName: string;
   activeStudentId: string;
   accounts: AccountInfo[];
+  mobileAuth: boolean;
 }
 
 function isMobileViewport() {
@@ -51,11 +53,13 @@ export default function Layout({
   userName,
   activeStudentId,
   accounts,
+  mobileAuth,
 }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
   const [switching, setSwitching] = useState(false);
+  const [error, setError] = useState("");
   const [isMobile, setIsMobile] = useState(isMobileViewport);
   // Mobile: overlay open/closed — Desktop: expanded/collapsed
   const [sidebarOpen, setSidebarOpen] = useState(!isMobileViewport());
@@ -102,8 +106,12 @@ export default function Layout({
     setSwitching(true);
     try {
       await accountsApi.switch(studentId);
+      await queryClient.cancelQueries();
+      queryClient.removeQueries({ predicate: q => q.queryKey[0] !== "me" });
       await queryClient.refetchQueries({ queryKey: ["me"] });
       queryClient.invalidateQueries();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Cambio account non riuscito.");
     } finally {
       setSwitching(false);
     }
@@ -159,7 +167,7 @@ export default function Layout({
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-2">
-          {navItems.map((item) => (
+          {navItems.filter(item => !mobileAuth || !["/voti", "/avvisi", "/bacheca"].includes(item.to)).map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -239,6 +247,8 @@ export default function Layout({
 
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-5xl mx-auto px-4 py-4 md:px-6 md:py-6">
+            {error && <p role="alert" className="mb-4 rounded-lg bg-red-50 text-red-700 p-3 text-sm">{error}</p>}
+            {mobileAuth && location.pathname === "/" && <p className="mb-4 rounded-lg bg-indigo-50 text-indigo-900 p-3 text-sm">Accesso SPID/CIE: sono disponibili lezioni, materie, assenze e Compiti AI. Voti, avvisi e bacheca non sono ancora supportati da questo collegamento.</p>}
             {children}
           </div>
         </main>

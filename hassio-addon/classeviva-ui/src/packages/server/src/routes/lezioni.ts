@@ -1,3 +1,4 @@
+import { sendClientError } from "../http.js";
 import { ultimiNGiorni } from "@classeviva/core";
 import type { Request, Response } from "express";
 import { Router } from "express";
@@ -32,8 +33,7 @@ router.get("/", requireAuth, async (req: Request, res: Response) => {
     const result = await getLezioni(client, dataInizio, dataFine);
     res.json({ ...result.data, fromCache: result.fromCache });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Errore API";
-    res.status(500).json({ error: message });
+    await sendClientError(req, res, err);
   }
 });
 

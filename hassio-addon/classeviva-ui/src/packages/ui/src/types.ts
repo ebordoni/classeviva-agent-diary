@@ -92,9 +92,9 @@ export interface Docente {
 }
 
 export interface Materia {
-  subjectId: number;
-  subjectDesc: string;
-  subjectCode: string;
+  id: number;
+  description: string;
+  order: number;
   teachers: Docente[];
 }
 

@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import type { ErrorRequestHandler } from "express";
 import session from "express-session";
 import crypto from "node:crypto";
 import path from "node:path";
@@ -29,7 +30,7 @@ const sessionSecret =
   process.env.SESSION_SECRET || crypto.randomBytes(32).toString("hex");
 
 app.set("trust proxy", 1);
-app.use(express.json());
+app.use(express.json({ limit: "128kb" }));
 
 app.use(
   session({
@@ -61,6 +62,11 @@ app.use("/api/bacheca", bachecaRouter);
 app.use("/api/didattica", didatticaRouter);
 app.use("/api/cache", cacheRouter);
 
+const apiErrorHandler: ErrorRequestHandler = (_error, _req, res, _next) => {
+  if (!res.headersSent) res.status(500).json({ error: "Richiesta non completata. Riprova." });
+};
+app.use(apiErrorHandler);
+
 // Serve static UI (Vite build output)
 const uiDistPath =
   process.env.UI_DIST_PATH ?? path.resolve(__dirname, "../../ui/dist");
@@ -88,7 +94,7 @@ app.listen(port, "0.0.0.0", () => {
           console.log(
             `[classeviva-ui] Sincronizzati ${configAccounts.length} account da configurazione`,
           );
-        });
+        }).catch(() => { console.error("[classeviva-ui] Sincronizzazione account non completata."); });
       }
     } catch {
       console.warn("[classeviva-ui] ACCOUNTS_CONFIG non valido, ignorato");

@@ -6,10 +6,11 @@ declare module "express-session" {
     authenticated?: boolean;
     /** Impostato al logout esplicito per non essere ri-autenticati subito dall'auto-login da config */
     manualLogout?: boolean;
+    spidLinkStartedAt?: number;
   }
 }
 
-// Keyed by studentId: i client persistono tra sessioni diverse e riavvii
+// Client condivisi tra sessioni del browser; ricreati dalle credenziali al riavvio.
 const clientStore = new Map<string, ClassevivaClient>();
 
 export function getClientByStudentId(

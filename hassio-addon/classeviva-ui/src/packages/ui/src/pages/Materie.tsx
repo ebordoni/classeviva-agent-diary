@@ -8,7 +8,7 @@ export default function Materie() {
   });
 
   const subjects = [...(data?.subjects ?? [])].sort((a, b) =>
-    (a.subjectDesc ?? "").localeCompare(b.subjectDesc ?? ""),
+    (a.description ?? "").localeCompare(b.description ?? ""),
   );
 
   return (
@@ -32,10 +32,10 @@ export default function Materie() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {subjects.map((s) => (
           <div
-            key={s.subjectId}
+            key={s.id}
             className="bg-white rounded-xl border border-gray-100 shadow-sm px-4 py-4"
           >
-            <p className="font-semibold text-gray-800">{s.subjectDesc}</p>
+            <p className="font-semibold text-gray-800">{s.description}</p>
             {s.teachers.length > 0 && (
               <p className="text-sm text-gray-500 mt-1">
                 {s.teachers.map((t) => t.teacherName).join(", ")}

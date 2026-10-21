@@ -1,7 +1,8 @@
 # Prova del callback mobile nel browser
 
 Estensione Chrome Manifest V3 sperimentale, mantenuta insieme alla diagnostica
-`scripts/probe-mobile-auth.mjs`. Non è ancora un login integrato negli add-on.
+`scripts/probe-mobile-auth.mjs`. Dalla UI 1.8.0 serve anche al collegamento
+SPID/CIE dell’add-on: consulta la [procedura Home Assistant](../../docs/spid-cie.md#ui-180-collegamento-a-home-assistant).
 
 ## Permessi e comportamento
 
@@ -16,7 +17,10 @@ Estensione Chrome Manifest V3 sperimentale, mantenuta insieme alla diagnostica
 - Il token è trasmesso al test locale solo dopo un comando esplicito e con
   un codice di collegamento monouso valido cinque minuti. L'estensione non
   conserva codice e token dopo la chiusura del popup. Il ricevitore conserva
-  la sessione soltanto nella memoria del processo e chiama le API Spaggiari.
+  la sessione soltanto nella memoria del processo durante la diagnostica.
+  In modalità collegamento Home Assistant, il programma locale passa il PA
+  alla sola scheda che ha avviato il collegamento, dopo conferma della
+  destinazione: l’add-on scambia il PA con Spaggiari e salva la sessione cifrata.
 
 ## Installazione manuale e prova
 

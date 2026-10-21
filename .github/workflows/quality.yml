@@ -36,3 +36,10 @@ jobs:
           --build-arg BUILD_FROM=ghcr.io/home-assistant/amd64-base-debian:bookworm
           --tag classeviva-${{ matrix.addon }}:ci
           hassio-addon/${{ matrix.addon }}
+      - if: matrix.addon == 'classeviva-ui'
+        run: >-
+          docker run --rm
+          --volume "$PWD/test/integration:/app/test:ro"
+          --entrypoint node
+          classeviva-${{ matrix.addon }}:ci
+          --test /app/test/ui-spid.mjs

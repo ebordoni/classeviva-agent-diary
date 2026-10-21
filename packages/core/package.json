@@ -1,6 +1,6 @@
 {
       "name": "@classeviva/core",
-      "version": "0.3.0",
+      "version": "0.4.0",
       "description": "Classeviva Core v2 — wrapper per la nuova API REST /rest/w1",
       "main": "./dist/index.js",
       "types": "./dist/index.d.ts",

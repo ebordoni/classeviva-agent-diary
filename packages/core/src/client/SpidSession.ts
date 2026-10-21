@@ -39,11 +39,15 @@ export class SpidSession {
   #http: AxiosInstance;
   #invalid = false;
   #refreshing?: Promise<string>;
+  #save?: ClassevivaConfig["onSpidSessionChanged"];
+  #dirty = false;
+  #saving?: Promise<void>;
 
-  private constructor(session: SessioneSpid, http: AxiosInstance) {
+  private constructor(session: SessioneSpid, http: AxiosInstance, config?: ClassevivaConfig) {
     this.#session = { version: 1, ident: session.ident, paToken: session.paToken,
       accessToken: session.accessToken, refreshToken: session.refreshToken, expiresAt: session.expiresAt };
     this.#http = http;
+    this.#save = config?.onSpidSessionChanged;
   }
 
   private static transport(config?: ClassevivaConfig): AxiosInstance {
@@ -67,7 +71,7 @@ export class SpidSession {
     const refreshToken: unknown = response.headers["z-spid-rauth"];
     if (!validSecret(refreshToken)) throw new ErroreHTTP(502, "Credenziale di rinnovo SPID/CIE assente nella risposta.");
     const session = await this.parseResponse(http, response, { paToken, refreshToken });
-    return new SpidSession(session, http);
+    return new SpidSession(session, http, config);
   }
 
   static restore(session: SessioneSpid, config?: ClassevivaConfig): SpidSession {
@@ -77,7 +81,7 @@ export class SpidSession {
       throw new FormatoNonValido("Sessione SPID/CIE non valida.");
     }
     studentIdFromIdent(session.ident);
-    return new SpidSession(session, this.transport(config));
+    return new SpidSession(session, this.transport(config), config);
   }
 
   private static async parseResponse(http: AxiosInstance, response: AxiosResponse,
@@ -127,7 +131,20 @@ export class SpidSession {
     return this.#refreshing;
   }
 
+  private async persist(): Promise<void> {
+    if (!this.#dirty || !this.#save) return;
+    if (this.#saving) return this.#saving;
+    const snapshot = { ...this.#session };
+    this.#saving = Promise.resolve().then(() => this.#save!(snapshot)).then(() => {
+      this.#dirty = false;
+    }).catch(() => {
+      throw new ErroreHTTP(503, "Salvataggio della sessione SPID/CIE non completato. Riprova.");
+    }).finally(() => { this.#saving = undefined; });
+    return this.#saving;
+  }
+
   private async refresh(): Promise<string> {
+    await this.persist();
     const expiry = jwtExpiry(this.#session.refreshToken);
     if (expiry !== undefined && expiry <= Date.now()) {
       this.#invalid = true;
@@ -150,12 +167,16 @@ export class SpidSession {
       if (error instanceof AccessoSpidRichiesto) this.#invalid = true;
       throw error;
     }
+    this.#dirty = true;
+    await this.persist();
     return this.#session.accessToken;
   }
 
   async get<T>(path: string): Promise<AxiosResponse<T>> {
     if (this.#invalid) throw new AccessoSpidRichiesto();
-    let token = this.#session.expiresAt > Date.now() + REFRESH_MARGIN ? this.#session.accessToken : await this.renew();
+    let token = this.#refreshing ? await this.#refreshing :
+      this.#session.expiresAt > Date.now() + REFRESH_MARGIN ? this.#session.accessToken : await this.renew();
+    await this.persist();
     for (let attempt = 0; attempt < 2; attempt++) {
       try { return await this.#http.get<T>(path, { headers: { "Z-Auth-Token": token } }); }
       catch (error) {
@@ -167,6 +188,8 @@ export class SpidSession {
         }
         // Un'altra lettura può aver già completato il rinnovo di questo token.
         token = this.#session.accessToken !== token ? this.#session.accessToken : await this.renew();
+        if (this.#refreshing) token = await this.#refreshing;
+        await this.persist();
       }
     }
     throw new AccessoSpidRichiesto();

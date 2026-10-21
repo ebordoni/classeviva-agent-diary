@@ -41,6 +41,48 @@ function initial(request) {
   return { data: { lessons: [], subjects: [], periods: [], events: [] } };
 }
 
+test("renewal waits for durable storage before allowing concurrent reads", async t => {
+  let release;
+  let started;
+  const saving = new Promise(resolve => { started = resolve; });
+  const blocked = new Promise(resolve => { release = resolve; });
+  const saved = [];
+  const calls = transport(t, request => request.path === "/auth/spidrf"
+    ? { data: auth("PRIVATE_NEW"), headers: { "z-spid-rauth": "PRIVATE_ROTATED" } } : initial(request));
+  const client = await ClassevivaClient.accediConSpid(pa(), { onSpidSessionChanged: async session => {
+    saved.push(session); started(); await blocked;
+  } });
+  const renewal = client.accedi();
+  await saving;
+  const count = calls.length;
+  const read = client.materie();
+  await new Promise(resolve => setTimeout(resolve, 10));
+  assert.equal(calls.length, count);
+  release();
+  await Promise.all([renewal, read]);
+  assert.equal(saved.length, 1);
+  assert.equal(saved[0].refreshToken, "PRIVATE_ROTATED");
+});
+
+test("failed persistence is sanitized and retried before another refresh or read", async t => {
+  let attempts = 0;
+  let saved;
+  const calls = transport(t, request => request.path === "/auth/spidrf"
+    ? { data: auth("PRIVATE_NEW"), headers: { "z-spid-rauth": "PRIVATE_ROTATED" } } : initial(request));
+  const client = await ClassevivaClient.accediConSpid(pa(), { onSpidSessionChanged: session => {
+    if (++attempts === 1) throw new Error("PRIVATE_FILESYSTEM_PATH");
+    saved = session;
+  } });
+  await assert.rejects(client.accedi(), error => {
+    assert.ok(error instanceof ErroreHTTP); assert.equal(inspect(error).includes("PRIVATE"), false); return true;
+  });
+  assert.equal(client.connesso, true);
+  await client.materie();
+  assert.equal(attempts, 2);
+  assert.equal(saved.refreshToken, "PRIVATE_ROTATED");
+  assert.equal(calls.filter(c => c.path === "/auth/spidrf").length, 1);
+});
+
 test("SPID login binds the profile and routes diary reads through mobile APIs", async t => {
   const calls = transport(t, initial);
   const client = await ClassevivaClient.accediConSpid(pa());

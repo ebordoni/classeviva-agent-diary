@@ -9,6 +9,8 @@
 export interface ClassevivaConfig {
   baseUrl?: string;
   timeout?: number;
+  /** Salvataggio del rinnovo prima di usare la nuova sessione. Non inviare a log. */
+  onSpidSessionChanged?: (session: SessioneSpid) => void | Promise<void>;
 }
 
 /** Credenziali sensibili: esportazione esplicita, nessuna persistenza nel core. */

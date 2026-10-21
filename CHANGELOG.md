@@ -7,6 +7,13 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [2.1.0] — 2026-10-21
+
+### Aggiunto
+
+- **Add-on UI 2.1.0:** accesso SPID/CIE automatico tramite collegamento diretto estensione–UI. Eliminati programma locale e copia dei codici dal flusso normale; download dell’estensione integrato nella UI e autorizzazione una tantum della destinazione.
+- Estensione 1.0.0 con permessi opzionali per i siti selezionati, associazione al documento di origine e acquisizione della sola pagina finale del login avviato dall’utente. Nessun token conservato nell’estensione.
+
 ## [2.0.1] — 2026-10-21
 
 ### Modificato

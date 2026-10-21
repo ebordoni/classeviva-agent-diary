@@ -34,6 +34,7 @@ Le seguenti directory sono copie del codice sorgente principale e devono avere c
 | --- | --- |
 | `packages/core/src` | `hassio-addon/classeviva-bot/src/packages/core/src`, `hassio-addon/classeviva-ui/src/packages/core/src` |
 | `packages/bot/src` | `hassio-addon/classeviva-bot/src/packages/bot/src` |
+| `tools/mobile-auth-bridge` | `hassio-addon/classeviva-ui/src/auth-extension` |
 
 Il workflow GitHub **Sync HA Addon Sources** aggiorna le copie automaticamente quando un push su `main` modifica i sorgenti o i manifest correlati. In locale, esegui sempre:
 

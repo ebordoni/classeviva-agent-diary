@@ -11,10 +11,10 @@ registro elettronico Classeviva. Richiede **Node.js 22 o superiore**.
 
 Per contribuire al progetto, consulta [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-La **UI Home Assistant 2.0.0** supporta il collegamento **SPID/CIE** tramite
-Chrome sul PC e conferma sul telefono, con sessione cifrata e rinnovo
+La **UI Home Assistant 2.1.0** supporta il collegamento **SPID/CIE** automatico tramite
+Chrome sul PC e conferma sul telefono, senza terminale o codici da copiare, con sessione cifrata e rinnovo
 automatico. Sono disponibili lezioni, materie, assenze e Compiti AI.
-Segui la [procedura di collegamento](./docs/spid-cie.md#ui-200-collegamento-a-home-assistant).
+Segui la [procedura di collegamento](./docs/spid-cie.md#ui-210-accesso-automatico-da-home-assistant).
 Il login SPID/CIE di bot e CLI non è ancora integrato.
 
 ## 📦 Packages
@@ -396,14 +396,14 @@ npm run verify:addon-sources
 
 ### Diagnostica sperimentale SPID/CIE mobile
 
-Il core **0.3.0** supporta ora sessioni SPID/CIE mobile, rinnovo automatico e
-letture di lezioni, materie, periodi, profilo e assenze. L'interfaccia di
-collegamento negli add-on sarà aggiunta nella fase successiva. L'API del core
+Il core **0.4.0** supporta sessioni SPID/CIE mobile, rinnovo automatico e
+letture di lezioni, materie, periodi, profilo e assenze. La UI include il
+collegamento automatico con l’estensione; il bot e la CLI mantengono il loro accesso attuale. L'API del core
 e le funzioni ancora escluse sono descritte nella
 [guida SPID/CIE](./docs/spid-cie.md#fase-1-api-del-core).
 
-Il login SPID/CIE non è ancora integrato negli add-on. Per verificare lo scambio
-del token restituito dal flusso mobile ufficiale è disponibile una prova locale:
+Per gli sviluppatori che vogliono verificare separatamente lo scambio
+del token restituito dal flusso mobile ufficiale resta disponibile una prova locale:
 
 ```bash
 npm run build:core

@@ -6,12 +6,14 @@ import test from "node:test";
 import { isMobileCallback, readMobileToken, sendActiveToken } from "../tools/mobile-auth-bridge/bridge.mjs";
 import { createProbeServer } from "../scripts/probe-mobile-auth.mjs";
 
-test("extension permissions are temporary page access and loopback networking only", async () => {
+test("extension requests automation hosts at setup and preserves the isolated diagnostic mode", async () => {
   const manifest = JSON.parse(await readFile(new URL("../tools/mobile-auth-bridge/manifest.json", import.meta.url), "utf8"));
-  assert.deepEqual(manifest.permissions, ["activeTab", "scripting"]);
+  assert.deepEqual(manifest.permissions, ["activeTab", "scripting", "storage"]);
   assert.deepEqual(manifest.host_permissions, ["http://127.0.0.1/*"]);
   assert.equal(manifest.content_scripts, undefined);
-  assert.equal(manifest.background, undefined);
+  assert.deepEqual(manifest.optional_host_permissions, ["http://*/*", "https://*/*"]);
+  assert.equal(manifest.externally_connectable, undefined);
+  assert.deepEqual(manifest.background, { service_worker: "background.mjs", type: "module" });
   assert.match(manifest.content_security_policy.extension_pages, /connect-src http:\/\/127\.0\.0\.1:18765$/);
 });
 

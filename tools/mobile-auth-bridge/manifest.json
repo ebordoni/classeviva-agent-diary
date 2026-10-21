@@ -1,12 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "ClasseViva — prova login mobile",
-  "version": "0.1.0",
-  "description": "Invia su richiesta il token del callback mobile al test locale sul PC. Nessuna credenziale salvata.",
-  "permissions": ["activeTab", "scripting"],
+  "name": "ClasseViva — accesso SPID/CIE",
+  "version": "1.0.0",
+  "minimum_chrome_version": "114",
+  "description": "Collega SPID/CIE alla tua UI Home Assistant, senza programmi locali o codici da copiare.",
+  "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": ["http://127.0.0.1/*"],
+  "optional_host_permissions": ["http://*/*", "https://*/*"],
+  "background": { "service_worker": "background.mjs", "type": "module" },
   "action": {
-    "default_title": "Prova il token mobile su questo PC",
+    "default_title": "Collega ClasseViva a Home Assistant",
     "default_popup": "popup.html"
   },
   "content_security_policy": {

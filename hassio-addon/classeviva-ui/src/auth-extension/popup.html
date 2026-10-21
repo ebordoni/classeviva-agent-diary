@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="it">
+  <meta charset="utf-8">
+  <title>Collega ClasseViva</title>
+  <link rel="stylesheet" href="popup.css">
+  <h1>Accesso SPID / CIE</h1>
+  <p>Apri la UI Classeviva su Home Assistant e abilita il collegamento una volta. Poi usa il pulsante di accesso nella UI.</p>
+  <p>Destinazione: <strong id="destination">Verifica in corso…</strong></p>
+  <button id="enable" disabled>Abilita su questo Home Assistant</button>
+  <p>Autorizzi l’accesso al sito del tuo Home Assistant e a web.spaggiari.eu. Il token viene letto solo nella scheda di login aperta dalla UI. PIN e conferme restano sul telefono.</p>
+  <p id="setup-result" role="status"></p>
+  <details><summary>Diagnostica con programma locale</summary>
+  <p>Solo per le prove tecniche precedenti. Il normale accesso dalla UI non richiede un programma locale.</p>
+  <label for="pairing">Codice dalla prova locale</label>
+  <input id="pairing" type="password" autocomplete="off" spellcheck="false">
+  <button id="send">Invia token al test locale</button>
+  <p>Nessun cookie o PIN letto. Nessuna credenziale salvata dall’estensione.</p>
+  <pre id="result" role="status">In attesa.</pre>
+  </details>
+  <script type="module" src="popup.mjs"></script>
+</html>

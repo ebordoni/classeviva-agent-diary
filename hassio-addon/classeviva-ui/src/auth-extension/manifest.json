@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "ClasseViva — accesso SPID/CIE",
+  "version": "1.0.0",
+  "minimum_chrome_version": "114",
+  "description": "Collega SPID/CIE alla tua UI Home Assistant, senza programmi locali o codici da copiare.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["http://127.0.0.1/*"],
+  "optional_host_permissions": ["http://*/*", "https://*/*"],
+  "background": { "service_worker": "background.mjs", "type": "module" },
+  "action": {
+    "default_title": "Collega ClasseViva a Home Assistant",
+    "default_popup": "popup.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; connect-src http://127.0.0.1:18765"
+  }
+}

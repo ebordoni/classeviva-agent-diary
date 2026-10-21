@@ -1,75 +1,77 @@
 # Indagine SPID/CIE — 20 ottobre 2026
 
-## UI 2.0.0: collegamento a Home Assistant
+## UI 2.1.0: accesso automatico da Home Assistant
 
-La UI integra il percorso mobile descritto in questa indagine. Il primo
-collegamento richiede **Chrome sul PC**, Node.js 22 o superiore e l’estensione
-locale già usata per le prove. Non occorre inserire la password del registro
-nella configurazione dell’add-on. Il bot e la CLI conservano il loro flusso
-attuale: questa fase collega soltanto la UI.
+Il collegamento avviene direttamente tra la UI e l’estensione Chrome. Non
+servono terminale, Node.js, il repository sul PC o codici da copiare.
+Il primo collegamento richiede Chrome sul PC e la conferma SPID/CIE dal
+telefono. Dopo il collegamento puoi consultare il diario anche da iPhone.
+Bot e CLI mantengono il loro flusso attuale.
 
-1. Aggiorna l’add-on **Classeviva UI a 2.0.0** e il repository sul PC con
-   `git pull`. Se Home Assistant mostra ancora 1.7.5, apri lo store degli add-on,
-   usa **Controlla aggiornamenti** dal menu e riapri la scheda dell’add-on.
-2. Chiudi con `Ctrl+C` la vecchia prova `probe-mobile-auth.mjs`, se è ancora in
-   esecuzione. Dalla root del repository avvia:
+### Preparazione una tantum
 
-   ```powershell
-   node scripts/link-home-assistant.mjs
-   ```
+1. Aggiorna **Classeviva UI alla 2.1.0** e aprila in Chrome sul PC.
+2. Nella schermata di accesso apri **Prima volta? Prepara l’accesso in pochi
+   passaggi** e premi **Scarica l’estensione**.
+3. Estrai lo ZIP in una cartella stabile sul PC. Apri `chrome://extensions`,
+   attiva **Modalità sviluppatore** e scegli **Carica estensione non
+   pacchettizzata**; seleziona la cartella estratta. Se avevi l’estensione di
+   prova 0.1.0, sostituiscila con questa versione 1.0.0.
+4. Torna alla UI Classeviva, apri **ClasseViva — accesso SPID/CIE** dal menu
+   Estensioni di Chrome e premi **Abilita su questo Home Assistant**.
+5. Controlla che la destinazione mostrata sia il tuo Home Assistant, quindi
+   concedi a Chrome i permessi per quel sito e `web.spaggiari.eu`. La UI
+   segnala **Estensione collegata**. L’abilitazione resta valida anche dopo
+   aver chiuso il browser; una nuova origine o porta richiede una nuova
+   abilitazione. Non concedere accesso indiscriminato a tutti i siti.
 
-   Non serve compilare il core o installare dipendenze per questo programma.
-   Lascia aperto il terminale fino alla conferma del collegamento.
-3. Se necessario, installa manualmente in Chrome l’estensione della cartella
-   [`tools/mobile-auth-bridge`](../tools/mobile-auth-bridge/README.md).
-   Se già installata per la prova precedente, puoi riutilizzarla.
-4. Apri la UI di Home Assistant **nello stesso Chrome sul PC**. Se sei già
-   nel diario, usa **Aggiungi account**, altrimenti premi **Collega con SPID / CIE**.
-5. Nella nuova scheda verifica che la **destinazione** sia il tuo Home Assistant,
-   poi premi **Conferma e apri Spaggiari**. Completa SPID/CIE e scegli scuola e
-   profilo. Per la prova precedente: IC Bovolone, codice VRIC872009.
-6. Nella pagina finale “loading… please wait”, apri l’estensione, incolla il
-   codice copiato dalla scheda di collegamento e premi **Invia token al test locale**.
-   Fallo subito: il PA osservato scade dopo un minuto.
-7. Attendi **Account collegato** e l’apertura del diario nella UI. Ora puoi
-   chiudere le schede di collegamento e fermare il programma con `Ctrl+C`.
-   L’uso quotidiano, anche da iPhone, e il rinnovo avvengono su Home Assistant.
+L’installazione manuale è necessaria finché l’estensione non sarà distribuita
+tramite uno store. Non è necessario aprire una porta di rete sull’add-on.
+Se la UI era già aperta durante l’installazione, ricaricala prima di abilitare
+l’estensione. Per aggiungere un profilo da un diario già aperto usa
+**Aggiungi account** nella barra superiore.
 
-Lascia aperte la UI e la scheda locale durante il collegamento. Se il browser
-non permette l’apertura della scheda, mostra una pagina bloccata o interrompe
-la comunicazione tra finestre, ripeti dalla UI nel browser desktop; non occorre
-disabilitare protezioni di sicurezza. Se la porta 18765 è occupata, chiudi il
-vecchio programma locale prima di avviare quello nuovo. Non eseguirli insieme.
+### Accesso
+
+1. Premi **Accedi con SPID / CIE** nella UI.
+2. Nella scheda Spaggiari seleziona scuola e profilo e completa SPID/CIE.
+   Nelle prove precedenti: IC Bovolone, codice VRIC872009.
+3. Attendi: il collegamento viene acquisito automaticamente, il diario si
+   apre e la scheda finale del login viene chiusa.
+
+Mantieni aperta la UI durante il login. **Annulla collegamento** interrompe
+la procedura; se chiudi o ricarichi la UI avvia un nuovo accesso. Il codice
+monouso di sessione scade dopo cinque minuti; il PA restituito da Spaggiari
+viene scambiato subito perché quello osservato dura un minuto.
+L’estensione non legge PIN o password, cookie o cronologia. Legge il campo
+mobile solo nella pagina finale della scheda di login che ha aperto, per un
+collegamento attivo, e lo invia al documento della UI che lo ha avviato.
+Non conserva PA, token di accesso o credenziali di rinnovo: salva soltanto
+le origini autorizzate e, nella memoria di sessione del browser, i metadati
+necessari alla procedura in corso. Il rinnovo resta sull’add-on.
 
 **Dati disponibili:** lezioni, materie, assenze e Compiti AI. L’estrazione AI
-richiede ancora la configurazione del provider. Voti, avvisi e bacheca sono
-nascosti per gli account SPID/CIE finché non saranno verificati con dati reali.
+richiede la configurazione del provider. Voti, avvisi e bacheca sono nascosti
+per gli account SPID/CIE finché non saranno verificati con dati reali.
 
 Le credenziali sono conservate in `/data/accounts.json` in forma cifrata
 AES-256-GCM, con chiave locale `/data/spid-session.key` e permessi riservati.
 Entrambi i file devono restare nel volume privato e insieme nei backup: chi
 possiede entrambi può recuperare la sessione. La cifratura protegge il file
 account isolato, non un’intera istanza Home Assistant compromessa.
-Rimuovere un account dalla schermata di accesso cancella le sue credenziali
-locali; **Logout** chiude soltanto la sessione della UI. Per un nuovo collegamento
-puoi prima rimuovere il vecchio profilo, se non è più utilizzabile.
+Rimuovere un account cancella le sue credenziali locali; **Logout** chiude
+soltanto la sessione della UI.
 
-Il rinnovo è automatico al bisogno e salva gli eventuali token ruotati prima
-di nuove letture. Dopo un riavvio l’add-on ricostruisce il client dalle
-credenziali salvate. Un rifiuto definitivo del rinnovo cancella queste
-credenziali e richiede di ricollegare il profilo; un errore temporaneo conserva
-la sessione per riprovare. I 30 giorni sono la scadenza dichiarata dal token
-osservato, non una durata garantita o già provata per intero.
+Il rinnovo è automatico al bisogno e salva i token ruotati prima delle nuove
+letture. Dopo un riavvio l’add-on ricostruisce il client dalle credenziali
+salvate. Un rifiuto definitivo richiede di ricollegare il profilo; un errore
+temporaneo conserva la sessione per riprovare. I 30 giorni sono la scadenza
+dichiarata dal token osservato, non una durata garantita o provata per intero.
+La disponibilità del login iniziale dal solo iPhone non è stata dimostrata.
 
-Verifica software: test automatici con risposte simulate per cifratura,
-riavvio, rinnovo, revoca e isolamento dei profili; build Docker e prova browser
-in una cornice locale simile a Ingress. La verifica sull’istanza Home Assistant
-reale resta da eseguire. I risultati delle API reali seguono nella sezione sotto.
-
-Per gli sviluppatori, `ClassevivaConfig.onSpidSessionChanged` (core 0.4.0)
-riceve una copia sensibile della sessione dopo ogni rinnovo e viene atteso
-prima delle nuove letture. Il primo salvataggio resta esplicito dopo
-`accediConSpid()`, quando il profilo è stato verificato. Non inviare la copia a log.
+I vecchi programmi `probe-mobile-auth.mjs` e `link-home-assistant.mjs` restano
+strumenti di diagnostica, separati dall’accesso normale. La modalità manuale
+è nel riquadro **Diagnostica con programma locale** dell’estensione.
 
 ## Flusso degli add-on prima dell’integrazione
 

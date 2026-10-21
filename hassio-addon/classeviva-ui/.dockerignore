@@ -6,3 +6,4 @@ src/**/.env*
 src/**/accounts.json
 src/**/spid-session.key
 src/package-lock.json
+src/packages/ui/public/classeviva-auth-extension.zip

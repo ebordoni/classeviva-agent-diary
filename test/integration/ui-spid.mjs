@@ -64,6 +64,7 @@ test("UI SPID linking, restart, refresh, revocation and account removal", async 
   app.use("/api/accounts", (await load("packages/server/dist/routes/accounts.js")).default);
   app.use("/api/materie", (await load("packages/server/dist/routes/materie.js")).default);
   app.use("/api/voti", (await load("packages/server/dist/routes/voti.js")).default);
+  app.use(express.static(path.join(root, 'packages/ui/dist')));
   const server = app.listen(0, "127.0.0.1");
   await new Promise(resolve => server.once("listening", resolve));
   t.after(() => new Promise(resolve => server.close(resolve)));
@@ -79,6 +80,12 @@ test("UI SPID linking, restart, refresh, revocation and account removal", async 
   const post = (url, data, options = {}) => request(url, { method: "POST", body: JSON.stringify(data), ...options });
   const start = () => post("/api/auth/spid/start", {});
   const complete = nonce => post("/api/auth/spid/complete", { nonce, paToken: "PRIVATE_PA" });
+
+  const extension = await fetch(base + '/classeviva-auth-extension.zip');
+  assert.equal(extension.status, 200);
+  const archive = Buffer.from(await extension.arrayBuffer());
+  assert.equal(archive.readUInt32LE(0), 0x04034b50);
+  assert.ok(archive.length > 1000);
 
   assert.equal((await request("/api/auth/me")).data.authenticated, false);
   assert.equal((await post("/api/auth/spid/start", {}, { headers: { "X-Classeviva-Request": "" } })).status, 403);

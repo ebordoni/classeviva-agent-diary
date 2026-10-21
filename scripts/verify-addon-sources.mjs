@@ -7,6 +7,7 @@ const directoryPairs = [
   ["packages/core/src", "hassio-addon/classeviva-bot/src/packages/core/src"],
   ["packages/core/src", "hassio-addon/classeviva-ui/src/packages/core/src"],
   ["packages/bot/src", "hassio-addon/classeviva-bot/src/packages/bot/src"],
+  ["tools/mobile-auth-bridge", "hassio-addon/classeviva-ui/src/auth-extension"],
 ];
 
 async function filesIn(directory) {

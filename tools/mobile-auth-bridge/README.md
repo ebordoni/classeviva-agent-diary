@@ -1,75 +1,63 @@
-# Prova del callback mobile nel browser
+# ClasseViva — accesso SPID/CIE (estensione 1.0.0)
 
-Estensione Chrome Manifest V3 sperimentale, mantenuta insieme alla diagnostica
-`scripts/probe-mobile-auth.mjs`. Dalla UI 2.0.0 serve anche al collegamento
-SPID/CIE dell’add-on: consulta la [procedura Home Assistant](../../docs/spid-cie.md#ui-200-collegamento-a-home-assistant).
+Collega la UI Home Assistant a Spaggiari senza terminale, programmi locali o
+codici da copiare. La UI 2.1.0 include il download dello ZIP dell’estensione.
 
-## Permessi e comportamento
+## Preparazione una tantum
 
-- `activeTab` e `scripting`: lettura una tantum, su pressione del pulsante,
-  del solo campo `spid-patoken` nella pagina HTTPS
-  `web.spaggiari.eu/home/app/default/mspidauth.php` con form `mspidauth-ok`.
-- Accesso di rete al loopback `127.0.0.1`. Chrome non distingue le porte nei
-  permessi host; codice e Content Security Policy limitano la destinazione
-  a `http://127.0.0.1:18765/bridge/probe`.
-- Nessun permesso `cookies`, `storage`, `history` o `webRequest`; nessuno script
-  permanente sulle pagine, nessun accesso a PIN o password CIE.
-- Il token è trasmesso al test locale solo dopo un comando esplicito e con
-  un codice di collegamento monouso valido cinque minuti. L'estensione non
-  conserva codice e token dopo la chiusura del popup. Il ricevitore conserva
-  la sessione soltanto nella memoria del processo durante la diagnostica.
-  In modalità collegamento Home Assistant, il programma locale passa il PA
-  alla sola scheda che ha avviato il collegamento, dopo conferma della
-  destinazione: l’add-on scambia il PA con Spaggiari e salva la sessione cifrata.
+1. Scarica lo ZIP dalla schermata di accesso della UI e scompattalo in una
+   cartella stabile, oppure usa questa cartella del repository aggiornato.
+2. In Chrome apri `chrome://extensions`, abilita **Modalità sviluppatore** e
+   scegli **Carica estensione non pacchettizzata**. Seleziona la cartella.
+   Sostituisci la precedente estensione di prova se era installata.
+3. Apri la UI Classeviva, poi il popup dell’estensione. Controlla la destinazione
+   e premi **Abilita su questo Home Assistant**. Concedi i permessi per il tuo
+   Home Assistant e `web.spaggiari.eu`.
+4. Nella UI premi **Accedi con SPID / CIE**, completa il login e attendi il ritorno
+   automatico al diario. Per un profilo aggiuntivo usa **Aggiungi account**.
 
-## Installazione manuale e prova
+[Procedura completa](https://github.com/ebordoni/classeviva-agent-diary/blob/main/docs/spid-cie.md#ui-210-accesso-automatico-da-home-assistant).
+Il primo collegamento avviene dal PC; le conferme restano sul telefono.
 
-L'installazione abilita temporaneamente la lettura del token della pagina
-attiva quando invochi l'estensione. Procedi solo dopo aver verificato questi
-permessi e il codice della cartella.
+## Permessi e riservatezza
 
-Per provare il **core dell'applicativo** committato, dalla root esegui:
+- `activeTab` e `scripting`: riconoscimento della UI dopo un comando dell’utente,
+  supporto alla cornice Ingress e lettura del solo campo `spid-patoken` nella
+  pagina finale HTTPS `web.spaggiari.eu/home/app/default/mspidauth.php`.
+- I permessi per i siti sono opzionali: il popup richiede soltanto il sito
+  Home Assistant selezionato e Spaggiari. Non registra script su tutti i siti.
+- `storage.local`: solo origini Home Assistant autorizzate. `storage.session`:
+  metadati temporanei della procedura, eliminati a completamento, annullamento
+  o chiusura del browser. Mai PA, token API, credenziali di rinnovo o URL Ingress.
+- Il worker legge soltanto la scheda che ha aperto per il login, con scadenza
+  e associazione al documento della UI di origine. Una navigazione, un’altra
+  scheda o un altro frame non possono ricevere il risultato al suo posto.
+- Nessun permesso `cookies`, `history` o `webRequest`; nessuna lettura di PIN
+  o password. Il server conserva e rinnova la sessione cifrata.
+- Il permesso loopback e il collegamento a `127.0.0.1:18765` sono mantenuti
+  esclusivamente per la diagnostica manuale precedente, attivata dal suo pulsante.
+
+Puoi revocare i permessi o rimuovere l’estensione da Chrome. Le sessioni già
+collegate alla UI continuano a rinnovarsi sul server; l’estensione serve
+soltanto per un nuovo login interattivo.
+
+## Diagnostica precedente
+
+Il riquadro **Diagnostica con programma locale** conserva la prova manuale.
+Solo per sviluppatori, dalla root del repository:
 
 ```powershell
 npm run build:core
 node scripts/probe-mobile-auth.mjs --core
 ```
 
-Chiudi prima un eventuale processo diagnostico precedente con `Ctrl+C`.
-La pagina mostrerà **Modalità: core dell’applicativo**. Senza `--core`, lo
-strumento usa invece le chiamate diagnostiche dirette alle API.
-L'estensione già installata funziona in entrambe le modalità.
+In alternativa `node scripts/link-home-assistant.mjs` mantiene il vecchio
+ponte locale. Non è richiesto dal nuovo pulsante della UI. Chiudi prima un
+vecchio programma sulla porta 18765 con `Ctrl+C`.
+Non incollare token o URL di autenticazione in chat, file sorgenti o log.
 
-1. Avvia `node scripts/probe-mobile-auth.mjs` dalla root del repository.
-2. In Chrome apri `chrome://extensions`, attiva **Modalità sviluppatore**,
-   scegli **Carica estensione non pacchettizzata** e seleziona questa cartella.
-3. Apri `http://127.0.0.1:18765`, copia il codice nella sezione **Collegamento
-   dalla pagina aperta**. Ricaricare la pagina genera un nuovo codice.
-4. Sulla scheda finale del login mobile con “loading… please wait”, premi
-   l'icona dell'estensione, incolla il codice e premi **Invia token al test locale**.
-5. Il ricevitore avvia subito lo scambio API: il token iniziale osservato dura
-   appena un minuto. Mostra solo le date del token, se è un JWT, e l'esito senza
-   credenziali. Il pulsante **Ripeti scambio diagnostico** permette di riprovare dopo una correzione del protocollo
-   locale senza esportare nuovamente il token. Se è disponibile, **Prova rinnovo**
-   verifica separatamente il rinnovo.
+## Copia inclusa nell’add-on
 
-Se la pagina finale è ancora aperta, è possibile tentare la prova da quella
-pagina senza rigenerare il collegamento di ritorno. La validità del token
-contenuto nella pagina resta da verificare. Non incollare token o URL di
-autenticazione in chat e non aggiungerli ai file del repository.
-
-Al termine puoi rimuovere l'estensione da `chrome://extensions`; arresta il
-processo locale con `Ctrl+C` per eliminare la sessione in memoria.
-
-## Esito della prova del core
-
-Completa un nuovo login CIE dal link mobile e trasferisci subito il PA con
-l'estensione. Il risultato deve riportare `engine: "@classeviva/core"` e
-`core.connected`, `core.identityBound`, `core.lessonsReadable`,
-`core.subjectsReadable`, `core.periodsReadable`, `core.absencesReadable`
-uguali a `true`. I conteggi non contengono i testi delle lezioni.
-Premi poi **Prova rinnovo**: lo strumento ripristina la sessione nel core,
-forza il rinnovo e ripete le letture. `accessTokenReplaced: true` conferma
-la sostituzione del token. Puoi ripetere la prova dopo più di un minuto
-senza eseguire un altro login CIE. La prova non comprende il login dalla
-UI Home Assistant né la conservazione della sessione dopo un riavvio.
+Questa cartella è la fonte; `hassio-addon/classeviva-ui/src/auth-extension`
+è la copia verificata da `npm run verify:addon-sources`. La build crea lo ZIP
+scaricabile dalla UI senza includere dati dell’istanza.

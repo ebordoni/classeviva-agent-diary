@@ -1,3 +1,10 @@
+## 2.1.0 — 2026-10-21
+
+- Accesso SPID/CIE automatico: la UI e l’estensione comunicano direttamente, senza script da terminale, Node.js o codici da copiare.
+- Estensione scaricabile dalla schermata di accesso e abilitazione una tantum sul proprio Home Assistant.
+- Acquisizione limitata alla scheda di login avviata dalla UI, con ritorno automatico al diario e gestione di annullamento, scadenza e ricaricamento della pagina.
+- Le sessioni esistenti restano compatibili. Per il nuovo flusso sostituire l’estensione di prova con la versione 1.0.0.
+
 ## 2.0.1 — 2026-10-21
 
 - Nuova icona e logo dell’add-on: ClasseViva Studenti e Famiglie.

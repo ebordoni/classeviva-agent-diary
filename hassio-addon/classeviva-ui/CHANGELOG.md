@@ -1,3 +1,7 @@
+## 2.0.1 — 2026-10-21
+
+- Nuova icona e logo dell’add-on: ClasseViva Studenti e Famiglie.
+
 ## 2.0.0 — 2026-10-21
 
 - Rilascio major del collegamento SPID/CIE introdotto nella 1.8.0, con sessioni cifrate, ripristino dopo riavvio e rinnovo automatico.

@@ -7,6 +7,12 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [2.0.1] — 2026-10-21
+
+### Modificato
+
+- **Add-on UI 2.0.1:** icona e logo aggiornati con il marchio ClasseViva Studenti e Famiglie.
+
 ## [2.0.0] — 2026-10-21
 
 ### Modificato

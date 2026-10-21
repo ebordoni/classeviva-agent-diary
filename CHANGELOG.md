@@ -7,6 +7,12 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [2.1.1] — 2026-10-21
+
+### Corretto
+
+- **UI 2.1.1 / estensione 1.0.1:** la pagina Spaggiari di scelta del profilo non viene più scambiata per un callback privo di token. Il collegamento prosegue fino alla selezione e alla pagina finale, con messaggi distinti e conservazione degli errori API già mostrati nella UI.
+
 ## [2.1.0] — 2026-10-21
 
 ### Aggiunto

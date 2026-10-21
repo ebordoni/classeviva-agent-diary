@@ -1,3 +1,9 @@
+## 2.1.1 — 2026-10-21
+
+- Corretto il login quando Spaggiari mostra la scelta del profilo sullo stesso indirizzo del callback: il collegamento resta attivo e attende la selezione del figlio prima di acquisire il token.
+- La UI distingue la scelta del profilo dall’attesa della pagina finale. Gli errori API già mostrati non sono sostituiti da un errore generico del ponte.
+- Estensione aggiornata alla 1.0.1: scaricare il nuovo ZIP, sostituire i file e ricaricare l’estensione in Chrome e la UI.
+
 ## 2.1.0 — 2026-10-21
 
 - Accesso SPID/CIE automatico: la UI e l’estensione comunicano direttamente, senza script da terminale, Node.js o codici da copiare.

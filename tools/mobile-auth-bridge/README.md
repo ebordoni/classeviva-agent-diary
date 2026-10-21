@@ -1,4 +1,4 @@
-# ClasseViva — accesso SPID/CIE (estensione 1.0.0)
+# ClasseViva — accesso SPID/CIE (estensione 1.0.1)
 
 Collega la UI Home Assistant a Spaggiari senza terminale, programmi locali o
 codici da copiare. La UI 2.1.0 include il download dello ZIP dell’estensione.
@@ -13,7 +13,7 @@ codici da copiare. La UI 2.1.0 include il download dello ZIP dell’estensione.
 3. Apri la UI Classeviva, poi il popup dell’estensione. Controlla la destinazione
    e premi **Abilita su questo Home Assistant**. Concedi i permessi per il tuo
    Home Assistant e `web.spaggiari.eu`.
-4. Nella UI premi **Accedi con SPID / CIE**, completa il login e attendi il ritorno
+4. Nella UI premi **Accedi con SPID / CIE**, completa il login, seleziona il profilo proposto da Spaggiari e attendi il ritorno
    automatico al diario. Per un profilo aggiuntivo usa **Aggiungi account**.
 
 [Procedura completa](https://github.com/ebordoni/classeviva-agent-diary/blob/main/docs/spid-cie.md#ui-210-accesso-automatico-da-home-assistant).
@@ -61,3 +61,10 @@ Non incollare token o URL di autenticazione in chat, file sorgenti o log.
 Questa cartella è la fonte; `hassio-addon/classeviva-ui/src/auth-extension`
 è la copia verificata da `npm run verify:addon-sources`. La build crea lo ZIP
 scaricabile dalla UI senza includere dati dell’istanza.
+
+## Correzione 1.0.1
+
+Spaggiari usa `mspidauth.php` anche per la scelta del profilo, prima di
+restituire il token. L’estensione attende la scelta del figlio senza
+interrompere il collegamento. Dopo l’aggiornamento dei file premi **Ricarica**
+per l’estensione in Chrome e ricarica anche la UI Home Assistant.

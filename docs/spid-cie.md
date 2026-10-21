@@ -10,13 +10,13 @@ Bot e CLI mantengono il loro flusso attuale.
 
 ### Preparazione una tantum
 
-1. Aggiorna **Classeviva UI alla 2.1.0** e aprila in Chrome sul PC.
+1. Aggiorna **Classeviva UI alla 2.1.1 o successiva** e aprila in Chrome sul PC.
 2. Nella schermata di accesso apri **Prima volta? Prepara l’accesso in pochi
    passaggi** e premi **Scarica l’estensione**.
 3. Estrai lo ZIP in una cartella stabile sul PC. Apri `chrome://extensions`,
    attiva **Modalità sviluppatore** e scegli **Carica estensione non
    pacchettizzata**; seleziona la cartella estratta. Se avevi l’estensione di
-   prova 0.1.0, sostituiscila con questa versione 1.0.0.
+   prova 0.1.0, sostituiscila con questa versione 1.0.1.
 4. Torna alla UI Classeviva, apri **ClasseViva — accesso SPID/CIE** dal menu
    Estensioni di Chrome e premi **Abilita su questo Home Assistant**.
 5. Controlla che la destinazione mostrata sia il tuo Home Assistant, quindi
@@ -32,6 +32,10 @@ l’estensione. Per aggiungere un profilo da un diario già aperto usa
 **Aggiungi account** nella barra superiore.
 
 ### Accesso
+
+La versione 2.1.1 con estensione 1.0.1 corregge l’interruzione sulla scelta
+del profilo. Dopo aver sostituito i file ricarica l’estensione da
+`chrome://extensions` e ricarica la UI, poi avvia un nuovo login.
 
 1. Premi **Accedi con SPID / CIE** nella UI.
 2. Nella scheda Spaggiari seleziona scuola e profilo e completa SPID/CIE.

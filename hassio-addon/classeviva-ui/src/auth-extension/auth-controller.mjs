@@ -69,7 +69,7 @@ export function createAuthController(api, now = Date.now) {
       const previous = await pending();
       if (previous && previous.uiTabId === sender.tab.id && previous.uiFrameId === sender.frameId &&
         previous.uiOrigin === origin && previous.documentId !== sender.documentId) await clear(previous.nonce);
-      return { ok: true, version: '1.0.0' };
+      return { ok: true, version: '1.0.1' };
     }
     if (message.type === 'cancel') {
       const entry = await pending();
@@ -112,10 +112,23 @@ export function createAuthController(api, now = Date.now) {
       // Conferma che il documento originale sia ancora aperto e in attesa.
       const waiting = await deliver(entry, { type: 'waiting' });
       if (!waiting?.ok) throw Error();
-      const results = await api.scripting.executeScript({ target: { tabId }, func: readMobileToken });
-      paToken = results.length === 1 ? results[0].result : null;
+      const results = await api.scripting.executeScript({ target: { tabId }, func: readMobileToken, args: [true] });
+      const page = results.length === 1 ? results[0].result : null;
+      if (page?.state === 'profile-selection' || page?.state === 'waiting') {
+        // Lo stesso endpoint ospita la scelta del figlio e il callback finale.
+        // La navigazione successiva riattiva capture, senza consumare il nonce.
+        await deliver(entry, { type: 'progress', stage: page.state });
+        return;
+      }
+      paToken = page?.state === 'token' ? page.paToken : null;
       if (typeof paToken !== 'string' || !paToken || paToken.length > 32768) throw Error();
+      if ((await pending())?.nonce !== entry.nonce) return;
       const result = await deliver(entry, { type: 'token', paToken });
+      if (!result?.ok && result?.reported) {
+        await clear(entry.nonce);
+        await api.tabs.update(entry.uiTabId, { active: true }).catch(() => {});
+        return;
+      }
       if (!result?.ok) throw Error();
       await clear(entry.nonce);
       await api.tabs.update(entry.uiTabId, { active: true }).catch(() => {});

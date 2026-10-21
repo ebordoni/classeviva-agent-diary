@@ -33,6 +33,21 @@ test("page reader requires the exact callback page, form and single token field"
   assert.equal(read(), null);
 });
 
+test("automatic reader distinguishes the intermediate profile chooser from the final token", () => {
+  const context = {
+    URL,
+    location: { origin: 'https://web.spaggiari.eu', pathname: '/home/app/default/mspidauth.php', href: 'https://web.spaggiari.eu/home/app/default/mspidauth.php' },
+    document: { getElementById: () => null, querySelectorAll: () => [{ getAttribute: () => '/home/app/default/mspidauth.php?private-profile' }] },
+  };
+  const read = () => JSON.parse(JSON.stringify(runInNewContext(`(${readMobileToken.toString()})(true)`, context)));
+  assert.deepEqual(read(), { state: 'profile-selection' });
+  context.document.getElementById = () => ({});
+  context.document.querySelectorAll = () => [{ value: 'PRIVATE_PA' }];
+  assert.deepEqual(read(), { state: 'token', paToken: 'PRIVATE_PA' });
+  context.document.querySelectorAll = () => [];
+  assert.deepEqual(read(), { state: 'waiting' });
+});
+
 test("extension rejects other pages before injection and transfers only to the fixed local receiver", async () => {
   for (const url of ["https://example.com/home/app/default/mspidauth.php", "http://web.spaggiari.eu/home/app/default/mspidauth.php",
     "https://web.spaggiari.eu/home/app/default/login.php", "https://name:password@web.spaggiari.eu/home/app/default/mspidauth.php"]) {

@@ -37,6 +37,13 @@ export default function SpidConnect({ onConnected }: { onConnected: () => Promis
       const entry = active.current;
       if (!entry || data.nonce !== entry.nonce) return;
       if (data.type === "started") { entry.acknowledged = true; setMessage("Completa SPID/CIE nella scheda Spaggiari. Il diario si aprirà automaticamente."); return; }
+      if (data.type === "progress") {
+        entry.acknowledged = true;
+        setMessage(data.stage === "profile-selection"
+          ? "Login riuscito: scegli il profilo da collegare nella scheda Spaggiari. Il diario si aprirà dopo la scelta."
+          : "Attendo il completamento del login nella scheda Spaggiari…");
+        return;
+      }
       if (data.type === "error" && !busy.current) { await fail(typeof data.error === "string" ? data.error : "Collegamento non riuscito. Riprova."); return; }
       if (data.type !== "token" || busy.current || typeof data.paToken !== "string" || !data.paToken || data.paToken.length > 32768) return;
       busy.current = true;

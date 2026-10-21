@@ -21,13 +21,14 @@
         nonce = undefined;
         if (completing) { completing({ ok: false }); completing = undefined; }
       } else if (message.type === 'finished' && message.nonce === nonce && completing) {
-        completing({ ok: message.ok === true }); completing = undefined; nonce = undefined;
+        completing({ ok: message.ok === true, reported: true }); completing = undefined; nonce = undefined;
       }
     } catch { post({ type: 'error', nonce, error: 'Estensione aggiornata o non raggiungibile. Ricarica la UI e riprova.' }); }
   });
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (sender.id !== chrome.runtime.id || message?.channel !== CHANNEL || !nonce || message.nonce !== nonce) return;
     if (message.type === 'waiting') { sendResponse({ ok: true }); return; }
+    if (message.type === 'progress') { post({ type: 'progress', nonce, stage: message.stage }); sendResponse({ ok: true }); return; }
     if (message.type === 'error') { post({ type: 'error', nonce, error: message.error }); nonce = undefined; sendResponse({ ok: true }); return; }
     if (message.type !== 'token' || completing || typeof message.paToken !== 'string' || !message.paToken || message.paToken.length > 32768) return;
     const timer = setTimeout(() => { if (completing === respond) { completing = undefined; sendResponse({ ok: false }); } }, 60_000);

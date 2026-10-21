@@ -11,15 +11,24 @@ export function isMobileCallback(value) {
 
 // Executed once in the active tab after the user presses the send button.
 // Keep self-contained: chrome.scripting serializes this function.
-export function readMobileToken() {
+export function readMobileToken(describe = false) {
   if (location.origin !== "https://web.spaggiari.eu" ||
-      location.pathname !== "/home/app/default/mspidauth.php" ||
-      !document.getElementById("mspidauth-ok")) return null;
+      location.pathname !== "/home/app/default/mspidauth.php") return null;
+  if (!document.getElementById("mspidauth-ok")) {
+    if (!describe) return null;
+    const profileLinks = Array.from(document.querySelectorAll('a[href]')).some(link => {
+      try {
+        const url = new URL(link.getAttribute('href'), location.href);
+        return url.origin === location.origin && url.pathname === location.pathname;
+      } catch { return false; }
+    });
+    return { state: profileLinks ? 'profile-selection' : 'waiting' };
+  }
   const inputs = document.querySelectorAll('input[name="spid-patoken"]');
-  if (inputs.length !== 1) return null;
+  if (inputs.length !== 1) return describe ? { state: 'waiting' } : null;
   const token = inputs[0].value;
-  if (!token || token.length > 32_768 || /^(?:\[redacted\]|<redacted>|\*+)$/i.test(token)) return null;
-  return token;
+  if (!token || token.length > 32_768 || /^(?:\[redacted\]|<redacted>|\*+)$/i.test(token)) return describe ? { state: 'waiting' } : null;
+  return describe ? { state: 'token', paToken: token } : token;
 }
 
 export async function sendActiveToken(pairingCode, chromeApi = chrome, request = fetch) {

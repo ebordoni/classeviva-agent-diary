@@ -25,7 +25,7 @@ function fakeChrome() {
     }])),
     permissions: { contains: async () => granted, request: async value => { effects.permissions.push(value); return granted; } },
     scripting: {
-      executeScript: async target => { effects.injected.push(target); return [{ result: 'PRIVATE_PA' }]; },
+      executeScript: async target => { effects.injected.push(target); return [{ result: { state: 'token', paToken: 'PRIVATE_PA' } }]; },
       unregisterContentScripts: async () => {}, registerContentScripts: async () => {},
     },
     tabs: {
@@ -83,6 +83,39 @@ test('unapproved origins, foreign senders, invalid nonces and expired requests c
     assert.equal(f.effects.created.length, 0);
   }
   for (const value of ['https://user:password@home.example', 'file:///test', 'https://web.spaggiari.eu', 'https://home.example/path']) assert.throws(() => hostPattern(value));
+});
+
+test('profile selection on the callback URL keeps the operation alive until a profile is chosen', async () => {
+  const f = fakeChrome();
+  const controller = createAuthController(f.api, () => NOW);
+  await controller.handleMessage(start, sender);
+  f.api.scripting.executeScript = async () => [{ result: { state: 'profile-selection' } }];
+  await controller.capture(42);
+  assert.equal(f.stored.session.pendingLogin.nonce, nonce);
+  assert.equal(f.effects.delivered.some(item => item.message.type === 'error'), false);
+  assert.equal(f.effects.delivered.at(-1).message.stage, 'profile-selection');
+  assert.equal(f.effects.removed.length, 0);
+  f.api.scripting.executeScript = async () => [{ result: { state: 'waiting' } }];
+  await controller.capture(42);
+  assert.equal(f.stored.session.pendingLogin.nonce, nonce);
+  f.api.scripting.executeScript = async () => [{ result: { state: 'token', paToken: 'PRIVATE_PA' } }];
+  await controller.capture(42);
+  assert.equal(f.stored.session.pendingLogin, undefined);
+  assert.equal(f.effects.delivered.filter(item => item.message.type === 'token').length, 1);
+  assert.deepEqual(f.effects.removed, [42]);
+});
+
+test('an API error already displayed in the UI is not replaced by a generic bridge error', async () => {
+  const f = fakeChrome();
+  const controller = createAuthController(f.api, () => NOW);
+  f.api.tabs.sendMessage = async (_id, message) => {
+    f.effects.delivered.push({ message });
+    return message.type === 'token' ? { ok: false, reported: true } : { ok: true };
+  };
+  await controller.handleMessage(start, sender);
+  await controller.capture(42);
+  assert.equal(f.stored.session.pendingLogin, undefined);
+  assert.equal(f.effects.delivered.some(item => item.message.type === 'error'), false);
 });
 
 test('cancellation and tab closure invalidate the pending request without reading the callback', async () => {

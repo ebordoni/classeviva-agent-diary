@@ -33,7 +33,7 @@ l’estensione. Per aggiungere un profilo da un diario già aperto usa
 
 ### Collegare due figli o account
 
-Ogni login SPID/CIE collega il solo profilo selezionato su Spaggiari. Per
+L’implementazione attuale collega il solo profilo selezionato su Spaggiari. Per
 aggiungere il secondo, dal diario premi **Aggiungi account**, avvia l’accesso
 SPID/CIE e seleziona l’altro figlio nella pagina Spaggiari. Puoi usare la stessa
 identità SPID/CIE se entrambi i profili sono associati ad essa.
@@ -44,6 +44,26 @@ login finché le rispettive sessioni sono valide. Se selezioni nuovamente lo
 stesso profilo ne aggiorni il collegamento, senza creare un secondo account.
 Per collegare il nuovo profilo usa Chrome sul PC con l’estensione già abilitata;
 poi entrambi saranno disponibili anche da iPhone.
+
+### Indagine sul collegamento di tutti i figli con un solo accesso
+
+La [documentazione Spaggiari](https://www.spaggiari.eu/assistenza-generale/come-accedere-allecosistema-spaggiari-tramite-spid)
+conferma che l’identità digitale dà accesso ai profili associati alla persona.
+Il login separato per ciascun figlio è quindi un limite del flusso attuale
+dell’add-on, non un requisito dimostrato della piattaforma.
+
+Per verificare il comportamento reale è disponibile la diagnostica locale
+`node scripts/probe-mobile-auth.mjs --profiles`. Conserva in memoria due
+sessioni acquisite, verifica letture nel percorso primo–secondo–primo e
+controlla separatamente se il token del primo consente di leggere la scheda
+del secondo. Gli identificativi provengono esclusivamente da due scambi di
+autenticazione riusciti: non vengono provati identificativi arbitrari.
+La prova restituisce solo conteggi e indicatori; non modifica gli account HA.
+
+Resta da verificare dal vivo se, dopo una sola conferma CIE, i collegamenti
+nella scelta dei figli permettono di ottenere entrambi i token, oppure se le
+API espongono una sessione o un elenco comune. I test simulati della
+diagnostica non dimostrano quale meccanismo usi l’app ufficiale.
 
 ### Accesso
 

@@ -308,10 +308,38 @@ export async function probeCoreRefresh(session) {
   return result;
 }
 
-function page(csrf, bridgeCode, useCore) {
+/** Only profiles independently authenticated by Spaggiari may enter this probe. */
+export async function probeProfileSwitch(sessions, request = fetch) {
+  if (sessions.length < 2) throw new Error("twoProfilesRequired");
+  const { ClassevivaClient } = await import("../packages/core/dist/client/ClassevivaClient.js");
+  const selected = sessions.slice(0, 2);
+  if (selected[0].ident === selected[1].ident) throw new Error("twoProfilesRequired");
+  const clients = await Promise.all(selected.map(session => ClassevivaClient.daSessioneSpid(session)));
+  const switches = [];
+  for (const index of [0, 1, 0]) {
+    const client = clients[index];
+    const subjects = await client.materie();
+    switches.push({ profile: index + 1, connected: client.connesso,
+      identityBound: client.esportaSessioneSpid()?.ident === selected[index].ident,
+      subjectsReadable: Array.isArray(subjects.subjects), subjectCount: subjects.subjects?.length ?? null });
+  }
+  const updated = clients.map(client => client.esportaSessioneSpid());
+  const otherId = /^[GS](\d+)[A-Z]?$/i.exec(updated[1].ident)?.[1];
+  if (!otherId) throw new Error("invalidProfile");
+  // Both IDs came from separate successful authentications, never from guesses.
+  const shared = await api(`v1/students/${otherId}/card`, { session: updated[0] }, request);
+  return { publicResult: { profilesCaptured: selected.length, switches,
+    sameAccessToken: updated[0].accessToken === updated[1].accessToken,
+    sameRefreshToken: updated[0].refreshToken === updated[1].refreshToken,
+    sharedTokenRead: { httpStatus: shared.response.status,
+      identityMatches: shared.response.ok && shared.data?.card?.ident === updated[1].ident } }, sessions: updated };
+}
+
+function page(csrf, bridgeCode, useCore, profilesMode = false) {
   return `<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
 <title>Prova accesso mobile ClasseViva</title><style>body{font:17px system-ui;max-width:760px;margin:48px auto;padding:0 24px;color:#182e46}button,input{font:inherit;margin:12px 0;padding:10px}pre{white-space:pre-wrap;background:#eef3f7;padding:16px}small{display:block}</style>
 <h1>Prova accesso mobile ClasseViva</h1>
+${profilesMode ? `<h2>Verifica di due profili con un solo login CIE</h2><p>Acquisisci le due pagine finali ottenute dalla stessa scelta dei figli. Le sessioni restano soltanto nella memoria di questo processo. La prova non modifica gli account su Home Assistant.</p><label for="pa-token">Token della pagina finale (solo prova tecnica locale)</label><input id="pa-token" type="password" autocomplete="off" spellcheck="false"><button id="capture-profile">Acquisisci profilo</button><button id="check-profiles">Verifica cambio profilo</button>` : ""}
 <p><strong>${useCore ? "Modalità: core dell’applicativo — accesso, letture e rinnovo tramite ClassevivaClient." : "Modalità: diagnostica diretta delle API."}</strong></p>
 <h2>Collegamento dalla pagina aperta</h2>
 <p>L’estensione di prova legge il token dalla pagina finale già aperta, senza ricaricarla. Invia il token solo a questo processo locale e solo premendo il suo pulsante.</p>
@@ -334,12 +362,14 @@ let busy=false;async function run(path,body){if(busy)return;busy=true;document.g
 document.getElementById('login').onclick=async()=>{const input=document.getElementById('callback');const callbackUrl=input.value.trim();input.value='';if(callbackUrl){await run('/probe',{callbackUrl});return;}const file=document.getElementById('file').files[0];if(!file){out.textContent='Incolla il collegamento della pagina finale.';return;}if(file.size>${MAX_BYTES}){out.textContent='File troppo grande: scegli il solo HTML.';return;}await run('/probe',{html:await file.text()});};
 document.getElementById('refresh').onclick=()=>run('/refresh',{});
 document.getElementById('retry').onclick=()=>run('/retry',{});
+${profilesMode ? `document.getElementById('capture-profile').onclick=()=>{const input=document.getElementById('pa-token');const paToken=input.value;input.value='';return run('/probe',{paToken});};document.getElementById('check-profiles').onclick=()=>run('/profiles',{});` : ""}
 document.getElementById('copy-code').onclick=async()=>{const input=document.getElementById('bridge-code');try{await navigator.clipboard.writeText(input.value);document.getElementById('copy-code').textContent='Codice copiato';}catch{input.select();out.textContent='Premi Ctrl+C per copiare il codice selezionato.';}};
 setInterval(async()=>{if(busy)return;try{const r=await fetch('/result',{cache:'no-store'});const result=await r.json();if(result.state==='waiting')return;out.textContent=JSON.stringify(result,null,2);document.getElementById('refresh').disabled=!result.refreshAvailable;document.getElementById('retry').disabled=!result.retryAvailable;}catch{}},2000);
 </script></html>`;
 }
 
-export function createProbeServer({ port = 18765, request = fetch, now = Date.now, autoExchange = true, useCore = false } = {}) {
+export function createProbeServer({ port = 18765, request = fetch, now = Date.now, autoExchange = true, useCore = false, profilesMode = false } = {}) {
+  if (profilesMode) useCore = true;
   const login = useCore ? probeCoreLogin : probeLogin;
   const refresh = useCore ? probeCoreRefresh : probeRefresh;
   const csrf = randomBytes(24).toString("hex");
@@ -351,6 +381,12 @@ export function createProbeServer({ port = 18765, request = fetch, now = Date.no
   let busy = false;
   let bridgeCode = "";
   let bridgeExpiresAt = 0;
+  const profiles = new Map();
+  function remember(result) {
+    if (profilesMode && result.session) profiles.set(result.session.ident, result.session);
+    if (profilesMode) result.publicResult.profilesCaptured = profiles.size;
+    return result;
+  }
   const server = createServer(async (req, res) => {
     const extensionOrigin = /^chrome-extension:\/\/[a-p]{32}$/.test(req.headers.origin ?? "") ? req.headers.origin : null;
     const bridgeRequest = req.url === "/bridge/probe";
@@ -369,7 +405,7 @@ export function createProbeServer({ port = 18765, request = fetch, now = Date.no
     if (req.method === "GET" && req.url === "/") {
       bridgeCode = randomBytes(24).toString("hex");
       bridgeExpiresAt = now() + 5 * 60_000;
-      return send(200, page(csrf, bridgeCode, useCore), true);
+      return send(200, page(csrf, bridgeCode, useCore, profilesMode), true);
     }
     if (req.method === "GET" && req.url === "/result") return send(200, {
       ...lastResult, ...(lastResult.paTokenMetadata && pendingPaToken ? { paTokenMetadata: tokenMetadata(pendingPaToken, now()) } : {}),
@@ -401,7 +437,7 @@ export function createProbeServer({ port = 18765, request = fetch, now = Date.no
           paTokenMetadata: tokenMetadata(pendingPaToken), state: "Token ricevuto in memoria; scambio API da avviare separatamente.",
           refreshAvailable: false, retryAvailable: true };
         if (autoExchange) {
-          const result = await login(pendingPaToken, request);
+          const result = remember(await login(pendingPaToken, request));
           session = result.session;
           lastResult = { source: "pagina aperta nel browser", tokenCaptured: true, ...result.publicResult,
             refreshAvailable: !!session?.refreshToken, retryAvailable: true };
@@ -412,7 +448,7 @@ export function createProbeServer({ port = 18765, request = fetch, now = Date.no
         return send(400, lastResult);
       } finally { busy = false; }
     }
-    if (req.method !== "POST" || !["/probe", "/refresh", "/retry"].includes(req.url)) return send(404, { error: "Non trovato." });
+    if (req.method !== "POST" || !["/probe", "/refresh", "/retry", ...(profilesMode ? ["/profiles"] : [])].includes(req.url)) return send(404, { error: "Non trovato." });
     const supplied = Buffer.from(String(req.headers["x-probe-csrf"] ?? ""));
     if (req.headers.origin !== origin || req.headers["content-type"] !== "application/json" ||
         supplied.length !== csrf.length || !timingSafeEqual(supplied, Buffer.from(csrf))) return send(403, { error: "Richiesta non consentita." });
@@ -422,10 +458,20 @@ export function createProbeServer({ port = 18765, request = fetch, now = Date.no
       let bytes = 0; const chunks = [];
       for await (const chunk of req) { bytes += chunk.length; if (bytes > MAX_BYTES * 2) throw new Error("size"); chunks.push(chunk); }
       const body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+      if (req.url === "/profiles") {
+        if (profiles.size < 2) return send(400, { error: "Acquisisci due profili distinti prima della verifica.", profilesCaptured: profiles.size });
+        const check = await probeProfileSwitch([...profiles.values()], request);
+        for (const updated of check.sessions) profiles.set(updated.ident, updated);
+        lastResult = check.publicResult;
+        return send(200, lastResult);
+      }
       let result;
       if (req.url === "/probe") {
         session = null;
-        if (body.callbackUrl) {
+        if (profilesMode && body.paToken) {
+          if (!validPaToken(body.paToken)) return send(400, { error: "Token non valido." });
+          result = await login(body.paToken, request);
+        } else if (body.callbackUrl) {
           if (useCore) return send(400, { error: "In modalità core usa l’estensione dalla pagina finale aperta nel browser." });
           result = await probeCallback(body.callbackUrl, request);
         } else {
@@ -443,6 +489,7 @@ export function createProbeServer({ port = 18765, request = fetch, now = Date.no
         if (!session?.refreshToken) return send(400, { error: "Rinnovo non disponibile." });
         result = await refresh(session, request);
       }
+      remember(result);
       session = result.session;
       lastResult = { ...result.publicResult, refreshAvailable: !!session?.refreshToken, retryAvailable: !!pendingPaToken };
       send(200, lastResult);
@@ -456,19 +503,20 @@ export function createProbeServer({ port = 18765, request = fetch, now = Date.no
   });
   server.requestTimeout = 30_000;
   server.headersTimeout = 10_000;
-  server.on("close", () => { session = null; pendingPaToken = null; });
+  server.on("close", () => { session = null; pendingPaToken = null; profiles.clear(); });
   return server;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const useCore = process.argv.includes("--core");
+  const profilesMode = process.argv.includes("--profiles");
+  const useCore = process.argv.includes("--core") || profilesMode;
   let ready = true;
   if (useCore) {
     try { await import("../packages/core/dist/client/ClassevivaClient.js"); }
     catch { ready = false; console.error("Core non disponibile: esegui prima npm run build:core."); process.exitCode = 1; }
   }
   if (ready) {
-    const server = createProbeServer({ useCore });
+    const server = createProbeServer({ useCore, profilesMode });
     server.listen(18765, "127.0.0.1", () => console.log(`Prova locale pronta (${useCore ? "core" : "API dirette"}): http://127.0.0.1:18765`));
     server.on("error", () => { console.error("Impossibile avviare la prova locale sulla porta 18765."); process.exitCode = 1; });
   }

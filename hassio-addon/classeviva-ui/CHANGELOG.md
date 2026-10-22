@@ -1,3 +1,8 @@
+## 2.1.4 — 2026-10-22
+
+- Diagnostica del cambio profilo estesa alle letture reali di materie e lezioni per i profili restituiti da Spaggiari, confrontando ID del codice account e `usrId` senza mostrarne i valori.
+- Verifica anche la struttura del portfolio. Un 404 sulla sola scheda non viene considerato prova dell’impossibilità di leggere il diario dell’altro figlio.
+
 ## 2.1.3 — 2026-10-22
 
 - Diagnostica del cambio profilo in «Aggiungi account»: verifica dalla sessione SPID/CIE già collegata l’elenco delle schede e l’accesso agli altri account salvati, senza nuove conferme CIE o programmi sul PC.

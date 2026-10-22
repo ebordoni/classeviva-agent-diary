@@ -81,6 +81,24 @@ rinnovare normalmente la sessione attiva, ma non collega, rimuove o converte
 gli account. L’esito mostra solo stati HTTP, tipi dei campi, conteggi e
 corrispondenze; nessun valore personale o token viene restituito alla UI.
 
+Il report reale della **2.1.3** ha restituito due schede da `/cards`, entrambe
+corrispondenti agli account salvati; la sola richiesta `/card` del secondo
+account ha risposto 404. Questo conferma la visibilità dell’elenco, ma non
+dimostra né il rifiuto di tutte le letture né l’esistenza di un token unico
+utilizzabile per entrambi i diari.
+
+La **2.1.4** estende la stessa verifica ai primi due profili restituiti:
+confronta `usrId` con la parte numerica di `ident`, prova scheda, materie e
+lezioni del giorno per ciascun ID distinto e riporta soltanto stati, conteggi
+e corrispondenze. I numeri non sono mostrati e provengono esclusivamente dalle
+schede ottenute con la sessione autenticata. Le richieste identiche vengono
+riutilizzate nella stessa prova; gli account non vengono convertiti o modificati.
+
+Legge inoltre `/xauth/myportfolio`, endpoint presente in un
+[client pubblico indipendente](https://github.com/Sythos/Classeviva-Dashboard-HACS/blob/main/custom_components/cvv_dashboard/api.py),
+per riportarne la sola struttura. Questa fonte non documenta il cambio profilo
+con SPID/CIE: il funzionamento con la sessione dell’utente resta da verificare.
+
 ### Accesso
 
 La versione 2.1.1 con estensione 1.0.1 corregge l’interruzione sulla scelta

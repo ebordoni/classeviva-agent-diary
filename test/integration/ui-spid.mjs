@@ -28,6 +28,9 @@ test("UI SPID linking, restart, refresh, revocation and account removal", async 
   let diskFailure = false;
   let cardsDenied = false;
   let crossProfileAccess = false;
+  let routedProfileReads = false;
+  let portfolioCardDenied = false;
+  let includeThirdProfile = false;
   const calls = [];
   const originalAdapter = axios.default.defaults.adapter;
   axios.default.defaults.adapter = async config => {
@@ -49,14 +52,22 @@ test("UI SPID linking, restart, refresh, revocation and account removal", async 
         await rename(process.env.ACCOUNTS_PATH, `${process.env.ACCOUNTS_PATH}.backup`);
         await mkdir(process.env.ACCOUNTS_PATH);
       }
+    } else if (config.url === "/xauth/myportfolio") {
+      data = { portfolio: { items: [{ ident: id, personalInfo: { schoolYY: 2026 }, token: "PRIVATE_PORTFOLIO_TOKEN" }] } };
     } else if (config.url.endsWith("/cards")) {
       if (cardsDenied) status = 403;
-      data = { cards: [{ ident: id, firstName: "PRIVATE_NAME", token: "PRIVATE_TOKEN" },
-        { ident: "G2345678A", firstName: "PRIVATE_OTHER_NAME" }] };
+      data = { cards: [{ ident: id, usrId: Number(id.slice(1, -1)), firstName: "PRIVATE_NAME", token: "PRIVATE_TOKEN" },
+        { ident: "G2345678A", usrId: 9876543, firstName: "PRIVATE_OTHER_NAME" },
+        ...(includeThirdProfile ? [{ ident: "G7777777A", usrId: 7777777 }] : [])] };
     } else if (config.url.endsWith("/card")) {
-      const selectedId = crossProfileAccess && config.url.includes("/2345678/") ? "G2345678A" : id;
+      if (routedProfileReads && config.url.includes("/2345678/")) status = 404;
+      if (portfolioCardDenied && config.url.includes("/9876543/")) status = 404;
+      const selectedId = (crossProfileAccess && config.url.includes("/2345678/")) || (routedProfileReads && config.url.includes("/9876543/")) ? "G2345678A" : id;
       data = { card: { ident: selectedId, usrId: Number(selectedId.slice(1, -1)), usrType: "G", firstName: "Studente", lastName: "Esempio" } };
-    } else data = { subjects: [{ id: 1, description: "Italiano", order: 1, teachers: [] }], lessons: [], events: [] };
+    } else {
+      if (routedProfileReads && config.url.includes("/2345678/")) status = 404;
+      data = { subjects: [{ id: 1, description: "Italiano", order: 1, teachers: [] }], lessons: [], events: [] };
+    }
     const response = { status, statusText: "", config, headers: axios.AxiosHeaders.from(headers), data };
     if (status >= 400) throw new axios.AxiosError("PRIVATE_ECHO", "ERR_BAD_RESPONSE", config, {}, response);
     return response;
@@ -128,6 +139,27 @@ test("UI SPID linking, restart, refresh, revocation and account removal", async 
   assert.equal(deniedProbe.data.cards.httpStatus, 403);
   assert.equal((await request("/api/auth/me")).data.authenticated, true);
   cardsDenied = false; crossProfileAccess = false;
+  routedProfileReads = true; includeThirdProfile = true;
+  const routed = (await post("/api/accounts/spid/profiles-probe", {})).data;
+  assert.equal(routed.profileReads.length, 2);
+  assert.equal(routed.returnedProfilesSkipped, 1);
+  assert.equal(calls.some(path => path.includes("7777777")), false);
+  assert.equal(routed.portfolio.httpStatus, 200);
+  assert.equal(routed.portfolio.schema.fields.portfolio.fields.items.item.fields.personalInfo.fields.schoolYY, "number");
+  assert.equal(routed.profileReads[0].usrIdMatchesIdent, true);
+  assert.equal(routed.profileReads[1].usrIdMatchesIdent, false);
+  assert.deepEqual(routed.profileReads[1].routes.map(route => route.idSource), ["ident", "usrId"]);
+  assert.equal(routed.profileReads[1].routes[0].subjects.httpStatus, 404);
+  assert.equal(routed.profileReads[1].routes[1].card.identityMatches, true);
+  assert.equal(routed.profileReads[1].routes[1].subjects.readable, true);
+  assert.equal(routed.profileReads[1].routes[1].lessons.readable, true);
+  assert.doesNotMatch(JSON.stringify(routed), /1234567|2345678|9876543|7777777/);
+  portfolioCardDenied = true;
+  const diaryOnly = (await post("/api/accounts/spid/profiles-probe", {})).data.profileReads[1].routes[1];
+  assert.equal(diaryOnly.card.httpStatus, 404);
+  assert.equal(diaryOnly.subjects.readable, true);
+  assert.equal(diaryOnly.lessons.readable, true);
+  routedProfileReads = false; portfolioCardDenied = false; includeThirdProfile = false;
   if (process.platform !== "win32") {
     for (const file of [process.env.ACCOUNTS_PATH, path.join(directory, "spid-session.key")]) {
       assert.equal((await stat(file)).mode & 0o777, 0o600);

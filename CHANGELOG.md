@@ -7,6 +7,12 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [2.1.4] — 2026-10-22
+
+### Migliorato
+
+- **Add-on UI 2.1.4:** diagnostica dei profili SPID/CIE estesa a portfolio, materie e lezioni, con confronto degli identificativi restituiti dall’API. Un 404 sulla scheda del secondo figlio non viene interpretato come rifiuto di tutte le letture.
+
 ## [2.1.3] — 2026-10-22
 
 ### Aggiunto

@@ -2,9 +2,23 @@ import { Router } from "express";
 import { loadAccounts, publicAccount, removeAccount } from "../accounts.js";
 import { accountClient, forgetClient } from "../clients.js";
 import { asyncRoute, sendClientError } from "../http.js";
+import { requireAuth } from "../middleware/auth.js";
+import { probeSpidProfiles } from "../spid-profiles-probe.js";
 import { activate } from "./auth.js";
 
 const router = Router();
+router.post("/spid/profiles-probe", (req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  if (req.get("X-Classeviva-Request") !== "1") return res.status(403).json({ error: "Richiesta non consentita." });
+  return next();
+}, requireAuth, asyncRoute(async (req, res) => {
+  if (!req.classeviva?.esportaSessioneSpid()) return res.status(409).json({ error: "Apri prima un account collegato con SPID/CIE." });
+  try {
+    const accounts = await loadAccounts();
+    return res.json(await probeSpidProfiles(req.classeviva, accounts.map(account => account.studentId)));
+  } catch (error) { return sendClientError(req, res, error); }
+}));
+
 router.get("/", asyncRoute(async (_req, res) => {
   res.setHeader("Cache-Control", "no-store");
   return res.json({ accounts: (await loadAccounts()).map(publicAccount) });

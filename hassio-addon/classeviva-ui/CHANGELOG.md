@@ -1,3 +1,8 @@
+## 2.1.3 — 2026-10-22
+
+- Diagnostica del cambio profilo in «Aggiungi account»: verifica dalla sessione SPID/CIE già collegata l’elenco delle schede e l’accesso agli altri account salvati, senza nuove conferme CIE o programmi sul PC.
+- Esito copiabile con soli indicatori e struttura della risposta, senza nomi, identificativi o credenziali. La prova non modifica gli account; il collegamento automatico di tutti i figli resta in verifica.
+
 ## 2.1.2 — 2026-10-21
 
 - Pulsante «Aggiungi account» visibile nella barra superiore anche su telefono, con istruzioni per collegare separatamente il profilo di un altro figlio tramite SPID/CIE.

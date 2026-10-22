@@ -7,6 +7,12 @@ e il versioning segue [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [2.1.3] — 2026-10-22
+
+### Aggiunto
+
+- **Add-on UI 2.1.3:** diagnostica dei profili SPID/CIE dalla sessione già salvata su Home Assistant, per verificare il cambio tra figli senza richiedere un nuovo login. Risultati tecnici copiabili privi di dati personali e credenziali; nessuna modifica agli account collegati.
+
 ## [2.1.2] — 2026-10-21
 
 ### Migliorato

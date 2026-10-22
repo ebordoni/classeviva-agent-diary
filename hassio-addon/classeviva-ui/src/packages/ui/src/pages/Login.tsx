@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { accountsApi, authApi, type AccountInfo } from "../api.ts";
 import SpidConnect from "../components/SpidConnect.tsx";
+import ProfileDiagnostics from "../components/ProfileDiagnostics.tsx";
 
 export default function Login({ accounts, forceNew = false }: { accounts: AccountInfo[]; forceNew?: boolean }) {
   const [studentId, setStudentId] = useState("");
@@ -49,6 +50,7 @@ export default function Login({ accounts, forceNew = false }: { accounts: Accoun
         </div>)}
       </section>}
       <SpidConnect onConnected={connected} />
+      {forceNew && accounts.some(account => account.authType === "spid") && <ProfileDiagnostics />}
       <details className="border-t pt-4 text-sm">
         <summary className="cursor-pointer text-gray-600">Accesso con password</summary>
         <p className="text-gray-500 mt-3">Disponibile solo per gli account che consentono ancora questo accesso.</p>

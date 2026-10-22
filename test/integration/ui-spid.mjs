@@ -26,6 +26,8 @@ test("UI SPID linking, restart, refresh, revocation and account removal", async 
   let transient = false;
   let refreshes = 0;
   let diskFailure = false;
+  let cardsDenied = false;
+  let crossProfileAccess = false;
   const calls = [];
   const originalAdapter = axios.default.defaults.adapter;
   axios.default.defaults.adapter = async config => {
@@ -47,8 +49,13 @@ test("UI SPID linking, restart, refresh, revocation and account removal", async 
         await rename(process.env.ACCOUNTS_PATH, `${process.env.ACCOUNTS_PATH}.backup`);
         await mkdir(process.env.ACCOUNTS_PATH);
       }
+    } else if (config.url.endsWith("/cards")) {
+      if (cardsDenied) status = 403;
+      data = { cards: [{ ident: id, firstName: "PRIVATE_NAME", token: "PRIVATE_TOKEN" },
+        { ident: "G2345678A", firstName: "PRIVATE_OTHER_NAME" }] };
     } else if (config.url.endsWith("/card")) {
-      data = { card: { ident: id, usrId: Number(id.slice(1, -1)), usrType: "G", firstName: "Studente", lastName: "Esempio" } };
+      const selectedId = crossProfileAccess && config.url.includes("/2345678/") ? "G2345678A" : id;
+      data = { card: { ident: selectedId, usrId: Number(selectedId.slice(1, -1)), usrType: "G", firstName: "Studente", lastName: "Esempio" } };
     } else data = { subjects: [{ id: 1, description: "Italiano", order: 1, teachers: [] }], lessons: [], events: [] };
     const response = { status, statusText: "", config, headers: axios.AxiosHeaders.from(headers), data };
     if (status >= 400) throw new axios.AxiosError("PRIVATE_ECHO", "ERR_BAD_RESPONSE", config, {}, response);
@@ -88,6 +95,7 @@ test("UI SPID linking, restart, refresh, revocation and account removal", async 
   assert.ok(archive.length > 1000);
 
   assert.equal((await request("/api/auth/me")).data.authenticated, false);
+  assert.equal((await post("/api/accounts/spid/profiles-probe", {})).status, 401);
   assert.equal((await post("/api/auth/spid/start", {}, { headers: { "X-Classeviva-Request": "" } })).status, 403);
   let pairing = (await start()).data;
   assert.equal((await post("/api/auth/spid/complete", { nonce: pairing.nonce, paToken: "PRIVATE_PA" }, { other: true })).status, 400);
@@ -98,6 +106,28 @@ test("UI SPID linking, restart, refresh, revocation and account removal", async 
   assert.equal((await request("/api/materie")).data.subjects.length, 1);
   assert.equal((await request("/api/voti")).status, 409);
   assert.equal((await readFile(process.env.ACCOUNTS_PATH, "utf8")).includes("PRIVATE"), false);
+  const beforeProbeCalls = calls.length;
+  assert.equal((await post("/api/accounts/spid/profiles-probe", {}, { headers: { "X-Classeviva-Request": "" } })).status, 403);
+  assert.equal(calls.length, beforeProbeCalls);
+  await accounts.upsertAccount("G2345678A", "PRIVATE_OLD_PASSWORD", "Altro studente");
+  const beforeProbeAccounts = await readFile(process.env.ACCOUNTS_PATH, "utf8");
+  const profileProbe = await post("/api/accounts/spid/profiles-probe", { studentId: "G9999999A" });
+  assert.equal(profileProbe.status, 200);
+  assert.equal(profileProbe.data.cards.httpStatus, 200);
+  assert.equal(profileProbe.data.cards.returnedProfileCount, 2);
+  assert.equal(profileProbe.data.cards.savedProfilesMatched, 2);
+  assert.equal(profileProbe.data.cards.schema.fields.cards.item.fields.token, "string");
+  assert.deepEqual(profileProbe.data.existingProfiles, [{ profile: 1, httpStatus: 200, identityMatches: false }]);
+  assert.equal(calls.some(path => path.includes("9999999")), false);
+  assert.doesNotMatch(JSON.stringify(profileProbe.data), /1234567|2345678/);
+  assert.equal(await readFile(process.env.ACCOUNTS_PATH, "utf8"), beforeProbeAccounts);
+  crossProfileAccess = true;
+  assert.equal((await post("/api/accounts/spid/profiles-probe", {})).data.existingProfiles[0].identityMatches, true);
+  cardsDenied = true;
+  const deniedProbe = await post("/api/accounts/spid/profiles-probe", {});
+  assert.equal(deniedProbe.data.cards.httpStatus, 403);
+  assert.equal((await request("/api/auth/me")).data.authenticated, true);
+  cardsDenied = false; crossProfileAccess = false;
   if (process.platform !== "win32") {
     for (const file of [process.env.ACCOUNTS_PATH, path.join(directory, "spid-session.key")]) {
       assert.equal((await stat(file)).mode & 0o777, 0o600);

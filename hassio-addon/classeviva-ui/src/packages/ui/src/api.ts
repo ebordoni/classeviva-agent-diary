@@ -156,6 +156,9 @@ export const cacheApi = {
 // ─── Accounts ────────────────────────────────────────────────────
 
 export const accountsApi = {
+  probeSpidProfiles: () => apiFetch<Record<string, unknown>>("api/accounts/spid/profiles-probe", {
+    method: "POST", headers: { "X-Classeviva-Request": "1" }, body: "{}",
+  }),
   list: () => apiFetch<{ accounts: AccountInfo[] }>("api/accounts"),
   remove: (studentId: string) =>
     apiFetch<{ success: boolean }>(`api/accounts/${studentId}`, {

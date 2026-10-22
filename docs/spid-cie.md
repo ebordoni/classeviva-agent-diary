@@ -65,6 +65,22 @@ nella scelta dei figli permettono di ottenere entrambi i token, oppure se le
 API espongono una sessione o un elenco comune. I test simulati della
 diagnostica non dimostrano quale meccanismo usi l’app ufficiale.
 
+Nella prova del 22 ottobre 2026 il selettore presentava due collegamenti
+distinti. Aprendoli in due schede, il primo ha mostrato il form finale mentre
+il secondo è tornato al login, sebbene entrambi i JWT di ritorno fossero
+ancora validi. Questo non dimostra che il token mobile abbia un ambito limitato
+a un solo figlio: lo scambio e il confronto di due sessioni non sono stati
+completati. Non viene quindi introdotto il riuso automatico di tali URL.
+
+Dalla UI **2.1.3** la verifica può proseguire sulla sessione già salvata in HA:
+**Aggiungi account → Diagnostica del cambio profilo → Verifica profili SPID/CIE**.
+La prova legge `/students/{id}/cards` del profilo attivo e tenta la scheda
+degli altri identificativi già presenti negli account salvati (massimo cinque).
+Non accetta identificativi dal browser e non prova numeri arbitrari. Può
+rinnovare normalmente la sessione attiva, ma non collega, rimuove o converte
+gli account. L’esito mostra solo stati HTTP, tipi dei campi, conteggi e
+corrispondenze; nessun valore personale o token viene restituito alla UI.
+
 ### Accesso
 
 La versione 2.1.1 con estensione 1.0.1 corregge l’interruzione sulla scelta

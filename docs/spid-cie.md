@@ -99,6 +99,51 @@ Legge inoltre `/xauth/myportfolio`, endpoint presente in un
 per riportarne la sola struttura. Questa fonte non documenta il cambio profilo
 con SPID/CIE: il funzionamento con la sessione dell’utente resta da verificare.
 
+Il report reale della **2.1.4** conferma che sia `/cards` sia
+`/xauth/myportfolio` restituiscono i due profili. Per entrambi `usrId` coincide
+con la parte numerica di `ident`. Con il token attivo, il primo profilo legge
+scheda, 14 materie e 7 lezioni del giorno; per il secondo tutte e tre le
+richieste rispondono 404. Sono quindi escluse, in questa prova, la differenza
+fra i due ID e la sola indisponibilità di `/card` come spiegazioni del mancato
+cambio. Vedere i due account nel portfolio non dimostra l’accesso ai due diari
+con lo stesso token: resta da ricostruire lo scambio eseguito dal client mobile
+quando seleziona l’altra identità.
+
+Il 22 ottobre l’utente ha confermato che nell’app ufficiale entrambi gli
+account erano già collegati prima del passaggio a SPID/CIE. Il cambio senza
+nuova conferma CIE non costituisce quindi una prova del recupero di due
+sessioni da una sola autenticazione iniziale.
+
+L’analisi statica del pacchetto Android 5.12.9 (6972), ottenuto dal mirror
+APKPure e non installato o eseguito, fornisce un riscontro più preciso nel
+modulo Flutter `login_flutter`:
+
+- `AuthRepositoryImpl.switchUserByIdentity` (`0xc75a70`) legge gli utenti
+  già salvati con `KeychainService.getAllUser`, cerca quello corrispondente
+  tramite `User.hasIdentity`, aggiorna l’ultimo utilizzo e lo rende attivo.
+  Se non trova l’account restituisce `null`; quel metodo non scambia token
+  con le API.
+- `switchUser` (`0xdb3ad0`) salva l’utente selezionato e notifica il cambio
+  locale. Anche questo metodo non acquisisce credenziali per un altro figlio.
+- Il login SPID salva separatamente il token con `TokenDao.save` e l’utente
+  con `KeychainService.save`. Il percorso di rinnovo chiama `refreshSpid`;
+  il relativo DTO serializza soltanto `pa` e `rf`, senza un selettore di profilo.
+
+Questi risultati descrivono i percorsi analizzati del pacchetto Android;
+non verificano direttamente il comportamento dell’installazione iPhone
+dell’utente e non escludono altri flussi della piattaforma. Sono però
+coerenti con il riuso di accessi già memorizzati, senza richiedere un token
+universale per entrambi i figli. Il pacchetto non è stato verificato rispetto
+al certificato di firma di una copia ottenuta dallo store ufficiale.
+
+La procedura attualmente supportata dall’add-on è collegare una volta anche
+il secondo figlio tramite **Aggiungi account → Accedi con SPID / CIE**,
+selezionando il suo profilo su Spaggiari. Un account conservato dal vecchio
+login con password non contiene automaticamente una sessione SPID. Dopo
+il collegamento ciascun profilo conserva la propria sessione cifrata e il
+cambio tramite avatar non richiede una nuova autenticazione finché la
+sessione è valida o rinnovabile. Non occorre rimuovere il primo account.
+
 ### Accesso
 
 La versione 2.1.1 con estensione 1.0.1 corregge l’interruzione sulla scelta
